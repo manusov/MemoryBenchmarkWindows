@@ -1,5 +1,5 @@
 /*
- *  Memory benchmark engineering sample #1, windows x64 console application.
+ *  Memory benchmark engineering sample #2, windows x64 console application.
  *  Debug paradigm: Java GUI + C(CPP) console + Assenbler DLL.
  *  (C)2018 IC Book Labs.
  *
@@ -7,44 +7,42 @@
  *
  */
 
-/*
-TODO LOCAL:
-1) Add not existed patterns, verify all, include AVX512 under emulator.
-2) Replace MOVAPD to MOVAPS, MOVNTPD to MOVNTPS for SSE 1 functionality.
-3) Verify all instruction modes (but non-temporal when non-temporal option).
-
-Backports to NCRB.
- */
-
-/*
-TODO GLOBAL:
-I.
-9 steps by options, include detect platform capabilities.
-II.
-1) BUG: mbpsStatistics[100] size limited, allocate memory for array
-2) Console help.
-3) Ergonomic, frequency measurement delay must be in the correct moment.
-4) Use regularOutput subroutine for all parameters.
-5) Optimize by CONST keyword.
-6) Correct support for UNICODE strings: TCHAR, TEXT, TPRINTF,
-verify ASCII and UNICODE variants.
-III.
-Port for ia32.
-IV.
-Ports for linux.
-V.
-Java GUI. JavaCrossPlatformCPUID first JCA application:
-JCA = Java/C/Assembler.
----
-Support all options sequentally.
-DEBUG //printf( "\n\n%08X %08X %08X %08X", eax, ebx, ecx, edx );
-*/
-
 #include <windows.h>
 #include <stdio.h>
 #include <math.h>
 
-// Console routines declarations
+// Text strings control settings
+#define SMIN 3           // minimum option string length, example a=b
+#define SMAX 81          // maximum option string length
+#define PRINT_NAME  20   // number of chars before "=" for tabulation
+#define DEFAULT_COLOR FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE   // console colors
+#define BOLD_COLOR FOREGROUND_GREEN | FOREGROUND_INTENSITY
+
+// Definitions for option control list (regular input)
+typedef enum { 
+	INTPARM, MEMPARM, SELPARM, STRPARM 
+} OPTION_TYPES;
+
+typedef struct {
+    char* name;             // pointer to parm. name for recognition NAME=VALUE
+    char** values;          // pointer to array of strings pointers, text opt.
+    void* data;             // pointer to updated option variable
+    OPTION_TYPES routine;   // select handling method for this entry
+} OPTION_ENTRY;
+
+// Definitions for parameters visual list (regular output)
+typedef enum { 
+	INTEGER, MEMSIZE, SELECTOR, POINTER, HEX64, MHZ, STRNG 
+} PRINT_TYPES;
+
+typedef struct {
+    char* name;             // pointer to parameter name for visual NAME=VALUE 
+    char** values;          // pointer to array of strings pointers, text opt.
+    void* data;             // pointer to visualized option variable
+    PRINT_TYPES routine;    // select handling method for this entry
+} PRINT_ENTRY;
+
+// Definitions for console routines
 void delayBeforeExit();
 typedef struct COLOR_STRING
 {
@@ -52,7 +50,9 @@ typedef struct COLOR_STRING
 	LPSTR text;
 } CSTR;
 typedef CSTR* CSTRP;
-BOOL colorPrintGivenHandle( HANDLE handle, CSTRP colorStrings );
+
+// Console routines declarations
+BOOL colorPrint( CSTRP colorStrings );
 BOOL colorPrint( CSTRP colorStrings );
 BOOL clearScreen( WORD color );
 void displayGivenError(CHAR* opName, DWORD dwError);
@@ -60,11 +60,13 @@ void displayError(CHAR* opName);
 void clearConsoleBeforeExit();
 void abortApplication();
 void abortError(CHAR* errorString);
-// This functions yet without unicode support
 DWORD inputLine( LPSTR promptString, LPSTR returnLine, int returnSize );
 DWORD inputChar( LPSTR promptString, LPSTR returnChar, int returnSize );
-void NewLine(void); 
-void ScrollScreenBuffer(HANDLE, INT); 
+void waitAnyKey( LPSTR promptString );
+void newLine(void); 
+void scrollScreenBuffer(HANDLE, INT);
+void dllFunctionCheck( void *functionPointer, CHAR *functionName, CHAR *dllName );
+void optionCheck( DWORD currentSetting, DWORD defaultSetting, CHAR *optionName );
 
 // DLL entry points declarations, see parameters comments at assembler DLL
 void ( __stdcall *DLL_GetDllStrings   ) ( char** , char** , char** );
@@ -74,28 +76,63 @@ void ( __stdcall *DLL_ExecuteXgetbv   ) ( DWORDLONG* );
 BOOL ( __stdcall *DLL_MeasureTsc      ) ( DWORDLONG* );
 BOOL ( __stdcall *DLL_PerformanceGate ) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );
 
-// Text strings control settings
-#define SMIN 3           // minimum option string length, example a=b
-#define SMAX 81          // maximum option string length
-#define PRINT_NAME  20   // number of chars before "=" for tabulation
-#define DEFAULT_COLOR FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE   // console colors
-#define BOLD_COLOR FOREGROUND_GREEN | FOREGROUND_INTENSITY
+// Service procedures source files: headers
+#include "service\printhelpers.h"
+#include "service\regularinput.h"
+#include "service\regularoutput.h"
+#include "service\statistics.h"
 
-// Connect source files: headers
-#include "constants.h"
-#include "helpers.h"
-#include "input.h"
-#include "output.h"
-#include "statistics.h"
-#include "optioncpu.h"
+// Headers for system routines
+#include "system\cpuinfo.h"
+#include "system\memory.h"
 
-// Connect source files: code and data
-#include "constants.c"
-#include "helpers.c"
-#include "input.c"
-#include "output.c"
-#include "statistics.c"
-#include "optioncpu.c"
+// Headers for options
+#include "options\rwmethods.h"
+#include "options\rwtargets.h"
+#include "options\rwaccess.h"
+#include "options\hyperthreading.h"
+#include "options\pagesize.h"
+#include "options\numa.h"
+#include "options\precision.h"
+#include "options\machinereadable.h"
+
+// Service procedures source files: code and data
+#include "service\printhelpers.c"
+#include "service\regularinput.c"
+#include "service\regularoutput.c"
+#include "service\statistics.c"
+
+// System routines
+#include "system\cpuinfo.c"
+#include "system\memory.c"
+
+// Data structures for options
+#include "options\rwmethods.c"
+#include "options\rwtargets.c"
+#include "options\rwaccess.c"
+#include "options\hyperthreading.c"
+#include "options\pagesize.c"
+#include "options\numa.c"
+#include "options\precision.c"
+#include "options\machinereadable.c"
+
+// Default options settings
+#define NOT_SET -1           // constant means no overrides for option, set default or default=f(sys)
+#define AUTO_SET -2          // constant means auto-detect by platform configuration
+#define DEFAULT_RW_METHOD AUTO_SET       // default method for read-write memory
+#define DEFAULT_RW_TARGET L1_CACHE       // default tested object is L1 cache memory
+#define DEFAULT_RW_ACCESS AUTO_SET       // non-temporal data mode disabled by default
+#define DEFAULT_THREADS_COUNT AUTO_SET   // number of execution threads, default single thread
+#define DEFAULT_HYPER_THREADING HTOFF    // hyper-threading disabled by default
+#define DEFAULT_PAGE_SIZE MIN_PAGES      // default pages is minimal size, 4KB
+#define DEFAULT_NUMA_MODE NON_AWARE      // default NUMA mode is non aware
+#define DEFAULT_PRECISION SLOW           // default test mode is precision
+#define DEFAULT_MACHINEREADABLE MROFF    // machine readable output disabled by default
+#define DEFAULT_MIN_BLOCK 4096           // minimum size of default data block
+#define DEFAULT_MAX_BLOCK 65536          // maximum size of default data block
+#define DEFAULT_STEP_BLOCK 1024          // default step from min to max is 512 bytes
+#define DEFAULT_PAGE_MODE NORMAL         // default page mode, 0 means classic 4KB
+#define DEFAULT_BUF_ALIGN 4096           // alignment factor, 4KB is default page size for x86/x64
 
 // Console support data
 HANDLE hStdin, hStdout;                 // handles for standard IN , standard OUT
@@ -172,13 +209,13 @@ DWORDLONG hyperThreadingBitmap;
 // this variable = f(command line options)
 DWORD hyperThreadingSelect;
 
-// Bitmap of available paging modes
+// Bitmap of available page size modes
 // this variable = f(platform configuration detect)
-DWORDLONG pagingModesBitmap;
+DWORDLONG pageSizeBitmap;
 
-// selected paging modes support option
+// selected page size support option
 // this variable = f(command line options)
-DWORD pagingModeSelect;
+DWORD pageSizeSelect;
 
 // Bitmap of available NUMA modes
 // this variable = f(platform configuration detect)
@@ -204,26 +241,39 @@ DWORDLONG machineReadableBitmap;
 // this variable = f(command line options)
 DWORD machineReadableSelect;
 
-// Option control list, used for command line parameters parsing
-static OPTION_ENTRY option_list[] = {
-	{ "operation"       , rwMethods       , &rwMethodSelect        , SELPARM } ,
-	{ "target"          , rwTargets       , &rwTargetSelect        , SELPARM } ,
-	{ "access"          , rwAccess        , &rwAccessSelect        , SELPARM } ,
-	{ "threads"         , NULL            , &threadsCountSelect    , INTPARM } ,
-	{ "hyperthreading"  , hyperThreading  , &hyperThreadingSelect  , SELPARM } ,
-	{ "paging"          , pagingMode      , &pagingModeSelect      , SELPARM } ,
-	{ "numa"            , numaMode        , &numaModeSelect        , SELPARM } ,
-	{ "precision"       , precision       , &precisionSelect       , SELPARM } ,
-	{ "machinereadable" , machineReadable , &machineReadableSelect , SELPARM } ,
-	{ "start"           , NULL            , &blockStart            , MEMPARM } ,
+// CPU information
+CHAR cpuVendorString[13];
+CHAR cpuModelString[49];
+DWORDLONG tscClk = 0;
+double tscHz = 0.0;
+double tscNs = 0.0;
+
+// Product and vendor names text strings
+CHAR sName[]      = "Memory benchmark engineering sample #2.";
+CHAR sVersion[]   = "v0.00.00. With extended debug messages.";
+CHAR sCopyright[] = "(C)2018 IC Book Labs.";
+
+// Option control list, used for command line parameters parsing (regular input)
+static OPTION_ENTRY command_line_options_list[] = {
+    { "operation"       , rwMethods       , &rwMethodSelect        , SELPARM } ,
+    { "target"          , rwTargets       , &rwTargetSelect        , SELPARM } ,
+    { "access"          , rwAccess        , &rwAccessSelect        , SELPARM } ,
+    { "threads"         , NULL            , &threadsCountSelect    , INTPARM } ,
+    { "hyperthreading"  , hyperThreading  , &hyperThreadingSelect  , SELPARM } ,
+    { "pagesize"        , pageSize        , &pageSizeSelect        , SELPARM } ,
+    { "numa"            , numaMode        , &numaModeSelect        , SELPARM } ,
+    { "precision"       , precision       , &precisionSelect       , SELPARM } ,
+    { "machinereadable" , machineReadable , &machineReadableSelect , SELPARM } ,
+    { "start"           , NULL            , &blockStart            , MEMPARM } ,
     { "end"             , NULL            , &blockEnd              , MEMPARM } ,
     { "step"            , NULL            , &blockStep             , MEMPARM } ,
-	{ NULL              , NULL            , NULL                   , 0       }
+    { NULL              , NULL            , NULL                   , 0       }
 };
 
-static PRINT_ENTRY print_list[] = {
+// System configuration print list, used for system configuration visual (regular output)
+static PRINT_ENTRY test_parameters_print_list[] = {
 // YET DISABLED BECAUSE UNDER CONSTRUCTION
-    { "CPU operation"       , rwMethodsDetails       , &rwMethodSelect        , SELECTOR } ,
+//    { "CPU operation"       , rwMethodsDetails       , &rwMethodSelect        , SELECTOR } ,
 //    { "Target object"       , rwTargetsDetails       , &rwTargetSelect        , SELECTOR } ,
 //    { "Cacheability mode"   , rwAccessDetails        , &rwAccessSelect        , SELECTOR } ,
 //    { "Threads count"       , NULL                   , &threadsCountSelect    , INTEGER  } ,
@@ -245,16 +295,19 @@ static PRINT_ENTRY print_list[] = {
 void delayBeforeExit()
 {
 	// sleep(10);
-	inputChar( "Press any key...", inputBuffer, RETURN_SIZE );
+	// inputChar( "\n\nPress any key...", inputBuffer, RETURN_SIZE );
+	// printf("\n\nPress any key...");
+	// getchar();
+	waitAnyKey( "\n\nPress any key..." );
 }
 
 // Helper routine: color output 
-BOOL colorPrintGivenHandle( HANDLE handle, CSTRP colorStrings )
+BOOL colorPrint( CSTRP colorStrings )
 {
 	BOOL status1 = FALSE, status2 = FALSE;
 	int i = 0;
 	do {
-		status1 = SetConsoleTextAttribute(handle, colorStrings[i].attribute);
+		status1 = SetConsoleTextAttribute(hStdout, colorStrings[i].attribute);
 		if (status1)
 		{
 			printf(colorStrings[i].text);
@@ -265,13 +318,8 @@ BOOL colorPrintGivenHandle( HANDLE handle, CSTRP colorStrings )
 		}
 	i++;
 	} while ( colorStrings[i].text != NULL );
-	status2 = SetConsoleTextAttribute(handle, defaultColor);
+	status2 = SetConsoleTextAttribute(hStdout, defaultColor);
 	return status1 && status2;
-}
-
-BOOL colorPrint( CSTRP colorStrings )
-{
-	return colorPrintGivenHandle( hStdout, colorStrings );
 }
 
 // Helper routine: clear screen
@@ -372,7 +420,7 @@ DWORD inputLine( LPSTR promptString, LPSTR returnLine, int returnSize )
 {
     DWORD outputCount = 0;
     DWORD inputCount = 0;
-	// console input
+	// console output, prompt string
 	if (! WriteFile ( 
           hStdout,                  // output handle 
           promptString,             // prompt string 
@@ -382,7 +430,7 @@ DWORD inputLine( LPSTR promptString, LPSTR returnLine, int returnSize )
     {
         return 0;
     }
-		// console output
+		// console input, any key
     if (! ReadFile ( 
           hStdin,       // input handle 
           returnLine,   // buffer to read into 
@@ -420,35 +468,40 @@ DWORD inputChar( LPSTR promptString, LPSTR returnLine, int returnSize  )
 	
 	DWORD outputCount = 0;
     DWORD inputCount = 0;
-    
+    // output prompt string
     if (! WriteFile ( 
           hStdout,                 // output handle 
           promptString,            // prompt string 
           lstrlenA(promptString),  // string length 
           &outputCount,            // bytes written 
           NULL) )                  // not overlapped 
-    {
+    // if error, restore original console mode and return
+	{
         SetConsoleMode(hStdin, fdwOldMode);
 		return 0;
     }
-
+	// input 1 char
     if ( ! ReadFile( hStdin, returnLine, 1, &inputCount, NULL ) )
+    // if error, restore original console mode and return
 	{
 		SetConsoleMode(hStdin, fdwOldMode);
 		return 0;
-	} 
+	}
+	// if ENTER key, make new line and return 
     if ( returnLine[0] == '\r' )
     {
-        NewLine();
+        newLine();
         SetConsoleMode(hStdin, fdwOldMode);
         return returnLine[0];
     }
-    	
+    // output char to console	
     else if ( ! WriteFile(hStdout, returnLine, inputCount, &outputCount, NULL) )
+    // if error, return 0
     {
 		SetConsoleMode(hStdin, fdwOldMode);
 		return 0;
 	}
+	// if no errors, return this char
     else
     {
 		SetConsoleMode(hStdin, fdwOldMode);
@@ -456,11 +509,11 @@ DWORD inputChar( LPSTR promptString, LPSTR returnLine, int returnSize  )
 	}
 }
 
-// The NewLine function handles carriage returns when the processed 
+// The newLine function handles carriage returns when the processed 
 // input mode is disabled. It gets the current cursor position 
 // and resets it to the first cell of the next row. 
 
-void NewLine(void) 
+void newLine(void) 
 { 
     if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo)) 
     {
@@ -476,7 +529,7 @@ void NewLine(void)
 
     if ((csbiInfo.dwSize.Y-1) == csbiInfo.dwCursorPosition.Y) 
     { 
-        ScrollScreenBuffer(hStdout, 1); 
+        scrollScreenBuffer(hStdout, 1); 
     } 
 
     // Otherwise, advance the cursor to the next line. 
@@ -492,7 +545,7 @@ void NewLine(void)
     }
 } 
 
-void ScrollScreenBuffer(HANDLE h, INT x)
+void scrollScreenBuffer(HANDLE h, INT x)
 {
     SMALL_RECT srctScrollRect, srctClipRect;
     CHAR_INFO chiFill;
@@ -528,6 +581,60 @@ void ScrollScreenBuffer(HANDLE h, INT x)
         &chiFill);       // fill character and color 
 }
 
+// Wait any key
+void waitAnyKey( LPSTR promptString )
+{
+	if ( promptString != NULL )
+	{
+		printf(promptString);
+	}
+	BOOL keepRunning = 1;
+	while(keepRunning)
+	{
+		INPUT_RECORD event = {0};
+		DWORD readCount = 0;
+		if( PeekConsoleInput( hStdin, &event, 1, &readCount ) && readCount>0 )
+		{
+			if( ReadConsoleInput( hStdin, &event, 1, &readCount ) )
+			{
+				if( event.EventType == KEY_EVENT )
+				{
+					KEY_EVENT_RECORD keyEvent = event.Event.KeyEvent;
+					if ( keyEvent.bKeyDown == TRUE )
+					{
+						keepRunning = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+// verify after load DLL function, if error, show error message and exit
+void dllFunctionCheck( void *functionPointer, CHAR *functionName, CHAR *dllName )
+{
+    if ( functionPointer == NULL )
+    {
+    	int N = 100;
+		CHAR p[N+1];
+    	snprintf(p, N, "load function=%s from module=%s", functionName, dllName );
+		displayError( p );	
+	}
+}
+
+// verify current and default settings match, if mismatch, show error message and exit
+void optionCheck( DWORD currentSetting, DWORD defaultSetting, CHAR *optionName )
+{
+	if ( currentSetting != defaultSetting )
+	{
+    	int N = 100;
+		CHAR p[N+1];
+    	snprintf(p, N, "\n\nCannot change default \"%s\" option in the engineering release", optionName );
+		abortError( p );	
+	}
+	
+}
+
 // Application entry point
 
 int main(int argc, char** argv) {
@@ -554,17 +661,6 @@ int main(int argc, char** argv) {
 	oldDwMaximumWindowSize = csbiInfo.dwMaximumWindowSize;
 	dwConSize = oldDwSize.X * oldDwSize.Y;
 	
-// Debug input
-//	DWORD a;
-//	LPSTR b = "\nPlease input: ";
-//	// a = inputLine( b, inputBuffer, RETURN_SIZE );
-//	// printf( "\ninput count = %d", a );
-//	CHAR c;
-//	c = inputChar( b, inputBuffer, RETURN_SIZE );
-//	printf( "\ninput char = %c", c );
-//  ExitProcess(GetLastError());
-//
-	
 // Set console window title string
 	if ( !SetConsoleTitle( sName ) )
 	{
@@ -579,7 +675,7 @@ int main(int argc, char** argv) {
 	}
 	
 // First message with console parameters
-	CSTR cstrStarting[] = {	{ BOLD_COLOR , "Starting..." } , { 0, NULL } };
+	CSTR cstrStarting[] = {	{ BOLD_COLOR , "\nStarting..." } , { 0, NULL } };
 	colorPrint ( cstrStarting );
 	printf( "\nsize(%d,%d) cursor(%d,%d) attribute %04xh window(%d,%d,%d,%d) maximum(%d,%d)" , 
 	           oldDwSize.X, oldDwSize.Y, oldDwCursorPosition.X, oldDwCursorPosition.Y, oldWAttributes,
@@ -590,72 +686,67 @@ int main(int argc, char** argv) {
 	printf( "\n%s\n%s\n%s", sName , sVersion , sCopyright );
 	
 // Load DLL and functions
-	CSTR cstrLoad[] = {	{ BOLD_COLOR , "\nLoad DLL..." } , { 0, NULL } };
+	CSTR cstrLoad[] = {	{ BOLD_COLOR , "\n\nLoad DLL..." } , { 0, NULL } };
 	colorPrint ( cstrLoad );
-	hDLL = LoadLibrary( "test1.dll" );
+	CHAR* dllName = "test2.dll";
+	hDLL = LoadLibrary( dllName );
+	CHAR* functionName;
 	if( hDLL == NULL )
 	{
-		displayError( "load DLL" );	
+		int N = 100;
+		CHAR p[N+1];
+    	snprintf(p, N, "load module=%s", dllName );
+		displayError( p );	
 	}
 	// Load function = Get DLL strings
+	functionName = "GetDllStrings";
 	DLL_GetDllStrings = ( void (__stdcall *) ( char** , char** , char** ) )
-    GetProcAddress( hDLL, "GetDllStrings" );
-    if ( DLL_GetDllStrings == NULL )
-    {
-    	displayError( "load function GetDllStrings from DLL" );	
-	}
-	// Load function = Check CPUID support
+    GetProcAddress( hDLL, functionName );
+    dllFunctionCheck( DLL_GetDllStrings, functionName, dllName );
+    // Load function = Check CPUID support
+    functionName = "CheckCpuid";
 	DLL_CheckCpuid = ( BOOL (__stdcall *) ( void ) )
-    GetProcAddress( hDLL, "CheckCpuid" );
-    if ( DLL_CheckCpuid == NULL )
-    {
-    	displayError( "load function CheckCpuid from DLL" );	
-	}
-	// Load function = Execute CPUID
+    GetProcAddress( hDLL, functionName );
+    dllFunctionCheck( DLL_CheckCpuid, functionName, dllName );
+    // Load function = Execute CPUID
+    functionName = "ExecuteCpuid";
 	DLL_ExecuteCpuid = ( void (__stdcall *) ( DWORD, DWORD, DWORD*, DWORD*, DWORD*, DWORD* ) )
-    GetProcAddress( hDLL, "ExecuteCpuid" );
-    if ( DLL_ExecuteCpuid == NULL )
-    {
-    	displayError( "load function ExecuteCpuid from DLL" );	
-	}
-	// load function = Execute XGETBV
+    GetProcAddress( hDLL, functionName );
+    dllFunctionCheck( DLL_ExecuteCpuid, functionName, dllName );
+    // load function = Execute XGETBV
+    functionName = "ExecuteXgetbv";
 	DLL_ExecuteXgetbv = ( void (__stdcall *) ( DWORDLONG* ) )
-	GetProcAddress( hDLL, "ExecuteXgetbv" );
-    if ( DLL_ExecuteXgetbv == NULL )
-    {
-    	displayError( "load function ExecuteXgetbv from DLL" );	
-	}
-	// Load function = Measure TSC clock
+	GetProcAddress( hDLL, functionName );
+    dllFunctionCheck( DLL_ExecuteXgetbv, functionName, dllName );
+    // Load function = Measure TSC clock
+    functionName = "MeasureTsc";
 	DLL_MeasureTsc = ( BOOL (__stdcall *) ( DWORDLONG* ) )
-	GetProcAddress( hDLL, "MeasureTsc" );
-    if ( DLL_MeasureTsc == NULL )
-    {
-    	displayError( "load function MeasureTsc from DLL" );	
-	}
-	// Load function = Performance Gate
+	GetProcAddress( hDLL, functionName );
+    dllFunctionCheck( DLL_MeasureTsc, functionName, dllName );
+    // Load function = Performance Gate
+    functionName = "PerformanceGate";
 	DLL_PerformanceGate = ( BOOL (__stdcall *) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* ) )
-	GetProcAddress( hDLL, "PerformanceGate" );
-    if ( DLL_PerformanceGate == NULL )
-    {
-    	displayError( "load function PerformanceGate from DLL" );	
-	}
-
-// Get strings from DLL, output DLL strings: name, version, copyright
+	GetProcAddress( hDLL, functionName );
+	dllFunctionCheck( DLL_PerformanceGate, functionName, dllName );
+	// Get strings from DLL, show DLL strings: name, version, copyright
 	char *dllProduct, *dllVersion, *dllVendor;
 	DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
 	printf( "\n%s\n%s\n%s", dllProduct, dllVersion, dllVendor );
 	
-// Set default parameters: benchmark options
+// Set defaults, get command line with overrides, and visual parameters
+	CSTR cstrCmd[] = {	{ BOLD_COLOR , "\n\nGet command line parameters..." } , { 0, NULL } };
+	colorPrint ( cstrCmd );
+	// Set default parameters: benchmark options
 	rwMethodSelect = DEFAULT_RW_METHOD;               // default method for read-write memory
 	rwTargetSelect = DEFAULT_RW_TARGET;               // default tested object is L1 cache memory
 	rwAccessSelect = DEFAULT_RW_ACCESS;               // non-temporal data mode disabled by default
 	threadsCountSelect = DEFAULT_THREADS_COUNT;       // number of execution threads, default single thread
 	hyperThreadingSelect = DEFAULT_HYPER_THREADING;   // hyper-threading disabled by default
+	pageSizeSelect = DEFAULT_PAGE_SIZE;               // page size minimal=4KB by default
 	numaModeSelect = DEFAULT_NUMA_MODE;               // default NUMA mode is non aware
 	precisionSelect = DEFAULT_PRECISION;              // default test mode is precision
 	machineReadableSelect = DEFAULT_MACHINEREADABLE;  // machine readable output disabled by default
-	
-// Set default parameters: memory blocks base and size
+	// Set default parameters: memory blocks base and size
 	blockStart = DEFAULT_MIN_BLOCK;
 	blockEnd = DEFAULT_MAX_BLOCK;
 	blockStep = DEFAULT_STEP_BLOCK;
@@ -665,235 +756,105 @@ int main(int argc, char** argv) {
 	bufferSize = 2 * blockMax + bufferAlignment;
 	bufferAlignedSrc = NULL;
 	bufferAlignedDst = NULL;
-
-// Get command line and visual parameters
-	CSTR cstrCmd[] = {	{ BOLD_COLOR , "\nGet command line parameters..." } , { 0, NULL } };
-	colorPrint ( cstrCmd );
-	regularInput ( argc, argv, option_list );
-
-// Verify input parameters validity	
-	if ( rwMethodSelect != DEFAULT_RW_METHOD )
-	{
-		abortError( "\n\nError, cannot cahnge default RW_METHOD option in the engineering release" );
-	}
-	
-	if ( rwTargetSelect != DEFAULT_RW_TARGET )
-	{
-		abortError( "\n\nError, cannot cahnge default RW_TARGET option in the engineering release" );
-	}
-	
-	if ( rwAccessSelect != DEFAULT_RW_ACCESS )
-	{
-		abortError( "\n\nError, cannot cahnge default RW_ACCESS option in the engineering release" );
-	}
-	
-	if ( threadsCountSelect != DEFAULT_THREADS_COUNT )
-	{
-		abortError( "\n\nError, cannot cahnge default THREADS_COUNT option in the engineering release" );
-	}
-	
-	if ( hyperThreadingSelect != DEFAULT_HYPER_THREADING )
-	{
-		abortError( "\n\nError, cannot cahnge default HYPER_THREADING option in the engineering release" );
-	}
-	
-	if ( numaModeSelect != DEFAULT_NUMA_MODE )
-	{
-		abortError( "\n\nError, cannot cahnge default NUMA_MODE option in the engineering release" );
-	}
-	
-	if ( precisionSelect != DEFAULT_PRECISION )
-	{
-		abortError( "\n\nError, cannot cahnge default PRECISION option in the engineering release" );
-	}
-	
-	if ( machineReadableSelect != DEFAULT_MACHINEREADABLE )
-	{
-		abortError( "\n\nError, cannot cahnge default MACHINEREADABLE option in the engineering release" );
-	}
-	
-// Start get CPU parameters
-	CSTR cstrCpu[] = {	{ BOLD_COLOR , "\nGet processor information..." } , { 0, NULL } };
-	colorPrint ( cstrCpu );
+	// Additional temporary variables
 	BOOL status;
-	DWORD eax, ebx, ecx, edx;
-	DWORDLONG hz;
-	double frequency, nanoseconds;
-	status = DLL_CheckCpuid();
-	if ( status == 0 )
-	{
-		abortError( "\n\nError, CPUID instruction not supported or locked" );
-	}
-
-// Get platform parameters: get CPU strings
-	DLL_ExecuteCpuid( 0, 0, &eax, &ebx, &ecx, &edx );
-	typedef union {
-		CHAR s8[52]; DWORD s32[13];
-	} CPUID_STRING;
-	CPUID_STRING cpuidString;
-	// Vendor string
-	cpuidString.s32[0] = ebx;
-	cpuidString.s32[1] = edx;
-	cpuidString.s32[2] = ecx;
-	cpuidString.s32[3] = 0;
-	printf( "\nCPU Vendor = %s", cpuidString.s8 );
-	// Model string
-	strcpy( cpuidString.s8 , "n/a" );
-	DLL_ExecuteCpuid( 0x80000000, 0, &eax, &ebx, &ecx, &edx );
-	if ( eax >= 0x80000004 )
-	{
-		DWORD function = 0x80000002;
-		int i = 0;
-		for( i=0; i<12; i+=4 )
-		{
-			DLL_ExecuteCpuid( function, 0, &eax, &ebx, &ecx, &edx );
-			cpuidString.s32[i+0] = eax;
-			cpuidString.s32[i+1] = ebx;
-			cpuidString.s32[i+2] = ecx;
-			cpuidString.s32[i+3] = edx;
-			function++;
-		}
-		cpuidString.s32[i] = 0;
-		CHAR* p1 = cpuidString.s8;
-		CHAR* p2 = p1;
-		BOOLEAN flag = FALSE;
-		while ( *p1 != 0 )
-		{
-			if ( ( *p1 != ' ' ) || ( flag == TRUE ) )
-			{
-				flag = TRUE;
-				*p2 = *p1;
-				p2++;
-			}
-		p1++;	
-		}
-		*p2 = 0;
-	}
-	printf( "\nCPU Model  = %s", cpuidString.s8 );
-
-// Get platform parameters: measure CPU TSC frequency
-	status = DLL_MeasureTsc( &hz );
-	if ( status == 0 )
-	{
-		abortError( "\n\nError, TSC clock measurement failed" );
-	}
-	frequency = hz;
-	frequency /= 1000000.0;                      // frequency visualization units = MHz
-	nanoseconds = hz;
-	nanoseconds = 1000000000.0 / nanoseconds;    // period visualization units = ps (picoseconds)
-	printf( "\nTSC frequency = %.2f , period = %.3f ns", frequency , nanoseconds );
+	DWORD errorCode;
+	DWORDLONG bitmapCpu, bitmapOs;
+	DWORDLONG mask;
+	DWORD tempSelection;
+	// Get and interpreting command line parameters, override defaults
+	regularInput ( argc, argv, command_line_options_list );
+	// Verify options settings, include engineering sample limitations
+	optionCheck ( rwMethodSelect, DEFAULT_RW_METHOD, command_line_options_list[0].name );
+	optionCheck ( rwTargetSelect, DEFAULT_RW_TARGET, command_line_options_list[1].name );
+	optionCheck ( rwAccessSelect, DEFAULT_RW_ACCESS, command_line_options_list[2].name );
+	optionCheck ( threadsCountSelect, DEFAULT_THREADS_COUNT, command_line_options_list[3].name );
+	optionCheck ( hyperThreadingSelect, DEFAULT_HYPER_THREADING, command_line_options_list[4].name );
+	optionCheck ( pageSizeSelect, DEFAULT_PAGE_SIZE, command_line_options_list[5].name );
+	optionCheck ( numaModeSelect, DEFAULT_NUMA_MODE, command_line_options_list[6].name );
+	optionCheck ( precisionSelect, DEFAULT_PRECISION, command_line_options_list[7].name );
+	optionCheck ( machineReadableSelect, DEFAULT_MACHINEREADABLE, command_line_options_list[8].name );
 	
-// Get platform parameters: get CPU features
-	DWORDLONG bitsCpuid=0, bitsXgetbv=0;
-	bitsCpuid  = buildCpuidBitmap ( cpuidControl );
-	bitsXgetbv = buildXgetbvBitmap( xgetbvControl );
-	rwMethodsBitmap = bitsCpuid & bitsXgetbv;
-
-// Verify platform parameters and user option validity: CPU read-write method
-	DWORDLONG mask = 0;
-	if ( rwMethodSelect == AUTO_SET )  // required select method = f(platform capabilities)
+// Get and output CPU vendor and model strings
+	CSTR cstrCpuid[] = { { BOLD_COLOR , "\n\nGet CPUID parameters and measure TSC clock..." } , { 0, NULL } };
+	colorPrint ( cstrCpuid );
+	status = detectCpu( cpuVendorString, cpuModelString );
+	if ( status == 0 )
 	{
-		// Try AVX512 read memory method
-		rwMethodSelect = CPU_FEATURE_READ_AVX512;
-		mask = ((DWORDLONG)1) << rwMethodSelect;
-		if ( ! (mask & rwMethodsBitmap) )
-		{
-			rwMethodSelect = CPU_FEATURE_READ_AVX256;
-		}
-		// Try AVX256 read memory method
-		mask = ((DWORDLONG)1) << rwMethodSelect;
-		if ( ! (mask & rwMethodsBitmap) )
-		{
-			rwMethodSelect = CPU_FEATURE_READ_SSE128;
-		}
-		// Try SSE128 read memory method
-		mask = ((DWORDLONG)1) << rwMethodSelect;
-		if ( ! (mask & rwMethodsBitmap) )
-		{
-			rwMethodSelect = CPU_FEATURE_READ_X64;
-		}
-		// Try common x86-64 read memory method
-		mask = ((DWORDLONG)1) << rwMethodSelect;
-		if ( ! (mask & rwMethodsBitmap) )
-		{
-			abortError( "\n\nError, compatible RW_METHOD not found" );
-		}
+		abortError( "\n\nCPUID instruction not supported or locked" );
+	}
+	printCpu( cpuVendorString, cpuModelString );
+// Measure and output CPU TSC frequency
+	errorCode = measureTsc( &tscClk, &tscHz, &tscNs );
+	if ( errorCode == 1)
+	{
+		abortError( "\n\nTSC not supported or locked" );
+	}
+	else if ( errorCode > 1 )
+	{
+		abortError( "\n\nTSC clock measurement failed" );
+	}
+	printTsc( tscHz, tscNs );
+// Detect and output supported read-write methods bitmap, by CPU and OS
+	detectMethods( &tempSelection, &rwMethodsBitmap, &bitmapCpu, &bitmapOs );
+	printMethods( tempSelection, rwMethodsBitmap, bitmapCpu, bitmapOs, rwMethodsDetails );
+	if ( tempSelection == -1 )
+	{
+		abortError( "\n\nCannot select read/write method" );
 	}
 	// Check for incorrect constant assign
+	if ( rwMethodSelect == AUTO_SET )  // required select method = f(platform capabilities)
+	{
+		rwMethodSelect = tempSelection;
+	}
 	else if ( rwMethodSelect == NOT_SET )  // wrong case 
 	{
-		abortError( "\n\nError, wrong internal settings for RW_METHOD option" );
+		abortError( "\n\nWrong internal settings for read/write method option" );
 	}
 	else  // required verification of user settings
 	{
 		mask = ((DWORDLONG)1) << rwMethodSelect;
-		if ( ! (bitsCpuid & mask ) )
+		if ( ! ( bitmapCpu & mask ) )
 		{
-			abortError( "\n\nError, selected RW_METHOD not supported by CPU" );
+			abortError( "\n\nSelected read/write method not supported by CPU" );
 		}
-		if ( ! (bitsXgetbv & mask ) )
+		if ( ! ( bitmapOs & mask ) )
 		{
-			abortError( "\n\nError, selected RW_METHOD not supported by OS context management" );
+			abortError( "\n\nSelected read/write method not supported by OS context management" );
 		}
 	}
-	
-	/* DEBUG
-	printf("\n\ncpuid map=%08X%08Xh, xgetbv map=%08X%08Xh, select=%08Xh\n" , 
-	        bitsCpuid >> 32, bitsCpuid, 
-			bitsXgetbv >> 32, bitsXgetbv,
-			rwMethodSelect );  // DEBUG
-	// printf("\n\nbitmap = %08X%08Xh , select %08Xh\n" , rwMethodsBitmap >> 32, rwMethodsBitmap, rwMethodSelect );  // DEBUG
-	// rwMethodsBitmap = CPU_FEATURES_UNCONDITIONAL;
-	printf("\n\nmethod=%d\n\n", rwMethodSelect);
-	rwMethodSelect = 0;  // DEBUG
-	DEBUG */	
 
-// Get platform parameters: detect cache memory
+// Other options support under construction.
+
+// ...
 
 
-// Verify platform parameters and user option validity: cache memory
-
-// Get platform parameters: detect threads count
-
-// Verify platform parameters and user option validity: threads count
-
-// Get platform parameters: detect page size
-
-// Verify platform parameters and user option validity: page size
-
-// Get platform parameters: detect NUMA configuration
-
-// Verify platform parameters and user option validity: NUMA mode
-
-
-// Get platform parameters: allocate memory (optional NUMA aware)
-	bufferBase = VirtualAlloc( NULL, bufferSize, MEM_COMMIT, PAGE_READWRITE );
-	if ( bufferBase == NULL )
-	{
-		displayError( "memory allocation" );
-	}
-	DWORD_PTR x1 = (DWORD_PTR)bufferBase;
-	DWORD_PTR x2 = x1 % bufferAlignment;
-	if ( x2 != 0 )
-	{
-		x2 = bufferAlignment - x2;
-		x1 += x2;
-	}
-	bufferAlignedSrc = (LPVOID)x1;
-	bufferAlignedDst = (LPVOID)(x1 + blockMax);
-	
-// Verify input parameters compatible with platform	
-
+// Memory allocation
+	allocateBuffer( bufferSize, bufferAlignment, blockMax, 
+                    &bufferBase, &bufferAlignedSrc, &bufferAlignedDst );
 
 // Output test operational parameters summary
-	CSTR cstrOparm[] = {	{ BOLD_COLOR , "\nReady to start with parameters..." } , { 0, NULL } };
+	CSTR cstrOparm[] = {	{ BOLD_COLOR , "\n\nReady to start with parameters..." } , { 0, NULL } };
 	colorPrint ( cstrOparm );
-	regularOutput ( print_list );
-
+	regularOutput ( test_parameters_print_list );
+	
 // Wait user press key (y/n)
-
-
+	char c = inputChar("\nStart (y/n) ? ", inputBuffer, 1);
+	c = tolower(c);
+	if ( c != 'y' )
+	{
+		releaseBuffer( bufferBase );
+		printf("\nExiting...\n" );
+		clearConsoleBeforeExit();
+    	ExitProcess(GetLastError());
+	} 
+	
 // Start benchmarking process
+
+	BYTE bytesPerInstruction[] = {
+	8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+	};
+
 	DWORDLONG deltaTSC = 0;
 	size_t repeatsCount = 2000000;
 	size_t instructionsCount = 0;
@@ -901,12 +862,15 @@ int main(int argc, char** argv) {
 	double cpi = 0.0;
 	double nspi = 0.0;
 	double megabytes = 0.0;
-	double seconds = 1.0 / hz;
+	double seconds = 1.0 / tscHz;
 	double mbps = 0.0;
 	
-	double mbpsStatistics[100];
+	int stepsCount = ( blockEnd - blockStart ) / blockStep + 1;
+	int arraySize = stepsCount * sizeof(double);
+	double *mbpsStatistics;
+	mbpsStatistics = (double*)malloc(arraySize);
 	
-	CSTR cstrRun[] = {	{ BOLD_COLOR , "\n   #    size   CPI     nsPI    MBPS\n\n" } , { 0, NULL } };
+	CSTR cstrRun[] = {	{ BOLD_COLOR , "\n\n   #    size   CPI     nsPI    MBPS\n\n" } , { 0, NULL } };
 	colorPrint ( cstrRun );
 	
     // pre-heat
@@ -930,7 +894,7 @@ int main(int argc, char** argv) {
 		}
 		cpi = deltaTSC;
         cpi /= ( instructionsCount * repeatsCount );
-        nspi = cpi * nanoseconds;
+        nspi = cpi * tscNs;
         mbps = blockStart * repeatsCount;
         mbps /= deltaTSC * seconds;
 		mbps /= 1000000.0;
@@ -947,6 +911,9 @@ int main(int argc, char** argv) {
 // Output test result parameters summary
 	printf( "\nMBPS max=%.2f , min=%.2f , average=%.2f , median=%.2f\n\n",
 	                max , min , average , median );
+
+// Memory release
+	releaseBuffer( bufferBase );
 
 // Restore screen and exit
 	delayBeforeExit();

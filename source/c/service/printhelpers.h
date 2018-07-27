@@ -1,6 +1,6 @@
 /*
- *   Common helpers subroutines and associated data structures declaration.
- *   Don't move tj this file routines, associated with current console context.
+ *   Common strings write helpers subroutines and associated data structures declaration.
+ *   Don't move to this file routines, associated with current console context.
  */
 
 #define KILO 1024

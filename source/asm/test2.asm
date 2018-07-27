@@ -191,7 +191,8 @@ mov [rcx],rax
 mov eax,-1
 ret
 
-; Performance patterns
+; Include files connect for performance patterns
+; Temporal (cacheable read and write) mode
 include 'read_mov64.inc'
 include 'write_mov64.inc'
 include 'copy_mov64.inc'
@@ -209,15 +210,34 @@ include 'write_avx512.inc'
 include 'copy_avx512.inc'
 include 'dot_fma256.inc'
 include 'dot_fma512.inc'
+; Non-temporal (non-cacheable write) mode
+include 'ntwrite_sse128.inc'
+include 'ntcopy_sse128.inc'
+include 'ntwrite_avx256.inc'
+include 'ntcopy_avx256.inc'
+include 'ntwrite_avx512.inc'
+include 'ntcopy_avx512.inc'
+; Non-temporal (non-cacheable read and write) mode
+include 'ntread_sse128.inc'
+include 'ntrcopy_sse128.inc'
+include 'ntread_avx256.inc'
+include 'ntrcopy_avx256.inc'
+include 'ntread_avx512.inc'
+include 'ntrcopy_avx512.inc'
+; Non-temporal (non-cacheable read-by-prefetch and write) mode
+include 'ntpread_sse128.inc'
+include 'ntpread_avx256.inc'
 
 ; Data section
 section '.data' data readable writeable
-StringProduct    DB 'Memory benchmark DLL for sample #1.',0
+StringProduct    DB 'Memory benchmark DLL for sample #2.',0
 StringVersion    DB 'v0.00.00',0
 StringCopyright  DB '(C)2018 IC Book Labs.',0
 
+; Pointers to performance patterns
 align 8
 PerformancePatterns:
+; Temporal (cacheable read and write) mode
 DQ  Pattern_Read_MOV64
 DQ  Pattern_Write_MOV64
 DQ  Pattern_Copy_MOV64
@@ -235,6 +255,27 @@ DQ  Pattern_Write_AVX512
 DQ  Pattern_Copy_AVX512
 DQ  Pattern_Dot_FMA256  
 DQ  Pattern_Dot_FMA512  
+; Non-temporal (non-cacheable write) mode 
+DQ  Pattern_NtWrite_SSE128
+DQ  Pattern_NtCopy_SSE128   ; This duplicated 1
+DQ  Pattern_NtWrite_AVX256
+DQ  Pattern_NtCopy_AVX256
+DQ  Pattern_NtWrite_AVX512
+DQ  Pattern_NtCopy_AVX512
+; Non-temporal (non-cacheable read and write) mode
+DQ  Pattern_NtRead_SSE128
+DQ  Pattern_NtRCopy_SSE128
+DQ  Pattern_NtRead_AVX256
+DQ  Pattern_NtRCopy_AVX256
+DQ  Pattern_NtRead_AVX512   
+DQ  Pattern_NtRCopy_AVX512
+; Non-temporal (non-cacheable read-by-prefetch and write) mode
+DQ  Pattern_NtpRead_SSE128
+DQ  Pattern_NtCopy_SSE128   ; This duplicated 1
+DQ  Pattern_NtpRead_AVX256
+; Reserved for same 256-512 bit operations
+; FMA with non-temporal store
+; Reserved 
 
 ; Export section
 section '.edata' export data readable

@@ -1,21 +1,6 @@
 /*
- *   Data constants.
+ *   Read-write methods options names strings and control data.
  */
-
-// Global text strings
-TCHAR sName[]      = "Memory benchmark engineering sample #1.";
-TCHAR sVersion[]   = "v0.00.00. With extended debug messages.";
-TCHAR sCopyright[] = "(C)2018 IC Book Labs.";
-
-// Enumeration of assembler read-write subroutines, memory read-write method select
-typedef enum {
-	READ_X64, WRITE_X64, COPY_X64, MODIFY_X64, 
-	WRITE_STRINGS_X64, COPY_STRINGS_X64,
-	READ_SSE128, WRITE_SSE128, COPY_SSE128,
-	READ_AVX256, WRITE_AVX256, COPY_AVX256,
-	READ_AVX512, WRITE_AVX512, COPY_AVX512,
-	DOT_FMA256, DOT_FMA512
-} RW_METHOD;
 
 // Text strings for option recognition and visual
 static char* rwMethods[] = { 
@@ -25,84 +10,6 @@ static char* rwMethods[] = {
 	"readavx256", "writeavx256", "copyavx256",
 	"readavx512", "writeavx512", "copyavx512",
 	"dotfma256", "dotfma512",
-	NULL
-};
-
-// Enumeration of target tested objects, argument for select block size and number of threads
-typedef enum {
-	L1_CACHE, L2_CACHE, L3_CACHE, L4_CACHE, DRAM
-} RW_TARGET;
-
-// Text strings for option recognition and visual
-static char* rwTargets[] = {
-	"l1cache", "l2cache", "l3cache", "l4cache", "dram",
-	NULL
-};
-
-// Enumeration of speculative (cacheable) memory access modes
-// temporal means cacheable, non-temporal means non cacheable
-typedef enum {
-	TEMPORAL, NON_TEMPORAL, DEFAULT_CACHING
-} RW_ACCESS;
-
-// Text strings for option recognition and visual
-static char* rwAccess[] = {
-	"temporal", "nontemporal", "default",
-	NULL
-};
-
-// Enumeration of hyper-threading support options
-typedef enum {
-	HTOFF, HTON
-} HYPER_THREADING;
-
-// Text strings for option recognition and visual
-static char* hyperThreading[] = {
-	"off", "on"
-};
-
-// Enumeration of paging options
-typedef enum {
-	DEFAULT_PAGES, LARGE_PAGES
-} PAGING_MODE;
-
-// Text strings for option recognition and visual
-static char* pagingMode[] = {
-	"default", "large",
-	NULL
-};
-
-// Enumeration of NUMA topology support options
-typedef enum {
-	NON_AWARE, FORCE_OPTIMAL, FORCE_NON_OPTIMAL
-} NUMA_MODE;
-
-// Text strings for option recognition and visual
-static char* numaMode[] = {
-	"nonaware", "forceoptimal", "forcenonoptimal",
-	NULL
-};
-
-// Enumeration of benchmark precision modes,
-// can select FAST or SLOW (better precision, but slow)
-typedef enum {
-	SLOW, FAST
-} PRECISION_MODE;
-
-// Text strings for option recognition and visual
-static char* precision[] = {
-	"slow", "fast",
-	NULL
-};
-
-// Enumeration of machine readable output modes
-typedef enum {
-	MROFF, MRON
-} MACHINEREADABLE_MODE;
-
-// Text strings for option recognition and visual
-static char* machineReadable[] = {
-	"off", "on",
 	NULL
 };
 
@@ -127,9 +34,9 @@ static char* rwMethodsDetails[] = {
 	"Dot product FMA-512 (VFMADD231)",
 	// Additions for non-temporal Write
 	"Non-temporal write SSE-128 (MOVNTPS)",
-	"Non-temporal copy SSE-128 (MOVAPS+MOVNTPS)",
+	"Non-temporal copy SSE-128 (MOVAPS+MOVNTPS)",    // this duplicated 1
 	"Non-temporal write AVX-256 (VMOVNTPD)",
-	"Non-temporal copy AVX-256 (VMOVAPD+VMOVNTPD)",
+	"Non-temporal copy AVX-256 (VMOVAPD+VMOVNTPD)",    // this duplicated 2, wrong
 	"Non-temporal write AVX-512 (VMOVNTPD)",
 	"Non-temporal copy AVX-512 (VMOVAPD+VMOVNTPD)",
 	// Additions for non-temporal Read
@@ -141,49 +48,19 @@ static char* rwMethodsDetails[] = {
 	"Non-temporal copy AVX-512 (VMOVNTDQA+VMOVNTPD)",
 	// Additions for non-temporal Read if CPU not supports (V)MOVNTDQA
 	// also if (V)MOVNTDQA is supported, but non-optimal
+	// based on PREFETCHNTA hint
 	"Non-temporal read SSE-128 (PREFETCHNTA+MOVAPS)",
-	"Non-temporal copy SSE-128 (PREFETCHNTA+MOVAPS+MOVNTPS)",
-	"Non-temporal read AVX-256 (PREFETCHNTA+VMOVAPD)"
-	"Non-temporal copy AVX-256 (PREFETCHNTA+VMOVAPD)"
-	"Non-temporal read AVX-512 (PREFETCHNTA+VMOVAPD)"
-	"Non-temporal copy AVX-512 (PREFETCHNTA+VMOVAPD)"
-	
-};
-
-static BYTE bytesPerInstruction[] = {
-	8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
-};
-
-static char* rwTargetsDetails[] = {
-	"L1 cache", "L2 cache", "L3 cache", "L4 cache", "DRAM"
-};
-
-static char* rwAccessDetails[] = {
-	"Temporal", "Non-temporal", "Default"
-};
-
-static char* hyperThreadingDetails[] = {
-	"Supported but disabled", "Enabled", "Not supported"
-};
-
-static char* pagingModeDetails[] = {
-	"Normal", "Large"
-};
-
-static char* numaModeDetails[] = {
-	"Non-aware", "Force optimal", "Force non-optimal"
-};
-
-static char* precisionDetails[] = {
-	"Slow and carefully", "Fast"
-};
-
-static char* machineReadableDetails[] = {
-	"Off", "On"
+	"Non-temporal copy SSE-128 (PREFETCHNTA+MOVAPS+MOVNTPS)",  // this duplicated 1
+	"Non-temporal read AVX-256 (PREFETCHNTA+VMOVAPD)",
+	// Reserved for extensions
+	// "Non-temporal copy AVX-256 (PREFETCHNTA+VMOVAPD)"
+	// "Non-temporal read AVX-512 (PREFETCHNTA+VMOVAPD)"
+	// "Non-temporal copy AVX-512 (PREFETCHNTA+VMOVAPD)"
+	// Reserved for FMA with non-temporal store
+	NULL
 };
 
 // Control structure for detect optional supported CPU features
-
 static CPUID_CONDITION cpuidControl[] = {
 	// Unconditional x86-64 instructions
 	{ ORMASK      , 0          , 0          , UNCOND , 0                       , CPU_FEATURES_UNCONDITIONAL },
@@ -206,7 +83,8 @@ static CPUID_CONDITION cpuidControl[] = {
 	{ ANDMASKLAST , 0x00000001 , 0x00000000 , ECX    , 1<<27                   , CPU_FEATURES_AVX512        }
 };
 
-static XGETBV_CONDITION xgetbvControl[] ={
+// Control structure for detect optional supported OS context management features
+static XGETBV_CONDITION xgetbvControl[] = {
 	{ UNCOND     , 0                           , CPU_FEATURES_UNCONDITIONAL },
 	{ UNCOND     , 0                           , CPU_FEATURES_SSE128        },
 	{ UNCOND     , 0                           , CPU_FEATURES_MOVNTDQA128   },
@@ -218,5 +96,121 @@ static XGETBV_CONDITION xgetbvControl[] ={
 };
 
 
+DWORDLONG buildCpuidBitmap( CPUID_CONDITION x[] )
+{
+	DWORDLONG y = 0;
+	int i = 0;
+	BOOLEAN featureSupported = FALSE;
+	do
+	{
+		featureSupported = getCpuidFeature( x[i].function, x[i].subfunction, x[i].reg, x[i].testBitmap );
+		if ( x[i].maskType == UNCOND )
+		{
+			y |= x[i].patchBitmap;
+		}
+		else if ( ( x[i].maskType == ORMASK ) || ( x[i].maskType == ORMASKLAST ) )
+		{
+			if (featureSupported)
+			{
+				y |= x[i].patchBitmap;
+			}
+		}
+		else if ( ( x[i].maskType == ANDMASK ) || ( x[i].maskType == ANDMASKLAST ) )
+		{
+			if (!featureSupported)
+			{
+				y &= ( ~ ( x[i].patchBitmap ) );
+			}
+		}
+		i++;
+	} while ( ( x[i-1].maskType != ORMASKLAST )&&( x[i-1].maskType != ANDMASKLAST )&&( x[i-1].maskType != UNCONDLAST ) );
+	
+	return y;
+}
+
+DWORDLONG buildXgetbvBitmap( XGETBV_CONDITION x[] )
+{
+	DWORDLONG y = 0;
+	int i = 0;
+	BOOLEAN featureSupported = FALSE;
+	do
+	{
+	featureSupported = getXgetbvFeature( x[i].testBitmap );
+	if ( x[i].maskType == UNCOND )
+		{
+			y |= x[i].patchBitmap;
+		}
+		else if ( ( x[i].maskType == ORMASK ) || ( x[i].maskType == ORMASKLAST ) )
+		{
+			if (featureSupported)
+			{
+				y |= x[i].patchBitmap;
+			}
+		}
+		else if ( ( x[i].maskType == ANDMASK ) || ( x[i].maskType == ANDMASKLAST ) )
+		{
+			if (!featureSupported)
+			{
+				y &= ( ~ ( x[i].patchBitmap ) );
+			}
+		}
+	i++;
+	} while ( ( x[i-1].maskType != ORMASKLAST )&&( x[i-1].maskType != ANDMASKLAST )&&( x[i-1].maskType != UNCONDLAST ) );
+	
+	return y;
+}
+
+void detectMethods( DWORD *select, DWORDLONG *bitmap, DWORDLONG *bitmapCpu, DWORDLONG *bitmapOs )
+{
+	*bitmapCpu = buildCpuidBitmap( cpuidControl );
+	*bitmapOs = buildXgetbvBitmap( xgetbvControl );
+	*bitmap = ( *bitmapCpu ) & ( *bitmapOs );
+	DWORD mask = 0;
+	// Try AVX512 read memory method
+	*select = CPU_FEATURE_READ_AVX512;
+	mask = ((DWORDLONG)1) << *select;
+	if ( ! (mask & *bitmap) )
+	{
+		*select = CPU_FEATURE_READ_AVX256;
+	}
+	// Try AVX256 read memory method
+	mask = ((DWORDLONG)1) << *select;
+	if ( ! (mask & *bitmap) )
+	{
+		*select = CPU_FEATURE_READ_SSE128;
+	}
+	// Try SSE128 read memory method
+	mask = ((DWORDLONG)1) << *select;
+	if ( ! (mask & *bitmap) )
+	{
+		*select = CPU_FEATURE_READ_X64;
+	}
+	// Try common x86-64 read memory method
+	mask = ((DWORDLONG)1) << *select;
+	if ( ! (mask & *bitmap) )
+	{
+		*select = -1;
+	}
+}
+
+void printMethods( DWORD select, DWORDLONG bitmap, DWORDLONG bitmapCpu, DWORDLONG bitmapOs, CHAR *methodsNames[] )
+{
+	printf("\n-------------------------------------------------------------------");
+	printf("\n  # CPU OS Operation and CPU instruction used");
+	printf("\n-------------------------------------------------------------------");
+	int i = 0;
+	int a, b;
+	while ( methodsNames[i] != NULL )
+	{
+		a = bitmapCpu & 1;
+		b = bitmapOs & 1;
+		printf("\n %2d  %-2d %-2d %s", i, a, b, methodsNames[i] );
+		bitmapCpu = bitmapCpu >> 1;
+		bitmapOs = bitmapOs >> 1;
+		i++;
+	}
+	printf("\n-------------------------------------------------------------------");
+	printf("\nDefault selection = %d , bitmap = %08X%08Xh", select, bitmap >> 32, bitmap );
+}
 
 
