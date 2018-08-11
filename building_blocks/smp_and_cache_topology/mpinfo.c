@@ -3,6 +3,14 @@
  * Build 4 information blocks: dump, topology list, cache list, summary.
  */
 
+/*
+TODO:
+1) Don't clear screen fully.
+2) When wait any key, don't use ALT, CONTROL, SHIFT.
+Or alternative variant, otherwise ALT-PrintScreen at PowerShell not possible.
+*/
+
+
 // Standard includes
 #include <stdio.h>
 #include <windows.h>
@@ -28,7 +36,7 @@ typedef CSTR* CSTRP;
 #include "system\getlpi.c"
 // Title and service strings include copyright
 CHAR* stringTitle1 = "Multiprocessing topology information by OS API.";
-CHAR* stringTitle2 = "v0.00. (C)2018 IC Book Labs.";
+CHAR* stringTitle2 = "v0.01. (C)2018 IC Book Labs.";
 CHAR* stringAnyKey = "Press any key...";
 // Console support data
 HANDLE hStdin, hStdout;                // handles for standard IN , standard OUT
@@ -173,7 +181,7 @@ void exitWithSystemError( CHAR* operationName )
     LocalFree( lpvMessageBuffer );
 	// Terminate application
 	waitAnyKey( stringAnyKey );
-	initializeScreen( oldWAttributes );
+	SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
     ExitProcess( 1 );
 }
 // Exit with error, detected internally, 
@@ -185,7 +193,7 @@ void exitWithInternalError( CHAR* messageName )
 		printf( "\nERROR: %s\n", messageName );
 	}
 	waitAnyKey( stringAnyKey );
-	initializeScreen( oldWAttributes );
+	SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
 	ExitProcess( 2 );
 }
 // Exit without errors
@@ -196,7 +204,7 @@ void exitWithMessage( CHAR* messageName )
 		printf( "%s\n", messageName );
 	}
 	waitAnyKey( stringAnyKey );
-	initializeScreen( oldWAttributes );
+	SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
 	ExitProcess( 0 );
 }
 
@@ -415,11 +423,11 @@ int main( int argc, char** argv )
 			snprintf( s4, 39, "%-16d%-7d%d", x2, x3, x4 );
 			
 			// Print all strings
-			CSTR cs1[] = { { color1, s1 },
-						   { color1, s2 },
-						   { color2, s3 },
-						   { color2, s4 },
-						   { 0, NULL } };
+            CSTR cs1[] = { { color1, s1 },
+                           { color1, s2 },
+                           { color2, s3 },
+                           { color2, s4 },
+                           { 0, NULL } };
 			colorPrint(cs1);
 			break;
 		}
