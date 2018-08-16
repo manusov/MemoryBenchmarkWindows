@@ -1,56 +1,31 @@
 /*
- *   Read-write methods definitions.
+ *   System information and benchmarks data and routines definitions
  */
 
-// Bitmaps generation for CPU and OS support (see associated structure at constants.c)
-typedef enum {
-CPU_FEATURE_READ_X64,
-CPU_FEATURE_WRITE_X64,
-CPU_FEATURE_COPY_X64,
-CPU_FEATURE_MODIFY_X64,
-CPU_FEATURE_WRITE_STRINGS_X64,
-CPU_FEATURE_COPY_STRINGS_X64,
-// Start optionally supported features
-CPU_FEATURE_READ_SSE128,
-CPU_FEATURE_WRITE_SSE128,
-CPU_FEATURE_COPY_SSE128,
-CPU_FEATURE_READ_AVX256,
-CPU_FEATURE_WRITE_AVX256,
-CPU_FEATURE_COPY_AVX256,
-CPU_FEATURE_READ_AVX512,
-CPU_FEATURE_WRITE_AVX512,
-CPU_FEATURE_COPY_AVX512,
-CPU_FEATURE_DOT_FMA256,
-CPU_FEATURE_DOT_FMA512,
-// Additions for non-temporal Write, 
-// NTW = non-temporal write ((V)MOVNTPS)
-CPU_FEATURE_NTW_WRITE_SSE128,
-CPU_FEATURE_NTW_COPY_SSE128,    // this duplicated 1
-CPU_FEATURE_NTW_WRITE_AVX256,
-CPU_FEATURE_NTW_COPY_AVX256,    // this duplicated 2, wrong
-CPU_FEATURE_NTW_WRITE_AVX512,
-CPU_FEATURE_NTW_COPY_AVX512,
-// Additions for non-temporal Read, 
-// NTRW = non-temporal read and write ((V)MOVNTDQA)
-CPU_FEATURE_NTRW_READ_SSE128,
-CPU_FEATURE_NTRW_COPY_SSE128,
-CPU_FEATURE_NTRW_READ_AVX256,
-CPU_FEATURE_NTRW_COPY_AVX256,
-CPU_FEATURE_NTRW_READ_AVX512,
-CPU_FEATURE_NTRW_COPY_AVX512,
-// Additions for non-temporal by Prefetch Read, 
-// NTPRW = non-temporal prefetched read and write (PREFETCHNTA)
-CPU_FEATURE_NTPRW_READ_SSE128,
-CPU_FEATURE_NTPRW_COPY_SSE128,   // this duplicated 1
-CPU_FEATURE_NTPRW_READ_AVX256,
-// Reserved for extensions
-// CPU_FEATURE_NTPRW_COPY_AVX256,
-// CPU_FEATURE_NTPRW_READ_AVX512,
-// CPU_FEATURE_NTPRW_COPY_AVX512
-// Reserved for FMA with non-temporal store
-} CPU_FEATURES;
+// CPU support and native DLL management data
+typedef struct {
+    DWORD64 bitmapCpu;
+    DWORD64 bitmapOs;
+} MPE_CPU_BITMAP;
+
+typedef struct {
+    double frequencyTsc;
+    double periodTsc;
+    DWORD64 dtsc;
+} MPE_CPU_MEASURE;
+
+typedef struct {
+    double mbps;
+    double cpi;
+    double bpi;
+} MPE_CPU_PERFORMANCE;
 
 // Structures for CPU optional supported features detect
+
+typedef enum {
+	EAX, EBX, ECX, EDX
+} CPUID_OUTPUT;
+
 typedef enum {
 	ORMASK , ANDMASK , ORMASKLAST , ANDMASKLAST, UNCOND, UNCONDLAST
 } MASK_TYPE;
@@ -150,9 +125,100 @@ typedef struct {
 ((DWORDLONG)1) << CPU_FEATURE_NTRW_READ_AVX256 |   \
 ((DWORDLONG)1) << CPU_FEATURE_NTRW_COPY_AVX256
 
+// CPU support and native DLL management functions
+DWORD initCpu( CHAR* returnText );
+DWORD deinitCpu( CHAR* returnText );
+DWORD showDll( CHAR* returnText );
+DWORD bitmapCpu ( CHAR* returnText, MPE_CPU_BITMAP* returnBinary );
+DWORD measureCpu( CHAR* returnText, MPE_CPU_MEASURE* returnBinary );
 DWORDLONG buildCpuidBitmap( CPUID_CONDITION x[] );
 DWORDLONG buildXgetbvBitmap( XGETBV_CONDITION x[] );
+DWORD performanceCpu( CHAR* returnText, MPE_CPU_PERFORMANCE* returnBinary );
+// CPU support and native DLL management: helpers functions
+void dllFunctionCheck( void *functionPointer, CHAR *functionName, CHAR *dllName );
+// CPUID/RDTSC/XGETBV helpers functions
+BOOL getCpuidFeature( DWORD function, DWORD subfunction, CPUID_OUTPUT reg, DWORD bitmask );
+BOOL getXgetbvFeature( DWORD bitmask );
+BOOL detectCpu( CHAR *cpuVendorString, CHAR *cpuModelString );
+int measureTsc( DWORDLONG *tscClk, double *tscHz, double *tscNs );
+void printCpu( CHAR *cpuVendorString, CHAR *cpuModelString );
+void printTsc( double tscHz, double tscNs );
 
-void detectMethods( DWORD *select, DWORDLONG *bitmap, DWORDLONG *bitmapCpu, DWORDLONG *bitmapOs );
-void printMethods( DWORD select, DWORDLONG bitmap, DWORDLONG bitmapCpu, DWORDLONG bitmapOs, CHAR *methodsNames[] );
+// SMP topology and caches list (by WinAPI) data
+typedef struct {      // Benchmark useable points include DATA or UNIFIED caches
+    DWORD64 pointL1;
+    DWORD64 pointL2;
+    DWORD64 pointL3;
+    DWORD32 cpuNumaDomains;
+    DWORD32 cpuPackages;
+    DWORD32 cpuCores;
+    DWORD32 cpuLogical;
+    DWORD32 cpuHt;
+} MPE_TOPOLOGY_DATA;
+// SMP topology and caches list (by WinAPI) functions
+DWORD initTopology( CHAR* returnText );
+DWORD deinitTopology( CHAR* returnText );
+DWORD detectTopology( CHAR* returnText, MPE_TOPOLOGY_DATA* returnBinary );
+
+// System memory information data
+typedef struct {
+    DWORD64 pointPhysicalMemory;
+    DWORD64 pointFreeMemory;
+} MPE_MEMORY_DATA;
+// System memory information functions
+DWORD initMemory( CHAR* returnText );
+DWORD deinitMemory( CHAR* returnText );
+DWORD detectMemory( CHAR* returnText, MPE_MEMORY_DATA* returnBinary );
+
+// SMP and Multi-Threading information data
+typedef struct {
+    DWORD32 nativeWidth;
+    DWORD32 logicalCpuCount;
+    DWORD64 logicalCpuBitmap;
+} MPE_OS_DATA;
+// SMP and Multi-Threading information functions
+DWORD initOs( CHAR* returnText );
+DWORD deinitOs( CHAR* returnText );
+DWORD detectOs( CHAR* returnText, MPE_OS_DATA* returnBinary );
+
+// ACPI information data
+typedef struct {
+    DWORD32 acpiCpuCount;
+    DWORD32 acpiNumaNodesCount;
+} MPE_ACPI_DATA;
+// ACPI information functions
+DWORD initAcpi( CHAR* returnText );
+DWORD deinitAcpi( CHAR* returnText );
+DWORD detectAcpi( CHAR* returnText, MPE_ACPI_DATA* returnBinary );
+
+// NUMA information data
+typedef struct {
+    DWORD32 numaDomains;
+} MPE_NUMA_COUNT;
+
+typedef struct {
+	DWORD32 numaId;
+	KAFFINITY numaAffinity;
+} MPE_NUMA_DOMAIN;
+// NUMA information functions
+DWORD initNuma( CHAR* returnText );
+DWORD deinitNuma( CHAR* returnText );
+DWORD detectNuma( CHAR* returnText, MPE_NUMA_COUNT* returnBinary );
+DWORD listNuma( CHAR* returnText, MPE_NUMA_DOMAIN* returnBinary, int nodeSelect );
+
+// Paging information data
+typedef struct {
+    DWORD32 defaultPage;
+    DWORD32 largePage;
+    DWORD32 pagingRights;
+} MPE_PAGING_DATA;
+// Paging information functions
+DWORD initPaging( CHAR* returnText );
+DWORD deinitPaging( CHAR* returnText );
+DWORD detectPaging( CHAR* returnText, MPE_PAGING_DATA* returnBinary );
+
+
+
+
+
 
