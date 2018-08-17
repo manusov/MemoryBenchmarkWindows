@@ -6,24 +6,22 @@
 /*
 
 TODO (near):
-1) Task Accept.
-2) Memory allocation.
-3) Task Input.
-4) Task Execute.
-5) Task Output.
+
+1) Debug method name unrecognized, "Press any key" without pre CR, LF.
+2) Debug method correct selection.
 
 TODO (far):
-1) Initializing DLL and CPU native support, show DLL strings.
-2) RW method select option.
-3) Selection (Y/N) dialogue support.
-4) Benchmarking.
-5) Remove string pass (CHAR* returnText), because possible application exit from callee.
-6) Remove unused status return, some routines can be VOID().
-7) Use seconds instead nanoseconds for TSC period ?
-8) Interrogate delays for all exit scenarios, exit codes 0-3. 
-9) Accurate resources release for all exit points.
-10) Refactoring, example mbpsCount and arraySize duplicated. NOT DUPLICATED. DUPLICATED STEPS COUNT.
-11) ...
+1...N) All options, next = Target Object, SMP/Caches list by WinAPI.
+
+TODO (bugs fix):
+
+1) Remove string pass (CHAR* returnText), because possible application exit from callee.
+2) Remove unused status return, some routines can be VOID().
+3) Use seconds instead nanoseconds for TSC period ?
+4) Interrogate delays for all exit scenarios, exit codes 0-3. 
+5) Accurate resources release for all exit points.
+6) Refactoring, example mbpsCount and arraySize duplicated. NOT DUPLICATED. DUPLICATED STEPS COUNT.
+7) ...
 
 */
 
@@ -63,9 +61,9 @@ CHAR* statusStrings[] =
 };
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "Build v0.00.00 for Windows ia32."
+#define BUILD_STRING "Build v0.00.01 for Windows ia32."
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "Build v0.00.00 for Windows x64."
+#define BUILD_STRING "Build v0.00.01 for Windows x64."
 #else
 #define BUILD_STRING "WRONG BUILD: UNSUPPORTED PLATFORM."
 #endif
@@ -390,6 +388,7 @@ void exitWithSystemError( CHAR* operationName )
     // Terminate application
     waitAnyKey( stringAnyKey );
     SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    printf( "\n" );
     ExitProcess( 1 );
 }
 // Exit with error, detected internally, 
@@ -402,6 +401,7 @@ void exitWithInternalError( CHAR* messageName )
     }
     waitAnyKey( stringAnyKey );
     SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    printf( "\n" );
     ExitProcess( 2 );
 }
 // Exit without errors
@@ -413,6 +413,7 @@ void exitWithMessage( CHAR* messageName )
     }
     waitAnyKey( stringAnyKey );
     SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    printf( "\n" );
     ExitProcess( 0 );
 }
 

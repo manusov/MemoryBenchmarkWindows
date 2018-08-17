@@ -22,9 +22,8 @@ void taskAccept( int argc, char** argv )
     CSTR cstrCmd[] = {	{ BOLD_COLOR , "\n\nGet command line parameters..." } , { 0, NULL } };
     colorPrint ( cstrCmd );
 	regularInput ( argc, argv, command_line_options_list );
-	printf( "\n" );
     // Options settings check
-    optionCheck ( userInput.optionRwMethod , DEFAULT_RW_METHOD, command_line_options_list[0].name );
+    // optionCheck ( userInput.optionRwMethod , DEFAULT_RW_METHOD, command_line_options_list[0].name );
 	optionCheck ( userInput.optionRwTarget , DEFAULT_RW_TARGET, command_line_options_list[1].name );
 	optionCheck ( userInput.optionNonTemporal , DEFAULT_RW_ACCESS, command_line_options_list[2].name );
 	optionCheck ( userInput.optionThreadsCount , DEFAULT_THREADS_COUNT, command_line_options_list[3].name );

@@ -44,10 +44,6 @@ void taskInput( )
     taskControl.selectBlockStart = blockStart;
     taskControl.selectBlockStop = blockStop;
     taskControl.selectBlockDelta = blockDelta;
-    
-    
-     
-    
     // Show benchmark parameters = f(options), ready to start test, wait user input
     CSTR cstrSparm[] = { { BOLD_COLOR , "\n\nReady to start with parameters:" } , { 0, NULL } };
     colorPrint ( cstrSparm );
@@ -81,7 +77,7 @@ BOOL methodCheck( DWORD bitSelect, DWORD64 bitMap )
         bitSelect -= 32;
         mask = mask << bitSelect;
     }
-    return ( bitMap & mask != 0 );
+    return ( ( bitMap & mask ) != 0 );
 }
 
 

@@ -37,7 +37,6 @@ void taskExecute( )
     int arraySize = stepsCount * sizeof(double);
     mbpsStatistics = (double*)malloc(arraySize);
 
-    printf( "\n" );
     CSTR cstrRun[] = {	{ BOLD_COLOR , "\n   #    size   CPI     nsPI    MBPS\n" } , { 0, NULL } };
     colorPrint ( cstrRun );
     lineOfTable( 78 );

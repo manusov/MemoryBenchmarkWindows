@@ -19,13 +19,14 @@ void regularInput ( int argc, char** argv, OPTION_ENTRY option_list[] )
     char cmdName[SMAX];             // extracted NAME of option string
     char cmdValue[SMAX];            // extracted VALUE of option string
     int MSG_MAX = 80+SMAX;
-    CHAR* msgString[MSG_MAX];       // error string about option
-    CHAR* pstr = NULL;
+    CHAR msgString[MSG_MAX];        // error string about option
+    CHAR* pstr = msgString;
 
     for (i=0; i<argc; i++)
     {
         printf( "\nparm # %d = %s", i+1 , argv[i] );
     }
+    printf ( "\n" );
 
 // Verify command line format and extract values	
     for (i=1; i<argc; i++)  // cycle for command line options
