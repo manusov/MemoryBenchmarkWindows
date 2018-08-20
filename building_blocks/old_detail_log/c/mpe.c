@@ -3,10 +3,32 @@
  *   Windows edition.
  */
 
+/*
+
+TODO (near):
+
+1) Debug method name unrecognized, "Press any key" without pre CR, LF.
+2) Debug method correct selection.
+
+TODO (far):
+1...N) All options, next = Target Object, SMP/Caches list by WinAPI.
+
+TODO (bugs fix):
+
+1) Remove string pass (CHAR* returnText), because possible application exit from callee.
+2) Remove unused status return, some routines can be VOID().
+3) Use seconds instead nanoseconds for TSC period ?
+4) Interrogate delays for all exit scenarios, exit codes 0-3. 
+5) Accurate resources release for all exit points.
+6) Refactoring, example mbpsCount and arraySize duplicated. NOT DUPLICATED. DUPLICATED STEPS COUNT.
+7) ...
+
+*/
+
+
 // Standard includes
 #include <stdio.h>
 #include <windows.h>
-
 // Definitions for console output
 #define SMIN 3           // minimum option string length, example a=b
 #define SMAX 81          // maximum option and status string length
@@ -18,26 +40,41 @@ typedef struct {
     LPSTR text;
 } CSTR;
 typedef CSTR* CSTRP;
-
+// Definition for status return
+typedef enum {
+    STATUS_OK,                   // Return this enable continue, operation executed successfully
+    STATUS_EMPTY,                // Return this enable continue, operation not required
+    STATUS_NOT_SUPPORTED,        // Return this enable continue, but operation is not supported
+    STATUS_UNDER_CONSTRUCTION,   // Return this enable continue, but routine is under construction
+    STATUS_API_ERROR,            // Return this required exit with get and decode OS error code
+    STATUS_INTERNAL_ERROR        // Return >=this required exit without  OS error code, can visual this
+} RETURN_STATUS;
+// Strings for status show
+CHAR* statusStrings[] =
+{
+    "OK",
+    "OK, EMPTY",
+    "NOT SUPPORTED",
+    "UNDER CONSTRUCTION",
+    "API ERROR",
+    "INTERNAL ERROR"
+};
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.10.00 for Windows ia32."
+#define BUILD_STRING "Build v0.00.01 for Windows ia32."
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.10.00 for Windows x64."
+#define BUILD_STRING "Build v0.00.01 for Windows x64."
 #else
-#define BUILD_STRING "UNSUPPORTED PLATFORM."
+#define BUILD_STRING "WRONG BUILD: UNSUPPORTED PLATFORM."
 #endif
-
 // Title and service strings include copyright
 CHAR* stringTitle1 = "Memory Performance Engine.";
 CHAR* stringTitle2 = BUILD_STRING;
 CHAR* stringTitle3 = "(C)2018 IC Book Labs.";
 CHAR* stringAnyKey = "Press any key...";
-
 // Console input buffer
 #define RETURN_SIZE 255
 CHAR inputBuffer[256];
-
 // Console support data
 HANDLE hStdin, hStdout;                // handles for standard IN , standard OUT
 CONSOLE_SCREEN_BUFFER_INFO csbiInfo;   // console control structure
@@ -46,19 +83,17 @@ COORD oldDwCursorPosition;             // cursor position at application start
 WORD oldWAttributes;                   // video color attribute
 SMALL_RECT oldSrWindow;                // console window size visible without scrollm example 0, 0, 79, 24
 COORD oldDwMaximumWindowSize;          // console window size if maximized but without scroll, example 80x68
-
 // console additional (calculated and defined) geometry parameters
 WORD defaultColor;                     // Default color for output, can be original color or constant value
 DWORD dwConSize;                       // Console size used for clear screen
 DWORD cCharsWritten;                   // Chars count used for clear screen
 COORD coordScreen = { 0, 0 };          // Coordinates used for clear screen
-
 // Application status and text strings
 int applicationStatus = -1;
 CHAR applicationString[SMAX];
 CHAR* pApplicationString;
-
 // Console routines declaration
+void showStatus( int status );
 BOOL initializeScreen( WORD color );
 DWORD inputChar( LPSTR promptString, LPSTR returnChar, int returnSize );
 void newLine(void);
@@ -69,42 +104,54 @@ BOOL colorPrint( CSTRP colorStrings );
 void exitWithSystemError( CHAR* operationName );
 void exitWithInternalError( CHAR* messageName );
 void exitWithMessage( CHAR* messageName );
-
 // This application includes, headers
-#include "servicehelpers\servicehelpers.h"
-#include "systemhelpers\systemhelpers.h"
-#include "tasksteps\tasksteps.h"
-
-// This application includes, service helpers modules
-#include "servicehelpers\printhelpers.c"
-#include "servicehelpers\statistics.c"
-#include "servicehelpers\regularinput.c"
-#include "servicehelpers\regularoutput.c"
+#include "service\service.h"
+#include "system\system.h"
+#include "task\task.h"
+#include "options\options.h"
 // This application includes, system support modules
-// ... reserved ...
-// This application includes, target task steps modules
-#include "tasksteps\taskroot.c"
-#include "tasksteps\stepdefaults.c"
-#include "tasksteps\stepcommandline.c"
-#include "tasksteps\stepoptioncheck.c"
-#include "tasksteps\steploadlibrary.c"
-#include "tasksteps\stepfunctioncheck.c"
-#include "tasksteps\stepdetectcpu.c"
-#include "tasksteps\stepmeasurecpu.c"
-#include "tasksteps\stepmpcache.c"
-#include "tasksteps\stepmemory.c"
-#include "tasksteps\stepnuma.c"
-#include "tasksteps\steppaging.c"
-#include "tasksteps\stepacpi.c"
-#include "tasksteps\stepbuildipb.c"
-#include "tasksteps\stepperformance.c"
-#include "tasksteps\stepinterpretingopb.c"
-#include "tasksteps\steprelease.c"
-#include "tasksteps\stepmemoryalloc.c"
-#include "tasksteps\stepstatisticsalloc.c"
-#include "tasksteps\helperrelease.c"
+#include "service\statistics.c"
+#include "system\mpecpu.c"
+#include "system\mpetopology.c"
+#include "system\mpememory.c"
+#include "system\mpeos.c"
+#include "system\mpeacpi.c"
+#include "system\mpenuma.c"
+#include "system\mpepaging.c"
+// This application includes, service helpers modules
+#include "service\regularinput.c"
+#include "service\regularoutput.c"
+#include "service\printhelpers.c"
+// Command line options support
+#include "options\options.c"
+#include "options\optionsdetails.c"
+#include "options\cpuoptions.c"
+// This application includes, benchmark task modules
+#include "task\taskroot.c"
+#include "task\mpetaskaccept.c"
+#include "task\mpetaskinput.c"
+#include "task\mpetaskexecute.c"
+#include "task\mpetaskoutput.c"
+#include "task\memoryallocation.c"
 
 // Helper routines for console application context.
+// Helper routine: print status string = f(status code)
+void showStatus( int status )
+{
+    int i = status;
+    CHAR* pStatus;
+	if ( ( i >= STATUS_INTERNAL_ERROR ) || ( i < 0 ) )
+    {
+        i = STATUS_INTERNAL_ERROR;
+        pStatus = statusStrings[i];
+        printf( "%s %d.", pStatus, status );
+    }
+    else
+    {
+        pStatus = statusStrings[i];
+        printf( "%s.", pStatus );
+    }
+}
 // Helper routine: clear screen and set cursor position to 0,0
 BOOL initializeScreen( WORD color )
 {
@@ -132,7 +179,6 @@ BOOL initializeScreen( WORD color )
     return status;
     }
 }
-
 // Modified console input, return by any key
 // ReadFile returns when any input is available.  
 // WriteFile is used to echo input. 
@@ -195,7 +241,6 @@ DWORD inputChar( LPSTR promptString, LPSTR returnLine, int returnSize  )
 		return returnLine[0];
 	}
 }
-
 // The newLine function handles carriage returns when the processed 
 // input mode is disabled. It gets the current cursor position 
 // and resets it to the first cell of the next row. 
@@ -225,7 +270,6 @@ void newLine(void)
         return;
     }
 } 
-
 // Scroll
 void scrollScreenBuffer(HANDLE h, INT x)
 {
@@ -253,7 +297,6 @@ void scrollScreenBuffer(HANDLE h, INT x)
         coordDest,       // top left destination cell 
         &chiFill);       // fill character and color 
 }
-
 // Helper routine: wait any key
 void waitAnyKey( LPSTR promptString )
 {
@@ -282,7 +325,6 @@ void waitAnyKey( LPSTR promptString )
         }
     }
 }
-
 // Print line of table
 void lineOfTable( int charsCount )
 {
@@ -292,7 +334,6 @@ void lineOfTable( int charsCount )
         printf("-");
     }
 }
-
 // Helper routine: color output 
 BOOL colorPrint( CSTRP colorStrings )
 {
@@ -314,7 +355,6 @@ BOOL colorPrint( CSTRP colorStrings )
     status2 = SetConsoleTextAttribute(hStdout, defaultColor);
     return status1 && status2;
 }
-
 // Exit with error, returned by OS API,
 // OS API error get and visualize,
 // Failed operation name accepted as input string
@@ -351,7 +391,6 @@ void exitWithSystemError( CHAR* operationName )
     printf( "\n" );
     ExitProcess( 1 );
 }
-
 // Exit with error, detected internally, 
 // for example: if AVX not supported, but required
 void exitWithInternalError( CHAR* messageName )
@@ -365,7 +404,6 @@ void exitWithInternalError( CHAR* messageName )
     printf( "\n" );
     ExitProcess( 2 );
 }
-
 // Exit without errors
 void exitWithMessage( CHAR* messageName )
 {
@@ -422,17 +460,46 @@ int main( int argc, char** argv )
             oldSrWindow.Left, oldSrWindow.Top, oldSrWindow.Right, oldSrWindow.Bottom,
             oldDwMaximumWindowSize.X, oldDwMaximumWindowSize.Y );
     // Print application first message strings
-    printf( "\n%s %s %s\n", stringTitle1, stringTitle2, stringTitle3 );
+    printf( "\n%s %s\n%s", stringTitle1, stringTitle2, stringTitle3 );
     
-    // Benchmark target task. 
-    // Note output status not used because 
-    // can conditionally internally return if errors detected
-    taskRoot( argc, argv );
+    // Benchmark target task
+    pApplicationString = applicationString;
+    *pApplicationString = 0;
+    applicationStatus = taskRoot( argc, argv, pApplicationString );
     // Target task done at this point
     
     // Exit console application
-    CSTR cstrExiting[] = {	{ BOLD_COLOR , "\n\nExiting...\n" } , { 0, NULL } };
+    CSTR cstrExiting[] = {	{ BOLD_COLOR , "\n\nExiting..." } , { 0, NULL } };
     colorPrint ( cstrExiting );
-    exitWithMessage( NULL );
+    printf("\nMain task return: ");
+    showStatus( applicationStatus );
+    int as = applicationStatus;
+    if ( as > STATUS_INTERNAL_ERROR )
+    {
+        as = STATUS_INTERNAL_ERROR;
+    }
+    switch ( as )
+    {
+        // Branch if no errors
+        case STATUS_OK:
+        case STATUS_EMPTY:
+        case STATUS_NOT_SUPPORTED:
+        case STATUS_UNDER_CONSTRUCTION:
+            exitWithMessage( " " );
+            break;
+        // Branch if error returned by OS API
+        case STATUS_API_ERROR:
+            exitWithSystemError( pApplicationString );
+            break;
+        // Branch if error detected by application logic
+        case STATUS_INTERNAL_ERROR:
+            exitWithInternalError( pApplicationString );
+            break;
+        // Branch for unrecognized status code    
+        default:
+            break;
+    }
+    // This executed if unrecognized status code
+    exitWithMessage( "\nStatus interpreting error." );
 }
 

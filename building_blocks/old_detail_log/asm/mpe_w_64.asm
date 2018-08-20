@@ -230,8 +230,8 @@ include 'ntpread_avx256.inc'
 
 ; Data section
 section '.data' data readable writeable
-StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.00.03 for Windows x64.',0
+StringProduct    DB 'Memory Performance Engine DLL.',0
+StringVersion    DB 'Build v0.00.02 for Windows x64.',0
 StringCopyright  DB '(C)2018 IC Book Labs.',0
 
 ; Pointers to performance patterns
