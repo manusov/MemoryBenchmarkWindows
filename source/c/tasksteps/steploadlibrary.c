@@ -4,7 +4,7 @@
  */
 
 // DLL and Functions names strings: for load and for error reporting
-CHAR* dllName = "mpe_w_64.dll";
+CHAR* dllName = NATIVE_LIBRARY_NAME;
 CHAR* fname1 = "GetDllStrings";
 CHAR* fname2 = "CheckCpuid";
 CHAR* fname3 = "ExecuteCpuid";

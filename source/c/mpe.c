@@ -21,9 +21,13 @@ typedef CSTR* CSTRP;
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.10.00 for Windows ia32."
+#define BUILD_STRING "v0.20.00 for Windows ia32."
+#define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
+#define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.10.00 for Windows x64."
+#define BUILD_STRING "v0.20.00 for Windows x64."
+#define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
+#define NATIVE_WIDTH 64
 #else
 #define BUILD_STRING "UNSUPPORTED PLATFORM."
 #endif

@@ -28,13 +28,13 @@ typedef struct {
 } XGETBV_CONDITION;
 
 // This features unconditionally supported by x64 CPU
-#define CPU_FEATURES_UNCONDITIONAL                 \
-((DWORDLONG)1) << CPU_FEATURE_READ_X64 |           \
-((DWORDLONG)1) << CPU_FEATURE_WRITE_X64 |          \
-((DWORDLONG)1) << CPU_FEATURE_COPY_X64 |           \
-((DWORDLONG)1) << CPU_FEATURE_MODIFY_X64 |         \
-((DWORDLONG)1) << CPU_FEATURE_WRITE_STRINGS_X64 |  \
-((DWORDLONG)1) << CPU_FEATURE_COPY_STRINGS_X64
+#define CPU_FEATURES_UNCONDITIONAL                      \
+((DWORDLONG)1) << CPU_FEATURE_READ_IA32_X64 |           \
+((DWORDLONG)1) << CPU_FEATURE_WRITE_IA32_X64 |          \
+((DWORDLONG)1) << CPU_FEATURE_COPY_IA32_X64 |           \
+((DWORDLONG)1) << CPU_FEATURE_MODIFY_IA32_X64 |         \
+((DWORDLONG)1) << CPU_FEATURE_WRITE_STRINGS_IA32_X64 |  \
+((DWORDLONG)1) << CPU_FEATURE_COPY_STRINGS_IA32_X64
 
 // This features validated by SSE feature bit:
 // CPUID function 00000001h register EDX bit 25
@@ -346,7 +346,7 @@ DWORD findMaxMethod( DWORDLONG bitmapCpu, DWORDLONG bitmapOs )
     mask = ((DWORDLONG)1) << select;
     if ( ! (mask & bitmap) )
     {
-        select = CPU_FEATURE_READ_X64;
+        select = CPU_FEATURE_READ_IA32_X64;
     }
     // Try common x86-64 read memory method
     mask = ((DWORDLONG)1) << select;

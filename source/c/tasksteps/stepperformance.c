@@ -3,17 +3,23 @@
  */
 
 // This table associated with native DLL procedures
+#if NATIVE_WIDTH == 32
+BYTE bytesPerInstruction[] = {
+4, 4, 4, 4, 4, 4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+};
+#endif
+#if NATIVE_WIDTH == 64
 BYTE bytesPerInstruction[] = {
 8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
 };
-
+#endif
 
 void stepPerformance( LIST_DLL_FUNCTIONS* xf,
                       MPE_PLATFORM_INPUT* xp, 
                       MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb, 
                       LIST_RELEASE_RESOURCES* xr )
 {
-    SIZE_T blockStart = ipb->selectBlockStart;
+    SIZE_T blockStart = ipb->selectBlockStart;   // note required 64-bit arithmetic, even in the 32-bit mode
     SIZE_T blockEnd = ipb->selectBlockStop;
     SIZE_T blockStep = ipb->selectBlockDelta;
     SIZE_T blockMax = blockStart;
@@ -48,7 +54,7 @@ void stepPerformance( LIST_DLL_FUNCTIONS* xf,
     status = ( xf->DLL_PerformanceGate )
              ( rwMethodSelect ,  bufferAlignedSrc , bufferAlignedDst ,
                instructionsCount , repeatsCount * 3 , &deltaTSC );
-               
+
     if ( status == 0 )
     {
         exitWithInternalError( "memory target operation failed at pre-heat phase" );
@@ -68,10 +74,15 @@ void stepPerformance( LIST_DLL_FUNCTIONS* xf,
             exitWithInternalError( "memory target operation failed at measurement phase" );
         }
         cpi = deltaTSC;
-        cpi /= ( instructionsCount * repeatsCount );
+        
+        DWORD64 ic = instructionsCount;
+        DWORD64 rc = repeatsCount;
+        DWORD64 bs = blockStart;
+        
+        cpi /= ( ic * rc );
         nspi = cpi * ( xp->platformTimings.nanosecondsTsc );
-        mbps = blockStart * repeatsCount;
-        mbps /= deltaTSC * seconds;
+        mbps = bs * rc;
+        mbps /= ( deltaTSC * seconds );
         mbps /= 1000000.0;
         mbpsStatistics[count-1] = mbps;
         printf ( " %3d  %6d   %5.3f   %5.3f   %-10.3f\n" , count , blockStart , cpi , nspi , mbps );

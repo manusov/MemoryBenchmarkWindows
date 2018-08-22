@@ -52,6 +52,10 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
         exitWithInternalError( "selected read/write method not supported by OS" );
     }
     ipb->selectRwMethod = cpuMethod;
+    
+    // DEBUG ASM METHODS
+    // ipb->selectRwMethod = 8; // DEBUG
+    // DEBUG ASM METHODS
 
     // ... oother options under construction ...
 

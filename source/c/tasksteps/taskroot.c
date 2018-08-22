@@ -18,8 +18,14 @@ LIST_RELEASE_RESOURCES listRelease;
 // Strings for command line options detect
 // Methods for read-write memory by CPU instruction set
 char* rwMethods[] = { 
+#if NATIVE_WIDTH == 32
+    "readmov32", "writemov32", "copymov32", "modifynot32",
+    "writestring32", "copystring32",
+#endif
+#if NATIVE_WIDTH == 64
     "readmov64", "writemov64", "copymov64", "modifynot64",
     "writestring64", "copystring64",
+#endif
     "readsse128", "writesse128", "copysse128",
     "readavx256", "writeavx256", "copyavx256",
     "readavx512", "writeavx512", "copyavx512",
@@ -63,12 +69,22 @@ char* machineReadable[] = {
 
 // Methods for read-write memory by CPU instruction set
 char* rwMethodsDetails[] = {
+#if NATIVE_WIDTH == 32
+	"Read ia32 (MOV)",
+	"Write ia32 (MOV)",
+	"Copy ia32 (MOV)",
+	"Modify ia32 (NOT)",
+	"Write ia32 strings (REP STOSD)",
+	"Copy ia32 strings (REP MOVSD)",
+#endif
+#if NATIVE_WIDTH == 64
 	"Read x86-64 (MOV)",
 	"Write x86-64 (MOV)",
 	"Copy x86-64 (MOV)",
 	"Modify x86-64 (NOT)",
 	"Write x86-64 strings (REP STOSQ)",
 	"Copy x86-64 strings (REP MOVSQ)",
+#endif
 	"Read SSE-128 (MOVAPS)",
 	"Write SSE-128 (MOVAPS)",
 	"Copy SSE-128 (MOVAPS)",

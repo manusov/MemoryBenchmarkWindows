@@ -5,6 +5,6 @@ GCC and FASM used for translation:
 GCC for executable file, FASM for DLL library.
 
 UNDER CONSTRUCTION.
-Yet engineering sample for Windows x64 only.
+Yet engineering samples for Windows ia32 and x64.
 
 
