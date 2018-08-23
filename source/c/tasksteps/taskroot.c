@@ -9,6 +9,7 @@ MPE_USER_OUTPUT userOutput;
 MPE_PLATFORM_INPUT platformInput;
 MPE_INPUT_PARAMETERS_BLOCK targetIpb;
 MPE_OUTPUT_PARAMETERS_BLOCK targetOpb;
+MPE_CALIBRATION speedCalibration;
 
 // Data for communication between steps routines
 LIST_DLL_FUNCTIONS listDll;
@@ -227,6 +228,16 @@ void taskRoot( int argc, char** argv )
     stepDetectCpu( &listDll, &platformInput.platformFeatures, &listRelease );
     // Check TSC support, measure TSC clock, show
     stepMeasureCpu( &listDll, &platformInput.platformTimings, &listRelease );
+    // Detect cache levels and SMP topology by WinAPI
+    stepMpCache( &platformInput.platformCache, &listRelease );
+    // Detect system memory
+    stepMemory( &platformInput.platformMemory, &listRelease );
+    // Detect NUMA topology
+    stepNuma( &platformInput.platformNuma, &listRelease );
+    // Detect memory paging options
+    stepPaging( &platformInput.platformPaging, &listRelease );
+    // Detect ACPI NUMA/SMP topology declaration
+    stepAcpi( &platformInput.platformAcpi, &listRelease );
     // Allocate memory for target benchmark read/write buffer
     stepMemoryAlloc( &userInput, &targetIpb, &listRelease );
     // Allocate memory for benchmark statistics buffer
@@ -234,7 +245,7 @@ void taskRoot( int argc, char** argv )
     // Build Input Parameters Block (IPB) for benchmark routine, show IPB fields
     stepBuildIpb( &userInput, &platformInput, &targetIpb, targetParameters, &listRelease );
     // Execute benchmark
-    stepPerformance( &listDll, &platformInput, &targetIpb, &targetOpb, &listRelease );
+    stepPerformance( &listDll, &platformInput, &targetIpb, &targetOpb, &speedCalibration, &listRelease );
     // Show benchmark results
     stepInterpretingOpb( &targetOpb, &userOutput, &listRelease );
     // Release allocated resources

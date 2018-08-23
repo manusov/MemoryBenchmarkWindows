@@ -161,6 +161,11 @@ typedef struct {
     DWORD32 acpiNumaNodesCount;
 } MPE_ACPI_DATA;
 
+// Benchmark measurement repeats count calibration
+typedef struct {
+    DWORD32 measurementRepeats;
+} MPE_CALIBRATION;
+
 // Parameters Block for user input
 // This data = f ( user settings at command line or defaults )
 typedef struct {
@@ -266,11 +271,11 @@ void stepLoadLibrary( LIST_DLL_FUNCTIONS* xf, LIST_RELEASE_RESOURCES* xr );
 void stepFunctionCheck( void* functionPointer, CHAR* functionName, CHAR* dllName );
 void stepDetectCpu( LIST_DLL_FUNCTIONS* xf, MPE_CPU_BITMAP* xb, LIST_RELEASE_RESOURCES* xr );
 void stepMeasureCpu( LIST_DLL_FUNCTIONS* xf, MPE_CPU_MEASURE* xm, LIST_RELEASE_RESOURCES* xr );
-void stepMpCache( MPE_CACHE_DATA xc, LIST_RELEASE_RESOURCES* xr );
-void stepMemory( MPE_MEMORY_DATA xm, LIST_RELEASE_RESOURCES* xr );
-void stepNuma( MPE_NUMA_DATA xn, LIST_RELEASE_RESOURCES* xr );
-void stepPaging( MPE_PAGING_DATA xp, LIST_RELEASE_RESOURCES* xr );
-void stepAcpi( MPE_ACPI_DATA xa, LIST_RELEASE_RESOURCES* xr );
+void stepMpCache( MPE_CACHE_DATA* xc, LIST_RELEASE_RESOURCES* xr );
+void stepMemory( MPE_MEMORY_DATA* xm, LIST_RELEASE_RESOURCES* xr );
+void stepNuma( MPE_NUMA_DATA* xn, LIST_RELEASE_RESOURCES* xr );
+void stepPaging( MPE_PAGING_DATA* xp, LIST_RELEASE_RESOURCES* xr );
+void stepAcpi( MPE_ACPI_DATA* xa, LIST_RELEASE_RESOURCES* xr );
 
 // Task routines-per-steps, phase 2 = allocate resources
 void stepMemoryAlloc( MPE_USER_INPUT* xi, MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCES* xr );
@@ -279,11 +284,14 @@ void stepStatisticsAlloc( MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCE
 void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp, MPE_INPUT_PARAMETERS_BLOCK* ipb,
                    PRINT_ENTRY parmList[],
                    LIST_RELEASE_RESOURCES* xr );
+// Benchmarks calibration, adjust measurement repeats count
+void stepCalibration( MPE_CALIBRATION* xc, LIST_RELEASE_RESOURCES* xr );
 
 // Task routines-per-steps, phase 4 = target operation
 void stepPerformance( LIST_DLL_FUNCTIONS* xf,
                       MPE_PLATFORM_INPUT* xp,
-                      MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb, 
+                      MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb,
+                      MPE_CALIBRATION* xc, 
                       LIST_RELEASE_RESOURCES* xr );
 
 // Task routines-per-steps, phase 5 = after target operation

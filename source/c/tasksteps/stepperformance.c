@@ -16,7 +16,8 @@ BYTE bytesPerInstruction[] = {
 
 void stepPerformance( LIST_DLL_FUNCTIONS* xf,
                       MPE_PLATFORM_INPUT* xp, 
-                      MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb, 
+                      MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb,
+                      MPE_CALIBRATION* xc, 
                       LIST_RELEASE_RESOURCES* xr )
 {
     SIZE_T blockStart = ipb->selectBlockStart;   // note required 64-bit arithmetic, even in the 32-bit mode
