@@ -6,20 +6,34 @@
  // Default options settings
 #define NOT_SET -1           // constant means no overrides for option, set default or default=f(sys)
 #define AUTO_SET -2          // constant means auto-detect by platform configuration
-#define DEFAULT_RW_METHOD AUTO_SET       // default method for read-write memory
-#define DEFAULT_RW_TARGET L1_CACHE       // default tested object is L1 cache memory
-#define DEFAULT_RW_ACCESS AUTO_SET       // non-temporal data mode disabled by default
-#define DEFAULT_THREADS_COUNT AUTO_SET   // number of execution threads, default single thread
-#define DEFAULT_HYPER_THREADING HTOFF    // hyper-threading disabled by default
-#define DEFAULT_PAGE_SIZE MIN_PAGES      // default pages is minimal size, 4KB
-#define DEFAULT_NUMA_MODE NON_AWARE      // default NUMA mode is non aware
-#define DEFAULT_PRECISION SLOW           // default test mode is precision
-#define DEFAULT_MACHINEREADABLE MROFF    // machine readable output disabled by default
-#define DEFAULT_MIN_BLOCK 4096           // minimum size of default data block
-#define DEFAULT_MAX_BLOCK 65536          // maximum size of default data block
-#define DEFAULT_STEP_BLOCK 1024          // default step from min to max is 512 bytes
-#define DEFAULT_PAGE_MODE NORMAL         // default page mode, 0 means classic 4KB
-#define DEFAULT_BUF_ALIGN 4096           // alignment factor, 4KB is default page size for x86/x64
+#define DEFAULT_RW_METHOD AUTO_SET        // default method for read-write memory
+#define DEFAULT_RW_TARGET L1_CACHE        // default tested object is L1 cache memory
+#define DEFAULT_RW_ACCESS AUTO_SET        // non-temporal data mode disabled by default
+#define DEFAULT_THREADS_COUNT AUTO_SET    // number of execution threads, default single thread
+#define DEFAULT_HYPER_THREADING HTOFF     // hyper-threading disabled by default
+#define DEFAULT_PAGE_SIZE MIN_PAGES       // default pages is minimal size, 4KB
+#define DEFAULT_NUMA_MODE NON_AWARE       // default NUMA mode is non aware
+#define DEFAULT_PRECISION AUTO_CALIBRATE  // default test precision mode is auto calibration
+#define DEFAULT_MACHINEREADABLE MROFF     // machine readable output disabled by default
+// Memory buffer settings
+#define DEFAULT_MIN_BLOCK NOT_SET         // 4096  // minimum size of default data block
+#define DEFAULT_MAX_BLOCK NOT_SET         // 65536 // maximum size of default data block
+#define DEFAULT_STEP_BLOCK NOT_SET        // 1024  // default step from min to max is 512 bytes
+#define DEFAULT_PAGE_MODE NORMAL          // default page mode, 0 means classic 4KB
+#define DEFAULT_BUF_ALIGN 4096            // alignment factor, 4KB is default page size for x86/x64
+// Benchmarks measurements settings
+#define DEFAULT_MEASUREMENT_TIME 1.0               // target time for adjust measurement repeats, seconds
+#define DEFAULT_MEASUREMENT_APPROXIMATION 5000     // start value for measurement repeats, iterations
+#define DEFAULT_FAST_L1 100000           // Number of measurement iterations for objects, fast mode defaults
+#define DEFAULT_FAST_L2 50000
+#define DEFAULT_FAST_L3 1000
+#define DEFAULT_FAST_DRAM 100
+#define DEFAULT_FAST_CUSTOM 100000
+#define DEFAULT_SLOW_L1 2000000          // Number of measurement iterations for objects, slow mode defaults
+#define DEFAULT_SLOW_L2 500000
+#define DEFAULT_SLOW_L3 10000
+#define DEFAULT_SLOW_DRAM 200
+#define DEFAULT_SLOW_CUSTOM 1000000
 
 // Enumerations for options settings
 // Bitmaps generation for CPU and OS support (see associated structure at constants.c)
@@ -99,7 +113,7 @@ typedef enum {
 // Enumeration of benchmark precision modes,
 // can select FAST or SLOW (better precision, but slow)
 typedef enum {
-	SLOW, FAST
+	SLOW, FAST, AUTO_CALIBRATE
 } PRECISION_MODE;
 
 // Enumeration of machine readable output modes
@@ -163,7 +177,19 @@ typedef struct {
 
 // Benchmark measurement repeats count calibration
 typedef struct {
+    double measurementTime;
+    DWORD32 measurementApproximation;
     DWORD32 measurementRepeats;
+    DWORD32 fastL1;
+    DWORD32 fastL2;
+    DWORD32 fastL3;
+    DWORD32 fastDRAM;
+    DWORD32 fastCustom;
+    DWORD32 slowL1;
+    DWORD32 slowL2;
+    DWORD32 slowL3;
+    DWORD32 slowDRAM;
+    DWORD32 slowCustom;
 } MPE_CALIBRATION;
 
 // Parameters Block for user input
@@ -264,7 +290,7 @@ typedef struct {
 void taskRoot( int argc, char** argv );
 
 // Task routines-per-steps, phase 1 = before target operation
-void stepDefaults( MPE_USER_INPUT* xi, LIST_RELEASE_RESOURCES* xr );
+void stepDefaults( MPE_USER_INPUT* xi, MPE_CALIBRATION* xc, LIST_RELEASE_RESOURCES* xr );
 void stepCommandLine( int argc, char** argv, OPTION_ENTRY x[] );
 void stepOptionCheck( DWORD currentSetting, DWORD defaultSetting, CHAR *optionName );
 void stepLoadLibrary( LIST_DLL_FUNCTIONS* xf, LIST_RELEASE_RESOURCES* xr );
@@ -278,14 +304,17 @@ void stepPaging( MPE_PAGING_DATA* xp, LIST_RELEASE_RESOURCES* xr );
 void stepAcpi( MPE_ACPI_DATA* xa, LIST_RELEASE_RESOURCES* xr );
 
 // Task routines-per-steps, phase 2 = allocate resources
-void stepMemoryAlloc( MPE_USER_INPUT* xi, MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCES* xr );
+void stepMemoryAlloc( MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCES* xr );
 void stepStatisticsAlloc( MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCES* xr );
 // Task routines-per-steps, phase 3 = build Input Parameters Block
 void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp, MPE_INPUT_PARAMETERS_BLOCK* ipb,
                    PRINT_ENTRY parmList[],
                    LIST_RELEASE_RESOURCES* xr );
 // Benchmarks calibration, adjust measurement repeats count
-void stepCalibration( MPE_CALIBRATION* xc, LIST_RELEASE_RESOURCES* xr );
+void stepCalibration( MPE_CALIBRATION* xc,
+                      LIST_DLL_FUNCTIONS* xf, 
+                      MPE_PLATFORM_INPUT* xp, MPE_INPUT_PARAMETERS_BLOCK* ipb,
+                      LIST_RELEASE_RESOURCES* xr );
 
 // Task routines-per-steps, phase 4 = target operation
 void stepPerformance( LIST_DLL_FUNCTIONS* xf,

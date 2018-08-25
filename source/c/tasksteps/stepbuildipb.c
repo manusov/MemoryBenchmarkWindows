@@ -2,6 +2,24 @@
  *    Build input parameters block = f ( user input, platform data ).
  */
 
+// Default definitions for cache and DRAM benchmarks
+
+#define AUTO_L1 16*1024
+#define AUTO_L2 128*1024
+#define AUTO_L3 4096*1024
+#define AUTO_DRAM 512*1024*1024
+#define AUTO_CUSTOM 1024*1024
+
+#define OPTIMAL_COUNT_L1 32
+#define OPTIMAL_COUNT_L2 32
+#define OPTIMAL_COUNT_L3 16
+#define OPTIMAL_COUNT_DRAM 8
+#define OPTIMAL_COUNT_CUSTOM 16
+
+#define DEFAULT_SET_MAX 4096
+#define DEFAULT_SET_MIN 65536
+#define DEFAULT_SET_STEP 1024
+
 // Local (not declared at header) helpers
 
 BOOL methodCheck( DWORD bitSelect, DWORD64 bitMap )
@@ -27,7 +45,7 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
                    PRINT_ENTRY parmList[],
                    LIST_RELEASE_RESOURCES* xr )
 {
-    // CPU memory read/write method
+    // Select CPU memory read/write method = f ( application defaults, command line options, platform features)
     DWORD cpuMethod = xu->optionRwMethod;
     if ( cpuMethod == DEFAULT_RW_METHOD )
     {
@@ -53,11 +71,68 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
     }
     ipb->selectRwMethod = cpuMethod;
     
-    // DEBUG ASM METHODS
-    // ipb->selectRwMethod = 8; // DEBUG
-    // DEBUG ASM METHODS
+    // Select target object = f ( application defaults, command line options )
+    ipb->selectRwTarget = xu->optionRwTarget;
+    DWORD64 blkMin = 0;
+    DWORD64 blkMax = 0;
+    DWORD64 blkStep = 0;
+    DWORD64 blkCount = 0;
+    switch ( ipb->selectRwTarget )
+    {
+        case L1_CACHE:
+            blkMax = xp->platformCache.pointL1;
+            if ( blkMax == 0 ) blkMax = AUTO_L1;
+            blkCount = OPTIMAL_COUNT_L1;
+            break;
+        case L2_CACHE:
+            blkMax = xp->platformCache.pointL2;
+            if ( blkMax == 0 ) blkMax = AUTO_L2;
+            blkCount = OPTIMAL_COUNT_L2;
+            break;
+        case L3_CACHE:
+            blkMax = xp->platformCache.pointL3;
+            if ( blkMax == 0 ) blkMax = AUTO_L3;
+            blkCount = OPTIMAL_COUNT_L3;
+            break;
+        case L4_CACHE:
+        case DRAM:
+            blkMax = AUTO_DRAM;
+            blkCount = OPTIMAL_COUNT_DRAM;
+            break;
+        case USER_DEFINED_TARGET:
+            blkMax = AUTO_CUSTOM;
+            blkCount = OPTIMAL_COUNT_CUSTOM;
+            break;
+        default:
+            break;
+    }
+    blkMax *= 2;
+    blkStep = blkMax / blkCount;
+    blkMin = blkStep;
+    if ( ( blkMin <= 0 )||( blkMax <= 0 )||( blkStep <= 0 )||( blkCount <= 0 ) )
+    {
+        helperRelease ( xr );
+        exitWithInternalError( "failed buffer parameters assignment for target object" );
+    }
+    // assign block start/stop/delta sizes from command line parameters
+    ipb->selectBlockStart = xu->optionBlockStart;
+    ipb->selectBlockStop = xu->optionBlockStop;
+    ipb->selectBlockDelta = xu->optionBlockDelta;
+    // if no command line options, set automatically
+    if ( ipb->selectBlockStart == NOT_SET ) ipb->selectBlockStart = blkMin;
+    if ( ipb->selectBlockStop == NOT_SET ) ipb->selectBlockStop = blkMax;
+    if ( ipb->selectBlockDelta == NOT_SET ) ipb->selectBlockDelta = blkStep;
 
-    // ... oother options under construction ...
+    
+    // ... other options under construction ...
+    
+    
+    // Select measurement precision mode = f (application defaults, command line options )
+    ipb->selectPrecision = xu->optionPrecision;
+    
+ 
+    // ... other options under construction ...
+    
 
     // Print parameters before benchmarks run
     CSTR cstrSparm[] = { { BOLD_COLOR , "\n\nReady to start with parameters:" } , { 0, NULL } };

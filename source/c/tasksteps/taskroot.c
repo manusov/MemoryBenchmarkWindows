@@ -59,7 +59,7 @@ char* numaMode[] = {
 };
 // Precision control
 char* precision[] = {
-    "slow", "fast",
+    "slow", "fast", "auto",
     NULL
 };
 // Machine readable option control
@@ -150,7 +150,7 @@ char* numaModeDetails[] = {
 };
 // Precision control
 char* precisionDetails[] = {
-	"Slow and accurate", "Fast and approximation",
+	"Slow and accurate", "Fast but inaccurate", "Auto-calibrated",
 	NULL
 };
 // Machine readable option control
@@ -179,16 +179,15 @@ OPTION_ENTRY commandLineOptions[] = {
 // System configuration print list, used for system configuration visual (regular output)
 PRINT_ENTRY targetParameters[] = {
     { "CPU operation"       , rwMethodsDetails       , &targetIpb.selectRwMethod        , SELECTOR } ,
-/*  THIS OPTIONS SUPPORT IS UNDER CONSTRUCTION     
     { "Target object"       , rwTargetsDetails       , &targetIpb.selectRwTarget        , SELECTOR } ,
-    { "Cacheability mode"   , rwAccessDetails        , &targetIpb.selectNonTemporal     , SELECTOR } ,
-    { "Threads count"       , NULL                   , &targetIpb.selectThreadsCount    , INTEGER  } ,
-    { "Hyper-threading"     , hyperThreadingDetails  , &targetIpb.selectHyperThreading  , SELECTOR } ,
-    { "Paging mode"         , pageSizeDetails        , &targetIpb.selectPageSize        , SELECTOR } ,
-    { "NUMA topology"       , numaModeDetails        , &targetIpb.selectNuma            , SELECTOR } ,
+//  SOME OPTIONS SUPPORT IS UNDER CONSTRUCTION     
+//  { "Cacheability mode"   , rwAccessDetails        , &targetIpb.selectNonTemporal     , SELECTOR } ,
+//  { "Threads count"       , NULL                   , &targetIpb.selectThreadsCount    , INTEGER  } ,
+//  { "Hyper-threading"     , hyperThreadingDetails  , &targetIpb.selectHyperThreading  , SELECTOR } ,
+//  { "Paging mode"         , pageSizeDetails        , &targetIpb.selectPageSize        , SELECTOR } ,
+//  { "NUMA topology"       , numaModeDetails        , &targetIpb.selectNuma            , SELECTOR } ,
     { "Precision mode"      , precisionDetails       , &targetIpb.selectPrecision       , SELECTOR } ,
-    { "Machine readable"    , machineReadableDetails , &targetIpb.selectMachineReadable , SELECTOR } ,
-UNDER CONSTRUCTION */
+//  { "Machine readable"    , machineReadableDetails , &targetIpb.selectMachineReadable , SELECTOR } ,
     { "Allocated buffer"    , NULL                   , &targetIpb.baseOriginal          , POINTER  } ,
     { "Aligned source"      , NULL                   , &targetIpb.baseSrcAligned        , POINTER  } ,
     { "Aligned destination" , NULL                   , &targetIpb.baseDstAligned        , POINTER  } ,
@@ -198,22 +197,36 @@ UNDER CONSTRUCTION */
     { NULL                  , NULL                   , NULL                             , 0        }
 };
 
+// This table associated with native DLL procedures
+#if NATIVE_WIDTH == 32
+BYTE bytesPerInstruction[] = 
+{
+    4, 4, 4, 4, 4, 4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+};
+#endif
+#if NATIVE_WIDTH == 64
+BYTE bytesPerInstruction[] = 
+{
+    8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+};
+#endif
+
 // Benchmark sequence routine
 void taskRoot( int argc, char** argv )
 {
     // Set options defaults
-    stepDefaults( &userInput, &listRelease );
+    stepDefaults( &userInput, &speedCalibration, &listRelease );
     // Override options by command line
     stepCommandLine( argc, argv, commandLineOptions );
     // Check options values, must be DEFAULT if support UNDER CONSTRUCTION
-    stepOptionCheck( userInput.optionRwMethod        , DEFAULT_RW_METHOD       , commandLineOptions[0].name );
-    stepOptionCheck( userInput.optionRwTarget        , DEFAULT_RW_TARGET       , commandLineOptions[1].name );
+    // UNLOCKED. stepOptionCheck( userInput.optionRwMethod        , DEFAULT_RW_METHOD       , commandLineOptions[0].name );
+    // UNLOCKED. stepOptionCheck( userInput.optionRwTarget        , DEFAULT_RW_TARGET       , commandLineOptions[1].name );
     stepOptionCheck( userInput.optionNonTemporal     , DEFAULT_RW_ACCESS       , commandLineOptions[2].name );
     stepOptionCheck( userInput.optionThreadsCount    , DEFAULT_THREADS_COUNT   , commandLineOptions[3].name );
     stepOptionCheck( userInput.optionHyperThreading  , DEFAULT_HYPER_THREADING , commandLineOptions[4].name );
     stepOptionCheck( userInput.optionPageSize        , DEFAULT_PAGE_SIZE       , commandLineOptions[5].name );
     stepOptionCheck( userInput.optionNuma            , DEFAULT_NUMA_MODE       , commandLineOptions[6].name );
-    stepOptionCheck( userInput.optionPrecision       , DEFAULT_PRECISION       , commandLineOptions[7].name );
+    // UNLOCKED. stepOptionCheck( userInput.optionPrecision       , DEFAULT_PRECISION       , commandLineOptions[7].name );
     stepOptionCheck( userInput.optionMachineReadable , DEFAULT_MACHINEREADABLE , commandLineOptions[8].name );
     // Load native DLL, show strings
     stepLoadLibrary( &listDll, &listRelease );
@@ -238,12 +251,14 @@ void taskRoot( int argc, char** argv )
     stepPaging( &platformInput.platformPaging, &listRelease );
     // Detect ACPI NUMA/SMP topology declaration
     stepAcpi( &platformInput.platformAcpi, &listRelease );
-    // Allocate memory for target benchmark read/write buffer
-    stepMemoryAlloc( &userInput, &targetIpb, &listRelease );
-    // Allocate memory for benchmark statistics buffer
-    stepStatisticsAlloc( &targetIpb, &listRelease );
     // Build Input Parameters Block (IPB) for benchmark routine, show IPB fields
     stepBuildIpb( &userInput, &platformInput, &targetIpb, targetParameters, &listRelease );
+    // Allocate memory for target benchmark read/write buffer
+    stepMemoryAlloc( &targetIpb, &listRelease );
+    // Allocate memory for benchmark statistics buffer
+    stepStatisticsAlloc( &targetIpb, &listRelease );
+    // Calibrate measurement repeats
+    stepCalibration( &speedCalibration, &listDll, &platformInput, &targetIpb, &listRelease );
     // Execute benchmark
     stepPerformance( &listDll, &platformInput, &targetIpb, &targetOpb, &speedCalibration, &listRelease );
     // Show benchmark results

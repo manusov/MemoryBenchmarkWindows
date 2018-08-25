@@ -5,9 +5,13 @@
 
 /*
 TODO:
-1) Remove replications of "kernel32" name and handle, use centralized load,
+1) Remove duplication of "kernel32" name and handle, use centralized load,
 or independent routines is better?
 2) Restore after privileges set for large pages use.
+3) Remove duplication of seconds variable.
+4) Some duplications as stepCalibration and stepPerformancs.
+5) Optimization, use arrays instead if/case with different elements of structures.
+6) Refactoring if redundant variables.
 
 */
 
@@ -29,11 +33,11 @@ typedef CSTR* CSTRP;
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.20.01 for Windows ia32."
+#define BUILD_STRING "v0.20.02 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.20.01 for Windows x64."
+#define BUILD_STRING "v0.20.02 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else

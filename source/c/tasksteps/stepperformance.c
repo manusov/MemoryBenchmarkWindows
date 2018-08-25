@@ -2,18 +2,6 @@
  *    Execute target operation: benchmark, output results table.
  */
 
-// This table associated with native DLL procedures
-#if NATIVE_WIDTH == 32
-BYTE bytesPerInstruction[] = {
-4, 4, 4, 4, 4, 4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
-};
-#endif
-#if NATIVE_WIDTH == 64
-BYTE bytesPerInstruction[] = {
-8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
-};
-#endif
-
 void stepPerformance( LIST_DLL_FUNCTIONS* xf,
                       MPE_PLATFORM_INPUT* xp, 
                       MPE_INPUT_PARAMETERS_BLOCK* ipb, MPE_OUTPUT_PARAMETERS_BLOCK* opb,
@@ -34,7 +22,7 @@ void stepPerformance( LIST_DLL_FUNCTIONS* xf,
 
     BOOL status = FALSE;
     DWORDLONG deltaTSC = 0;
-    SIZE_T repeatsCount = 2000000;
+    SIZE_T repeatsCount = xc->measurementRepeats;
     SIZE_T instructionsCount = 0;
     int count = 1;
     double cpi = 0.0;
@@ -44,7 +32,7 @@ void stepPerformance( LIST_DLL_FUNCTIONS* xf,
     double mbps = 0.0;
     double* mbpsStatistics = xr->bufferStatistics;
 
-    CSTR cstrRun[] = {	{ BOLD_COLOR , "\n   #    size   CPI     nsPI    MBPS\n" } , { 0, NULL } };
+    CSTR cstrRun[] = {	{ BOLD_COLOR , "\n   #        size   CPI     nsPI    MBPS\n" } , { 0, NULL } };
     colorPrint ( cstrRun );
     lineOfTable( 78 );
     printf( "\n" );
@@ -86,7 +74,7 @@ void stepPerformance( LIST_DLL_FUNCTIONS* xf,
         mbps /= ( deltaTSC * seconds );
         mbps /= 1000000.0;
         mbpsStatistics[count-1] = mbps;
-        printf ( " %3d  %6d   %5.3f   %5.3f   %-10.3f\n" , count , blockStart , cpi , nspi , mbps );
+        printf ( " %3d  %10d   %5.3f   %5.3f   %-10.3f\n" , count , blockStart , cpi , nspi , mbps );
         count++;
         blockStart += blockStep;
     }
