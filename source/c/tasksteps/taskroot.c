@@ -180,8 +180,8 @@ OPTION_ENTRY commandLineOptions[] = {
 PRINT_ENTRY targetParameters[] = {
     { "CPU operation"       , rwMethodsDetails       , &targetIpb.selectRwMethod        , SELECTOR } ,
     { "Target object"       , rwTargetsDetails       , &targetIpb.selectRwTarget        , SELECTOR } ,
+    { "Cacheability mode"   , rwAccessDetails        , &targetIpb.selectNonTemporal     , SELECTOR } ,
 //  SOME OPTIONS SUPPORT IS UNDER CONSTRUCTION     
-//  { "Cacheability mode"   , rwAccessDetails        , &targetIpb.selectNonTemporal     , SELECTOR } ,
 //  { "Threads count"       , NULL                   , &targetIpb.selectThreadsCount    , INTEGER  } ,
 //  { "Hyper-threading"     , hyperThreadingDetails  , &targetIpb.selectHyperThreading  , SELECTOR } ,
 //  { "Paging mode"         , pageSizeDetails        , &targetIpb.selectPageSize        , SELECTOR } ,
@@ -201,13 +201,15 @@ PRINT_ENTRY targetParameters[] = {
 #if NATIVE_WIDTH == 32
 BYTE bytesPerInstruction[] = 
 {
-    4, 4, 4, 4, 4, 4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+     4,  4,  4,  4,  4,  4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
+    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32
 };
 #endif
 #if NATIVE_WIDTH == 64
 BYTE bytesPerInstruction[] = 
 {
-    8, 8, 8, 8, 8, 8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64
+     8,  8,  8,  8,  8,  8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
+    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32
 };
 #endif
 
@@ -221,7 +223,7 @@ void taskRoot( int argc, char** argv )
     // Check options values, must be DEFAULT if support UNDER CONSTRUCTION
     // UNLOCKED. stepOptionCheck( userInput.optionRwMethod        , DEFAULT_RW_METHOD       , commandLineOptions[0].name );
     // UNLOCKED. stepOptionCheck( userInput.optionRwTarget        , DEFAULT_RW_TARGET       , commandLineOptions[1].name );
-    stepOptionCheck( userInput.optionNonTemporal     , DEFAULT_RW_ACCESS       , commandLineOptions[2].name );
+    // UNLOCKED. stepOptionCheck( userInput.optionNonTemporal     , DEFAULT_RW_ACCESS       , commandLineOptions[2].name );
     stepOptionCheck( userInput.optionThreadsCount    , DEFAULT_THREADS_COUNT   , commandLineOptions[3].name );
     stepOptionCheck( userInput.optionHyperThreading  , DEFAULT_HYPER_THREADING , commandLineOptions[4].name );
     stepOptionCheck( userInput.optionPageSize        , DEFAULT_PAGE_SIZE       , commandLineOptions[5].name );
@@ -257,6 +259,8 @@ void taskRoot( int argc, char** argv )
     stepMemoryAlloc( &targetIpb, &listRelease );
     // Allocate memory for benchmark statistics buffer
     stepStatisticsAlloc( &targetIpb, &listRelease );
+    // Show message about ready to start and parameters list
+    stepReadyToStart( targetParameters, &listRelease );
     // Calibrate measurement repeats
     stepCalibration( &speedCalibration, &listDll, &platformInput, &targetIpb, &listRelease );
     // Execute benchmark

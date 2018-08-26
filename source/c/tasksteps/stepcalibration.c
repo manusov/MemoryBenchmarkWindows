@@ -7,8 +7,37 @@ void stepCalibration( MPE_CALIBRATION* xc,
                       MPE_PLATFORM_INPUT* xp, MPE_INPUT_PARAMETERS_BLOCK* ipb, 
                       LIST_RELEASE_RESOURCES* xr )
 {
-    
     // Show begin message
+    DWORD32 xSlow = xc->measurementApproximation;
+    DWORD32 xFast = xc->measurementApproximation;
+    switch ( ipb->selectRwTarget )
+    {
+        case L1_CACHE:
+            xSlow = xc->slowL1;
+            xFast = xc->fastL1;
+            break;
+        case L2_CACHE:
+            xSlow = xc->slowL2;
+            xFast = xc->fastL2;
+            break;
+        case L3_CACHE:
+            xSlow = xc->slowL3;
+            xFast = xc->fastL3;
+            break;
+        case L4_CACHE:
+        case DRAM:
+            xSlow = xc->slowDRAM;
+            xFast = xc->fastDRAM;
+            break;
+        case USER_DEFINED_TARGET:
+            xSlow = xc->slowCustom;
+            xFast = xc->fastCustom;
+            break;
+        default:
+            break;
+    }
+    xc->measurementApproximation = xFast;
+    
     if ( ipb->selectPrecision == AUTO_CALIBRATE )
     {
         printf( "\nTarget time=%.1f seconds, repeats approximation=%d iterations\nAuto calibration mode selected...", 
@@ -31,10 +60,13 @@ void stepCalibration( MPE_CALIBRATION* xc,
         DWORDLONG deltaTSC = 0;
         SIZE_T instructionsCount = blockMax / bytesPerInstruction[ rwMethodSelect ];
         SIZE_T repeatsCount = xc->measurementApproximation;
+
         // Measurement for calibration
         status = ( xf->DLL_PerformanceGate )
                  ( rwMethodSelect ,  bufferAlignedSrc , bufferAlignedDst ,
                    instructionsCount , repeatsCount , &deltaTSC );
+
+        // Analysing calibration results
         if ( status == 0 )
         {
             helperRelease ( xr );
@@ -51,35 +83,6 @@ void stepCalibration( MPE_CALIBRATION* xc,
     }
     else
     {
-        DWORD32 xSlow = xc->measurementApproximation;
-        DWORD32 xFast = xc->measurementApproximation;
-        switch ( ipb->selectRwTarget )
-        {
-            case L1_CACHE:
-                xSlow = xc->slowL1;
-                xFast = xc->fastL1;
-                break;
-            case L2_CACHE:
-                xSlow = xc->slowL2;
-                xFast = xc->fastL2;
-                break;
-            case L3_CACHE:
-                xSlow = xc->slowL3;
-                xFast = xc->fastL3;
-                break;
-            case L4_CACHE:
-            case DRAM:
-                xSlow = xc->slowDRAM;
-                xFast = xc->fastDRAM;
-                break;
-            case USER_DEFINED_TARGET:
-                xSlow = xc->slowCustom;
-                xFast = xc->fastCustom;
-                break;
-            default:
-                break;
-        }
-        
         if ( ipb->selectPrecision == SLOW )
         {
             xc->measurementRepeats = xSlow;

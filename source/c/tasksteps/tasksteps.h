@@ -8,7 +8,7 @@
 #define AUTO_SET -2          // constant means auto-detect by platform configuration
 #define DEFAULT_RW_METHOD AUTO_SET        // default method for read-write memory
 #define DEFAULT_RW_TARGET L1_CACHE        // default tested object is L1 cache memory
-#define DEFAULT_RW_ACCESS AUTO_SET        // non-temporal data mode disabled by default
+#define DEFAULT_RW_ACCESS NOT_SET         // non-temporal data mode disabled by default
 #define DEFAULT_THREADS_COUNT AUTO_SET    // number of execution threads, default single thread
 #define DEFAULT_HYPER_THREADING HTOFF     // hyper-threading disabled by default
 #define DEFAULT_PAGE_SIZE MIN_PAGES       // default pages is minimal size, 4KB
@@ -310,6 +310,8 @@ void stepStatisticsAlloc( MPE_INPUT_PARAMETERS_BLOCK* ipb, LIST_RELEASE_RESOURCE
 void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp, MPE_INPUT_PARAMETERS_BLOCK* ipb,
                    PRINT_ENTRY parmList[],
                    LIST_RELEASE_RESOURCES* xr );
+// Show message about ready to start and parameters list
+void stepReadyToStart( PRINT_ENTRY parmList[], LIST_RELEASE_RESOURCES* xr );
 // Benchmarks calibration, adjust measurement repeats count
 void stepCalibration( MPE_CALIBRATION* xc,
                       LIST_DLL_FUNCTIONS* xf, 

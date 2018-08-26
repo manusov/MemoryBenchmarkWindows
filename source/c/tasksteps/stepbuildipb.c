@@ -20,6 +20,95 @@
 #define DEFAULT_SET_MIN 65536
 #define DEFAULT_SET_STEP 1024
 
+/*
+
+Temporal vs Nontemporal methods replacement
+
+ID    Temporal        Nontemporal        Replaced ?
+------------------------------------------------------
+0     Read_MOV64      Read_MOV64
+1     Write_MOV64     Write_MOV64
+2     Copy_MOV64      Copy_MOV64
+3     Modify_NOT64    Modify_NOT64
+4     Write_STOSQ     Write_STOSQ
+5     Copy_MOVSQ      Copy_MOVSQ
+6     Read_SSE128     NtpRead_SSE128     +
+7     Write_SSE128    NtWrite_SSE128     +
+8     Copy_SSE128     NtCopy_SSE128      +
+9     Read_AVX256     NtpRead_AVX256     +
+10    Write_AVX256    NtWrite_AVX256     +
+11    Copy_AVX256     NtCopy_AVX256      +
+12    Read_AVX512     Read_AVX512 
+13    Write_AVX512    NtWrite_AVX512     +
+14    Copy_AVX512     NtCopy_AVX512      +
+15    Dot_FMA256      Dot_FMA256
+16    Dot_FMA512      Dot_FMA512
+------------------------------------------------------
+
+C replace argument                      C replace result                       Replaced ?
+-------------------------------------------------------------------------------------------
+CPU_FEATURE_READ_IA32_X64               CPU_FEATURE_READ_IA32_X64
+CPU_FEATURE_WRITE_IA32_X64              CPU_FEATURE_WRITE_IA32_X64
+CPU_FEATURE_COPY_IA32_X64               CPU_FEATURE_COPY_IA32_X64
+CPU_FEATURE_MODIFY_IA32_X64             CPU_FEATURE_MODIFY_IA32_X64
+CPU_FEATURE_WRITE_STRINGS_IA32_X64      CPU_FEATURE_WRITE_STRINGS_IA32_X64
+CPU_FEATURE_COPY_STRINGS_IA32_X64       CPU_FEATURE_COPY_STRINGS_IA32_X64
+CPU_FEATURE_READ_SSE128                 CPU_FEATURE_NTPRW_READ_SSE128          +
+CPU_FEATURE_WRITE_SSE128                CPU_FEATURE_NTW_WRITE_SSE128           +
+CPU_FEATURE_COPY_SSE128                 CPU_FEATURE_NTW_COPY_SSE128            +
+CPU_FEATURE_READ_AVX256                 CPU_FEATURE_NTPRW_READ_AVX256          +
+CPU_FEATURE_WRITE_AVX256                CPU_FEATURE_NTW_WRITE_AVX256           +
+CPU_FEATURE_COPY_AVX256                 CPU_FEATURE_NTRW_COPY_AVX256           +
+CPU_FEATURE_READ_AVX512                 CPU_FEATURE_READ_AVX512
+CPU_FEATURE_WRITE_AVX512                CPU_FEATURE_NTW_WRITE_AVX512           +
+CPU_FEATURE_COPY_AVX512                 CPU_FEATURE_NTW_COPY_AVX512            +
+CPU_FEATURE_DOT_FMA256                  CPU_FEATURE_DOT_FMA256
+CPU_FEATURE_DOT_FMA512                  CPU_FEATURE_DOT_FMA256
+
+Replacements array
+------------------------------------------------------
+CPU_FEATURE_READ_IA32_X64,
+CPU_FEATURE_WRITE_IA32_X64,
+CPU_FEATURE_COPY_IA32_X64,
+CPU_FEATURE_MODIFY_IA32_X64,
+CPU_FEATURE_WRITE_STRINGS_IA32_X64,
+CPU_FEATURE_COPY_STRINGS_IA32_X64,
+CPU_FEATURE_NTPRW_READ_SSE128,
+CPU_FEATURE_NTW_WRITE_SSE128,
+CPU_FEATURE_NTW_COPY_SSE128,
+CPU_FEATURE_NTPRW_READ_AVX256,
+CPU_FEATURE_NTW_WRITE_AVX256,
+CPU_FEATURE_NTRW_COPY_AVX256,
+CPU_FEATURE_READ_AVX512,
+CPU_FEATURE_NTW_WRITE_AVX512,
+CPU_FEATURE_NTW_COPY_AVX512,
+CPU_FEATURE_DOT_FMA256,
+CPU_FEATURE_DOT_FMA256,
+
+*/
+
+#define NT_COUNT 17
+BYTE nontemporalMethods[] =
+{
+    CPU_FEATURE_READ_IA32_X64,
+    CPU_FEATURE_WRITE_IA32_X64,
+    CPU_FEATURE_COPY_IA32_X64,
+    CPU_FEATURE_MODIFY_IA32_X64,
+    CPU_FEATURE_WRITE_STRINGS_IA32_X64,
+    CPU_FEATURE_COPY_STRINGS_IA32_X64,
+    CPU_FEATURE_NTPRW_READ_SSE128,
+    CPU_FEATURE_NTW_WRITE_SSE128,
+    CPU_FEATURE_NTW_COPY_SSE128,
+    CPU_FEATURE_NTPRW_READ_AVX256,
+    CPU_FEATURE_NTW_WRITE_AVX256,
+    CPU_FEATURE_NTRW_COPY_AVX256,
+    CPU_FEATURE_READ_AVX512,
+    CPU_FEATURE_NTW_WRITE_AVX512,
+    CPU_FEATURE_NTW_COPY_AVX512,
+    CPU_FEATURE_DOT_FMA256,
+    CPU_FEATURE_DOT_FMA256,
+};
+
 // Local (not declared at header) helpers
 
 BOOL methodCheck( DWORD bitSelect, DWORD64 bitMap )
@@ -41,8 +130,8 @@ BOOL methodCheck( DWORD bitSelect, DWORD64 bitMap )
 // Step action routine
 
 void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp, 
-                   MPE_INPUT_PARAMETERS_BLOCK* ipb, 
-                   PRINT_ENTRY parmList[],
+                   MPE_INPUT_PARAMETERS_BLOCK* ipb,
+                   PRINT_ENTRY parmList[], 
                    LIST_RELEASE_RESOURCES* xr )
 {
     // Select CPU memory read/write method = f ( application defaults, command line options, platform features)
@@ -77,27 +166,32 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
     DWORD64 blkMax = 0;
     DWORD64 blkStep = 0;
     DWORD64 blkCount = 0;
+    DWORD temporalByObject = DEFAULT_CACHING;
     switch ( ipb->selectRwTarget )
     {
         case L1_CACHE:
             blkMax = xp->platformCache.pointL1;
             if ( blkMax == 0 ) blkMax = AUTO_L1;
             blkCount = OPTIMAL_COUNT_L1;
+            temporalByObject = TEMPORAL;
             break;
         case L2_CACHE:
             blkMax = xp->platformCache.pointL2;
             if ( blkMax == 0 ) blkMax = AUTO_L2;
             blkCount = OPTIMAL_COUNT_L2;
+            temporalByObject = TEMPORAL;
             break;
         case L3_CACHE:
             blkMax = xp->platformCache.pointL3;
             if ( blkMax == 0 ) blkMax = AUTO_L3;
             blkCount = OPTIMAL_COUNT_L3;
+            temporalByObject = TEMPORAL;
             break;
         case L4_CACHE:
         case DRAM:
             blkMax = AUTO_DRAM;
             blkCount = OPTIMAL_COUNT_DRAM;
+            temporalByObject = NON_TEMPORAL;   // NON_TEMPORAL even for L4 cache
             break;
         case USER_DEFINED_TARGET:
             blkMax = AUTO_CUSTOM;
@@ -122,6 +216,29 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
     if ( ipb->selectBlockStart == NOT_SET ) ipb->selectBlockStart = blkMin;
     if ( ipb->selectBlockStop == NOT_SET ) ipb->selectBlockStop = blkMax;
     if ( ipb->selectBlockDelta == NOT_SET ) ipb->selectBlockDelta = blkStep;
+    
+    // Select temporal/nontemporal mode = f ( application defaults, command line options )
+    
+    if ( xu->optionNonTemporal != NOT_SET )
+    {
+        ipb->selectNonTemporal = xu->optionNonTemporal;
+    }
+    else
+    {
+        ipb->selectNonTemporal = temporalByObject;
+    }
+    
+    if ( ipb->selectNonTemporal == NON_TEMPORAL )
+    {
+        if ( ipb->selectRwMethod > NT_COUNT )
+        {
+            exitWithInternalError( "failed non-temporal memory read/write method selection" );
+        }
+        else
+        {
+            ipb->selectRwMethod = nontemporalMethods[ ipb->selectRwMethod ];
+        }
+    }
 
     
     // ... other options under construction ...
@@ -132,22 +249,7 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
     
  
     // ... other options under construction ...
-    
+   
 
-    // Print parameters before benchmarks run
-    CSTR cstrSparm[] = { { BOLD_COLOR , "\n\nReady to start with parameters:" } , { 0, NULL } };
-    colorPrint ( cstrSparm );
-    regularOutput( parmList );
-    // Wait user input
-   	char c = inputChar( "\nStart (y/n) ? ", inputBuffer, 1 );
-   	// Handling user input
-	printf( "\n" );
-	c = tolower( c );
-	if ( c != 'y' )
-	{
-        // Memory buffer de-allocation and exit
-        helperRelease( xr );
-		ExitProcess( 3 );
-	} 
 }
 

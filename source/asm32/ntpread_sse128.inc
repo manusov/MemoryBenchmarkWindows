@@ -31,22 +31,22 @@ prefetchnta [eax+16*00+ebx]
 prefetchnta [eax+16*04+ebx]
 @@:
 ; end of patch v0.98.1
-movapd xmm0,[eax-16*08]
-movapd xmm1,[eax-16*07]
-movapd xmm2,[eax-16*06]
-movapd xmm3,[eax-16*05]
-movapd xmm4,[eax-16*04]
-movapd xmm5,[eax-16*03]
-movapd xmm6,[eax-16*02]
-movapd xmm7,[eax-16*01]
-movapd xmm0,[eax+16*00]
-movapd xmm1,[eax+16*01]
-movapd xmm2,[eax+16*02]
-movapd xmm3,[eax+16*03]
-movapd xmm4,[eax+16*04]
-movapd xmm5,[eax+16*05]
-movapd xmm6,[eax+16*06]
-movapd xmm7,[eax+16*07]
+movaps xmm0,[eax-16*08]
+movaps xmm1,[eax-16*07]
+movaps xmm2,[eax-16*06]
+movaps xmm3,[eax-16*05]
+movaps xmm4,[eax-16*04]
+movaps xmm5,[eax-16*03]
+movaps xmm6,[eax-16*02]
+movaps xmm7,[eax-16*01]
+movaps xmm0,[eax+16*00]
+movaps xmm1,[eax+16*01]
+movaps xmm2,[eax+16*02]
+movaps xmm3,[eax+16*03]
+movaps xmm4,[eax+16*04]
+movaps xmm5,[eax+16*05]
+movaps xmm6,[eax+16*06]
+movaps xmm7,[eax+16*07]
 add eax,ebx                  ; Modify address, addend=register (not constant) for optimization!
 dec edx
 jnz Block_NtpRead_SSE128     ; Cycle for block data transfer, DEC/JNZ is faster than LOOP!
@@ -59,7 +59,7 @@ jz Measure_NtpRead_SSE128
 mov ebx,16                   ; 16 bytes per cycle with one 128-bit SSE register
 ; Tail cycle
 Tail_NtpRead_SSE128:
-movapd xmm0,[eax-16*08]
+movaps xmm0,[eax-16*08]
 add eax,ebx                  ; Modify address, addend=register (not constant) for optimization!
 dec edx
 jnz Tail_NtpRead_SSE128      ; Cycle for tail data transfer, DEC/JNZ is faster than LOOP!

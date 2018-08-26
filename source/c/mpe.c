@@ -5,6 +5,13 @@
 
 /*
 TODO:
+
+Group 1. Select target object option.
+1) Adaptive calibration start constant, for example too slow for DRAM.
+2) Adaptive cache levels, trying L3 = detected L2 * 2, if L3 not detected by WinAPI/CPUID.
+3) Name and procedure mismatch: PREFETCHNTA+MOVAPS, really MOVAPD.
+
+Group 2.
 1) Remove duplication of "kernel32" name and handle, use centralized load,
 or independent routines is better?
 2) Restore after privileges set for large pages use.
@@ -33,11 +40,11 @@ typedef CSTR* CSTRP;
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.20.02 for Windows ia32."
+#define BUILD_STRING "v0.20.03 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.20.02 for Windows x64."
+#define BUILD_STRING "v0.20.03 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -113,6 +120,7 @@ void exitWithMessage( CHAR* messageName );
 #include "tasksteps\steppaging.c"
 #include "tasksteps\stepacpi.c"
 #include "tasksteps\stepbuildipb.c"
+#include "tasksteps\stepreadytostart.c"
 #include "tasksteps\stepcalibration.c"
 #include "tasksteps\stepperformance.c"
 #include "tasksteps\stepinterpretingopb.c"
