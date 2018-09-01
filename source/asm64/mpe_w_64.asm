@@ -94,6 +94,18 @@ pop rbx
 xor eax,eax
 ret
 
+; Execute RDTSC instruction, assume support already verified
+; INPUT:
+; Parm#1 = RCX = Pointer to output QWORD variable = 64-bit TSC value
+; OUTPUT:
+; void
+ExecuteRdtsc:
+rdtsc
+mov [rcx+0],eax
+mov [rcx+4],edx
+xor eax,eax
+ret 
+
 ; Execute XGETBV instruction, assume support already verified
 ; INPUT:
 ; Parm#1 = RCX = Pointer to output QWORD variable = XCR0 bitmap
@@ -231,7 +243,7 @@ include 'ntpread_avx256.inc'
 ; Data section
 section '.data' data readable writeable
 StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.20.00 for Windows x64.',0
+StringVersion    DB 'v0.20.01 for Windows x64.',0
 StringCopyright  DB '(C)2018 IC Book Labs.',0
 
 ; Pointers to performance patterns
@@ -283,6 +295,7 @@ export  'test1.dll'                 ,\
 GetDllStrings   , 'GetDllStrings'   ,\
 CheckCpuid      , 'CheckCpuid'      ,\
 ExecuteCpuid    , 'ExecuteCpuid'    ,\
+ExecuteRdtsc    , 'ExecuteRdtsc'    ,\
 ExecuteXgetbv   , 'ExecuteXgetbv'   ,\
 MeasureTsc      , 'MeasureTsc'      ,\
 PerformanceGate , 'PerformanceGate'  
@@ -295,4 +308,3 @@ include 'api\kernel32.inc'
 ; Fixups section
 data fixups
 end data
-

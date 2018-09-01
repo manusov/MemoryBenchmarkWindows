@@ -7,7 +7,7 @@
 #define AUTO_L1 16*1024
 #define AUTO_L2 128*1024
 #define AUTO_L3 4096*1024
-#define AUTO_DRAM 512*1024*1024
+#define AUTO_DRAM 64*1024*1024
 #define AUTO_CUSTOM 1024*1024
 
 #define OPTIMAL_COUNT_L1 32
@@ -247,6 +247,14 @@ void stepBuildIpb( MPE_USER_INPUT* xu, MPE_PLATFORM_INPUT* xp,
     // Select measurement precision mode = f (application defaults, command line options )
     ipb->selectPrecision = xu->optionPrecision;
     
+    // Threads count option
+    ipb->selectThreadsCount = xu->optionThreadsCount;
+    if ( ipb->selectThreadsCount == AUTO_SET )
+    {
+        ipb->selectThreadsCount = 1;
+    }
+    
+ 
  
     // ... other options under construction ...
    

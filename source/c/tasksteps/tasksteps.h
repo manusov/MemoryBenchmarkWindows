@@ -158,6 +158,7 @@ typedef struct {
 
 // NUMA information data
 typedef struct {
+    KAFFINITY systemAffinity;
     DWORD32 domainsCount;
     MPE_NUMA_DOMAIN* domainsList;
 } MPE_NUMA_DATA;
@@ -266,6 +267,7 @@ typedef struct {
     void ( __stdcall *DLL_GetDllStrings   ) ( char** , char** , char** );
     BOOL ( __stdcall *DLL_CheckCpuid      ) ( void );
     void ( __stdcall *DLL_ExecuteCpuid    ) ( DWORD, DWORD, DWORD* , DWORD* , DWORD* , DWORD* );
+    void ( __stdcall *DLL_ExecuteRdtsc    ) ( DWORDLONG* );
     void ( __stdcall *DLL_ExecuteXgetbv   ) ( DWORDLONG* );
     BOOL ( __stdcall *DLL_MeasureTsc      ) ( DWORDLONG* );
     BOOL ( __stdcall *DLL_PerformanceGate ) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );
@@ -275,7 +277,41 @@ typedef struct {
     CHAR* name4;
     CHAR* name5;
     CHAR* name6;
+    CHAR* name7;
 } LIST_DLL_FUNCTIONS;
+
+// This control structure used per thread.
+// Array of this structures is multithread context. 
+// Note 1. TrueSize not used when memory release, block identified by base.
+// Note 2. Last 3 entries reserved yet.
+typedef struct
+{
+    HANDLE eventHandle;         // Event Handle for this thread operation complete signal
+    HANDLE threadHandle;        // Thread Handle for execution thread
+    KAFFINITY threadAffinity;   // Affinity Mask = F (True Affinity Mask, Options)
+    BOOL ( __stdcall *DLL_PerformanceGate )
+         ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );  // Low-level function entry point
+    DWORD_PTR methodId;         // Entry point to Target operation method subroutine ID
+    LPVOID base1;               // Source for read, destination for write and modify
+    LPVOID base2;               // Destination for copy
+    SIZE_T sizeBytes;           // Block size, units = bytes, for memory allocation
+    SIZE_T sizeInstructions;    // Block size, units = instructions, for benchmarking
+    DWORD_PTR largePages;       // Bit D0=Large Pages, other bits [1-31/63] = reserved
+    SIZE_T measurementRepeats;  // Number of measurement repeats
+    KAFFINITY trueAffinity;     // True affinity mask, because modified as f(options)
+    LPVOID trueBase;            // True (before alignment) memory block base for release
+    PDWORD64 returnDeltaTSC;    // Pointer to output list of returned dTSC
+    DWORD32 returnCount;        // Output list entries counter
+    DWORD32 returnLimit;        // Output list number of entries
+} THREAD_CONTROL_ENTRY;
+
+// Data structures for call benchmark patterns in the multi-thread mode.
+typedef struct
+{
+    THREAD_CONTROL_ENTRY* threadsControl;
+    HANDLE* signalsHandles;
+    int threadsCount;
+} MT_DATA;
 
 // Structure for list objects requires release
 typedef struct {
@@ -284,6 +320,8 @@ typedef struct {
     int statisticsCount;
     HANDLE nativeLibrary;
     CHAR* dllName;
+    THREAD_CONTROL_ENTRY* threadsControl;
+    HANDLE* signalsHandles;
 } LIST_RELEASE_RESOURCES;
 
 // Task routines sequencer

@@ -40,7 +40,7 @@ void stepCalibration( MPE_CALIBRATION* xc,
     
     if ( ipb->selectPrecision == AUTO_CALIBRATE )
     {
-        printf( "\nTarget time=%.1f seconds, repeats approximation=%d iterations\nAuto calibration mode selected...", 
+        printf( "\nTarget time=%.1f seconds, repeats approximation=%d iterations\nSingle-thread auto calibration mode selected...", 
                 xc->measurementTime, xc->measurementApproximation );
         double seconds = 1.0 / ( xp->platformTimings.clkTsc );           // seconds per one TSC clock
         double tryingSeconds = 0.0;

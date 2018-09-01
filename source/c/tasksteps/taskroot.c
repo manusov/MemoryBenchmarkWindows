@@ -15,6 +15,9 @@ MPE_CALIBRATION speedCalibration;
 LIST_DLL_FUNCTIONS listDll;
 LIST_RELEASE_RESOURCES listRelease;
 
+// Data structures for call benchmark patterns in the multi-thread mode.
+MT_DATA mtData;
+
 // Command line parameters parse control
 // Strings for command line options detect
 // Methods for read-write memory by CPU instruction set
@@ -181,8 +184,8 @@ PRINT_ENTRY targetParameters[] = {
     { "CPU operation"       , rwMethodsDetails       , &targetIpb.selectRwMethod        , SELECTOR } ,
     { "Target object"       , rwTargetsDetails       , &targetIpb.selectRwTarget        , SELECTOR } ,
     { "Cacheability mode"   , rwAccessDetails        , &targetIpb.selectNonTemporal     , SELECTOR } ,
+    { "Threads count"       , NULL                   , &targetIpb.selectThreadsCount    , INTEGER  } ,
 //  SOME OPTIONS SUPPORT IS UNDER CONSTRUCTION     
-//  { "Threads count"       , NULL                   , &targetIpb.selectThreadsCount    , INTEGER  } ,
 //  { "Hyper-threading"     , hyperThreadingDetails  , &targetIpb.selectHyperThreading  , SELECTOR } ,
 //  { "Paging mode"         , pageSizeDetails        , &targetIpb.selectPageSize        , SELECTOR } ,
 //  { "NUMA topology"       , numaModeDetails        , &targetIpb.selectNuma            , SELECTOR } ,
@@ -224,7 +227,7 @@ void taskRoot( int argc, char** argv )
     // UNLOCKED. stepOptionCheck( userInput.optionRwMethod        , DEFAULT_RW_METHOD       , commandLineOptions[0].name );
     // UNLOCKED. stepOptionCheck( userInput.optionRwTarget        , DEFAULT_RW_TARGET       , commandLineOptions[1].name );
     // UNLOCKED. stepOptionCheck( userInput.optionNonTemporal     , DEFAULT_RW_ACCESS       , commandLineOptions[2].name );
-    stepOptionCheck( userInput.optionThreadsCount    , DEFAULT_THREADS_COUNT   , commandLineOptions[3].name );
+    // UNLOCKED. stepOptionCheck( userInput.optionThreadsCount    , DEFAULT_THREADS_COUNT   , commandLineOptions[3].name );
     stepOptionCheck( userInput.optionHyperThreading  , DEFAULT_HYPER_THREADING , commandLineOptions[4].name );
     stepOptionCheck( userInput.optionPageSize        , DEFAULT_PAGE_SIZE       , commandLineOptions[5].name );
     stepOptionCheck( userInput.optionNuma            , DEFAULT_NUMA_MODE       , commandLineOptions[6].name );
@@ -236,9 +239,10 @@ void taskRoot( int argc, char** argv )
     stepFunctionCheck( listDll.DLL_GetDllStrings   , listDll.name1 , listRelease.dllName );
     stepFunctionCheck( listDll.DLL_CheckCpuid      , listDll.name2 , listRelease.dllName );
     stepFunctionCheck( listDll.DLL_ExecuteCpuid    , listDll.name3 , listRelease.dllName );
-    stepFunctionCheck( listDll.DLL_ExecuteXgetbv   , listDll.name4 , listRelease.dllName );
-    stepFunctionCheck( listDll.DLL_MeasureTsc      , listDll.name5 , listRelease.dllName );
-    stepFunctionCheck( listDll.DLL_PerformanceGate , listDll.name6 , listRelease.dllName );
+    stepFunctionCheck( listDll.DLL_ExecuteRdtsc    , listDll.name4 , listRelease.dllName );
+    stepFunctionCheck( listDll.DLL_ExecuteXgetbv   , listDll.name5 , listRelease.dllName );
+    stepFunctionCheck( listDll.DLL_MeasureTsc      , listDll.name6 , listRelease.dllName );
+    stepFunctionCheck( listDll.DLL_PerformanceGate , listDll.name7 , listRelease.dllName );
     // Check CPUID, show CPU vendor and model strings, get functionality bitmaps, show this bitmaps
     stepDetectCpu( &listDll, &platformInput.platformFeatures, &listRelease );
     // Check TSC support, measure TSC clock, show
@@ -255,16 +259,45 @@ void taskRoot( int argc, char** argv )
     stepAcpi( &platformInput.platformAcpi, &listRelease );
     // Build Input Parameters Block (IPB) for benchmark routine, show IPB fields
     stepBuildIpb( &userInput, &platformInput, &targetIpb, targetParameters, &listRelease );
-    // Allocate memory for target benchmark read/write buffer
-    stepMemoryAlloc( &targetIpb, &listRelease );
     // Allocate memory for benchmark statistics buffer
     stepStatisticsAlloc( &targetIpb, &listRelease );
-    // Show message about ready to start and parameters list
-    stepReadyToStart( targetParameters, &listRelease );
-    // Calibrate measurement repeats
-    stepCalibration( &speedCalibration, &listDll, &platformInput, &targetIpb, &listRelease );
-    // Execute benchmark
-    stepPerformance( &listDll, &platformInput, &targetIpb, &targetOpb, &speedCalibration, &listRelease );
+    
+    if ( ( targetIpb.selectThreadsCount == NOT_SET ) ||
+         ( targetIpb.selectThreadsCount == AUTO_SET ) ||
+         ( targetIpb.selectThreadsCount == 1 ) )
+    // Single-thread branch
+    {
+        // Allocate memory for target benchmark read/write buffer
+        stepMemoryAlloc( &targetIpb, &listRelease );
+        // Show message about ready to start and parameters list
+        stepReadyToStart( targetParameters, &listRelease );
+        // Calibrate measurement repeats
+        stepCalibration( &speedCalibration, &listDll, &platformInput, &targetIpb, &listRelease );
+        // Execute benchmark
+        stepPerformance( &listDll, &platformInput, 
+                         &targetIpb, &targetOpb, &speedCalibration, &listRelease );
+    }
+    else
+    // Multi-thread branch. 
+    // TODO: make regular: ST = MT with Threads Count = 1. But old ST branch required for debug.
+    {
+        // Allocate memory for threads descriptors list and threads handles list
+        mtStepListAlloc( &mtData, &targetIpb, &listRelease );
+        // Open multithread session, build threads descriptors list
+        mtStepOpen( &mtData, &listDll, &platformInput, &targetIpb, &listRelease );
+        // Allocate memory for target benchmark read/write buffer
+        mtStepMemoryAlloc( &mtData, &targetIpb, &listRelease );
+        // Show message about ready to start and parameters list
+        stepReadyToStart( targetParameters, &listRelease );
+        // Calibrate measurement repeats
+        mtStepCalibration( &mtData, &speedCalibration, &listDll, &platformInput, &targetIpb, &listRelease );
+        // Execute benchmark
+        mtStepPerformance( &mtData, &listDll, &platformInput, 
+                           &targetIpb, &targetOpb, &speedCalibration, &listRelease );
+        // Close multithread session: terminate threads, close events handles
+        mtStepClose( &mtData, &listRelease );
+    }
+    
     // Show benchmark results
     stepInterpretingOpb( &targetOpb, &userOutput, &listRelease );
     // Release allocated resources

@@ -13,12 +13,23 @@ Group 1. Select target object option.
 
 Group 2.
 1) Remove duplication of "kernel32" name and handle, use centralized load,
-or independent routines is better?
+   or independent routines is better?
 2) Restore after privileges set for large pages use.
 3) Remove duplication of seconds variable.
 4) Some duplications as stepCalibration and stepPerformancs.
 5) Optimization, use arrays instead if/case with different elements of structures.
 6) Refactoring if redundant variables.
+7) Use Thread Control structures array as part of IPB, for single thread also. 
+8) NUMA-optimization with item 6, thread control as IPB is better for NUMA.
+9) Bug with non-supported CPU instruction set can be used when "access=nontemporal" option used.
+10) Remove duplications of some procedures for example calibration: 2 calibration + 2 performance = 4 duplicated.
+11) Serializing common global RDTSC for multi-thread mode.
+12) Status after wait objects.
+13) Remove extra transit variables.
+14) Accurate data types match.
+
+Group 3.
+Big Refactoring.
 
 */
 
@@ -40,11 +51,11 @@ typedef CSTR* CSTRP;
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.20.03 for Windows ia32."
+#define BUILD_STRING "v0.20.04 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.20.03 for Windows x64."
+#define BUILD_STRING "v0.20.04 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -97,6 +108,7 @@ void exitWithMessage( CHAR* messageName );
 #include "servicehelpers\servicehelpers.h"
 #include "systemhelpers\systemhelpers.h"
 #include "tasksteps\tasksteps.h"
+#include "multithread\multithread.h"
 
 // This application includes, service helpers modules
 #include "servicehelpers\printhelpers.c"
@@ -128,6 +140,16 @@ void exitWithMessage( CHAR* messageName );
 #include "tasksteps\stepmemoryalloc.c"
 #include "tasksteps\stepstatisticsalloc.c"
 #include "tasksteps\helperrelease.c"
+// This application includes, multi-thread management
+#include "multithread\mtsteplistalloc.c"
+#include "multithread\mtstepmemoryalloc.c"
+#include "multithread\mtstepopen.c"
+#include "multithread\mtstepclose.c"
+#include "multithread\mtstepcalibration.c"
+#include "multithread\mtstepperformance.c"
+#include "multithread\threadsrun.c"
+#include "multithread\threadsrestart.c"
+#include "multithread\threadentry.c"
 
 // Helper routines for console application context.
 // Helper routine: clear screen and set cursor position to 0,0

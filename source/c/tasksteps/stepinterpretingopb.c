@@ -7,6 +7,11 @@ void stepInterpretingOpb( MPE_OUTPUT_PARAMETERS_BLOCK* opb, MPE_USER_OUTPUT* uou
 {
     // Assign local variables values
     int mbpsCount = xr->statisticsCount;
+    if ( mbpsCount == 0 )
+    {
+        helperRelease( xr );
+        exitWithInternalError("statistics data is wrong");
+    }
     double* mbpsStatistics = xr->bufferStatistics;
     double minMbps = 0;
     double maxMbps = 0;

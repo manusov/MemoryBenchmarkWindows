@@ -10,6 +10,32 @@ CHAR* gnhnFunction = "GetNumaHighestNodeNumber";
 
 void stepNuma( MPE_NUMA_DATA* xn, LIST_RELEASE_RESOURCES* xr )
 {
+    // Get system affinity mask
+    DWORD_PTR processAffinity = 0;
+    DWORD_PTR systemAffinity = 0;
+    BOOL status = FALSE;
+    HANDLE processHandle = GetCurrentProcess();
+    if ( processHandle != NULL )
+    {
+        status = GetProcessAffinityMask( processHandle, &processAffinity, &systemAffinity );
+        if ( status )
+        {
+            xn->systemAffinity = systemAffinity;
+        }
+        else
+        {
+            exitWithSystemError( "get process affinity mask" );
+        }
+    }
+    else
+    {
+        exitWithSystemError( "get process handle" );
+    }
+    if ( xn->systemAffinity == 0 )
+    {
+        exitWithInternalError( "interpreting affinity mask" );
+    }
+
     // Variable for return, default NUMA domains count = 1
     int numaDomainsCount = 1;
     // Local variables, for get platform NUMA topology by WinAPI

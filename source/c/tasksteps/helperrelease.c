@@ -31,4 +31,15 @@ void helperRelease( LIST_RELEASE_RESOURCES* xr )
             exitWithSystemError( p );	
         }
     }
+    // Release threads list
+    if ( xr->threadsControl != NULL )
+    {
+        free( xr->threadsControl );
+    }
+    // Release threads events list
+    if ( xr->signalsHandles != NULL )
+    {
+        free( xr->signalsHandles );
+    }
 }
+
