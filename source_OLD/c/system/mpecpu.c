@@ -141,6 +141,7 @@ XGETBV_CONDITION xgetbvControl[] = {
 	{ ORMASKLAST , 1<<2                        , CPU_FEATURES_MOVNTDQA256   }
 };
 
+// Build supported read-write methods bitmaps
 DWORD bitmapCpu ( CHAR* returnText, MPE_CPU_BITMAP* returnBinary )
 {
     int N = 100;
@@ -161,6 +162,7 @@ DWORD bitmapCpu ( CHAR* returnText, MPE_CPU_BITMAP* returnBinary )
     return STATUS_OK;
 }
 
+// Measure TSC clock
 DWORD measureCpu( CHAR* returnText, MPE_CPU_MEASURE* returnBinary )
 {
     int N = 100;
@@ -192,6 +194,7 @@ DWORD measureCpu( CHAR* returnText, MPE_CPU_MEASURE* returnBinary )
     return STATUS_OK;
 }
 
+// Call performance pattern ( UNUSED YET BECAUSE DIRECT CALL )
 DWORD performanceCpu( CHAR* returnText, MPE_CPU_PERFORMANCE* returnBinary )
 {
     return STATUS_UNDER_CONSTRUCTION;

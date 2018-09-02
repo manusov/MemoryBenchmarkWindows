@@ -159,6 +159,21 @@ typedef struct {      // Benchmark useable points include DATA or UNIFIED caches
 DWORD initTopology( CHAR* returnText );
 DWORD deinitTopology( CHAR* returnText );
 DWORD detectTopology( CHAR* returnText, MPE_TOPOLOGY_DATA* returnBinary );
+// SMP topology and caches list (by WinAPI) helpers data definitions
+typedef BOOL ( WINAPI *LPFN_GLPI )(
+    PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, 
+    PDWORD );
+// Internal status conventions
+typedef enum {
+	FUNCTION_NO_ERRORS,       // 0 means no errors, can continue
+	FUNCTION_API_ERROR,       // 1 means required call GetLastError()
+	FUNCTION_INTERNAL_ERROR   // >=2 required external decoding of status
+} FUNCTION_RETURN;
+// SMP topology and caches list (by WinAPI) helpers
+DWORD getLPI( PSYSTEM_LOGICAL_PROCESSOR_INFORMATION *ptrPtr, DWORD *ptrSize );
+DWORD countSetBits( ULONG_PTR bitMask );
+#define ONE_ENTRY 6
+int scratchAffinity( char* scratchPointer, DWORD64 bitmap, int bufferLimit );
 
 // System memory information data
 typedef struct {

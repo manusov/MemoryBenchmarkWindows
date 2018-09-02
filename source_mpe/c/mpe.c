@@ -7,9 +7,10 @@
 TODO:
 
 Group 1. Select target object option.
-1) Adaptive calibration start constant, for example too slow for DRAM.
-2) Adaptive cache levels, trying L3 = detected L2 * 2, if L3 not detected by WinAPI/CPUID.
-3) Name and procedure mismatch: PREFETCHNTA+MOVAPS, really MOVAPD.
+1) Console redirect.
+2) Adaptive calibration start constant, for example too slow for DRAM.
+3) Adaptive cache levels, trying L3 = detected L2 * 2, if L3 not detected by WinAPI/CPUID.
+4) Name and procedure mismatch: PREFETCHNTA+MOVAPS, really MOVAPD.
 
 Group 2.
 1) Remove duplication of "kernel32" name and handle, use centralized load,
@@ -51,11 +52,11 @@ typedef CSTR* CSTRP;
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.20.04 for Windows ia32."
+#define BUILD_STRING "v0.30.00 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.20.04 for Windows x64."
+#define BUILD_STRING "v0.30.00 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -67,6 +68,9 @@ CHAR* stringTitle1 = "Memory Performance Engine.";
 CHAR* stringTitle2 = BUILD_STRING;
 CHAR* stringTitle3 = "(C)2018 IC Book Labs.";
 CHAR* stringAnyKey = "Press any key...";
+
+// Console application mode control: dialogue (TRUE) or redirect (FALSE)
+BOOL dialogueMode;
 
 // Console input buffer
 #define RETURN_SIZE 255
@@ -151,32 +155,34 @@ void exitWithMessage( CHAR* messageName );
 #include "multithread\threadsrestart.c"
 #include "multithread\threadentry.c"
 
-// Helper routines for console application context.
 // Helper routine: clear screen and set cursor position to 0,0
 BOOL initializeScreen( WORD color )
 {
-    BOOL status = FALSE;
-    status = SetConsoleTextAttribute( hStdout, color );
-    if (!status)
+    if ( dialogueMode )
     {
-        return status;
-	}
-    status = FillConsoleOutputCharacter( hStdout, (CHAR) ' ',
-        dwConSize, coordScreen, &cCharsWritten );
-    if (!status)
-    {
-        return status;
-	}
-    status = FillConsoleOutputAttribute( hStdout, color,
-        dwConSize, coordScreen, &cCharsWritten );
-    if (!status)
-    {
-        return status;
-    }
-    status = SetConsoleCursorPosition( hStdout, coordScreen );
-    if (!status)
-    {
-    return status;
+        BOOL status = FALSE;
+        status = SetConsoleTextAttribute( hStdout, color );
+        if (!status)
+        {
+            return status;
+        }
+        status = FillConsoleOutputCharacter( hStdout, (CHAR) ' ',
+                 dwConSize, coordScreen, &cCharsWritten );
+        if (!status)
+        {
+            return status;
+        }
+        status = FillConsoleOutputAttribute( hStdout, color,
+                 dwConSize, coordScreen, &cCharsWritten );
+        if (!status)
+        {
+            return status;
+        }
+        status = SetConsoleCursorPosition( hStdout, coordScreen );
+        if (!status)
+        {
+            return status;
+        }
     }
 }
 
@@ -185,62 +191,69 @@ BOOL initializeScreen( WORD color )
 // WriteFile is used to echo input. 
 DWORD inputChar( LPSTR promptString, LPSTR returnLine, int returnSize  )
 {
-    // console mode variables
-	DWORD fdwMode;
-	DWORD fdwOldMode; 
-    // save original console mode
-	if (! GetConsoleMode(hStdin, &fdwOldMode)) 
+    if ( dialogueMode )
     {
-    	return 0;
-    }
-	// set required console mode
-    fdwMode = fdwOldMode & ~( ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT );
-    if (! SetConsoleMode(hStdin, fdwMode)) 
-    {
-    	return 0;
-    }
+        // console mode variables
+        DWORD fdwMode;
+        DWORD fdwOldMode; 
+        // save original console mode
+	   if (! GetConsoleMode(hStdin, &fdwOldMode)) 
+        {
+    	   return 0;
+        }
+	   // set required console mode
+        fdwMode = fdwOldMode & ~( ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT );
+        if (! SetConsoleMode(hStdin, fdwMode)) 
+        {
+    	   return 0;
+        }
 	
-	DWORD outputCount = 0;
-    DWORD inputCount = 0;
-    // output prompt string
-    if (! WriteFile ( 
-          hStdout,                 // output handle 
-          promptString,            // prompt string 
-          lstrlenA(promptString),  // string length 
-          &outputCount,            // bytes written 
-          NULL) )                  // not overlapped 
-    // if error, restore original console mode and return
-	{
-        SetConsoleMode(hStdin, fdwOldMode);
-		return 0;
+        DWORD outputCount = 0;
+        DWORD inputCount = 0;
+        // output prompt string
+        if (! WriteFile ( 
+              hStdout,                 // output handle 
+              promptString,            // prompt string 
+              lstrlenA(promptString),  // string length 
+              &outputCount,            // bytes written 
+              NULL) )                  // not overlapped 
+        // if error, restore original console mode and return
+        {
+            SetConsoleMode(hStdin, fdwOldMode);
+            return 0;
+        }
+        // input 1 char
+        if ( ! ReadFile( hStdin, returnLine, 1, &inputCount, NULL ) )
+        // if error, restore original console mode and return
+        {
+            SetConsoleMode(hStdin, fdwOldMode);
+            return 0;
+        }
+        // if ENTER key, make new line and return 
+        if ( returnLine[0] == '\r' )
+        {
+            newLine();
+            SetConsoleMode(hStdin, fdwOldMode);
+            return returnLine[0];
+        }
+        // output char to console	
+        else if ( ! WriteFile(hStdout, returnLine, inputCount, &outputCount, NULL) )
+        // if error, return 0
+        {
+            SetConsoleMode(hStdin, fdwOldMode);
+            return 0;
+        }
+        // if no errors, return this char
+        else
+        {
+            SetConsoleMode(hStdin, fdwOldMode);
+            return returnLine[0];
+        }
     }
-	// input 1 char
-    if ( ! ReadFile( hStdin, returnLine, 1, &inputCount, NULL ) )
-    // if error, restore original console mode and return
-	{
-		SetConsoleMode(hStdin, fdwOldMode);
-		return 0;
-	}
-	// if ENTER key, make new line and return 
-    if ( returnLine[0] == '\r' )
-    {
-        newLine();
-        SetConsoleMode(hStdin, fdwOldMode);
-        return returnLine[0];
-    }
-    // output char to console	
-    else if ( ! WriteFile(hStdout, returnLine, inputCount, &outputCount, NULL) )
-    // if error, return 0
-    {
-		SetConsoleMode(hStdin, fdwOldMode);
-		return 0;
-	}
-	// if no errors, return this char
     else
     {
-		SetConsoleMode(hStdin, fdwOldMode);
-		return returnLine[0];
-	}
+        return 'Y';
+    }
 }
 
 // The newLine function handles carriage returns when the processed 
@@ -248,85 +261,102 @@ DWORD inputChar( LPSTR promptString, LPSTR returnLine, int returnSize  )
 // and resets it to the first cell of the next row. 
 void newLine(void) 
 { 
-    if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo)) 
+    if ( dialogueMode )
     {
-        MessageBox(NULL, "GetConsoleScreenBufferInfo", 
-                         "Console Error", MB_OK); 
-        return;
-    }
-    csbiInfo.dwCursorPosition.X = 0; 
-    // If it is the last line in the screen buffer, scroll 
-    // the buffer up. 
-    if ((csbiInfo.dwSize.Y-1) == csbiInfo.dwCursorPosition.Y) 
-    { 
-        scrollScreenBuffer(hStdout, 1); 
-    } 
-    // Otherwise, advance the cursor to the next line. 
-    else csbiInfo.dwCursorPosition.Y += 1; 
+        if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo)) 
+        {
+            MessageBox(NULL, "GetConsoleScreenBufferInfo", 
+                             "Console Error", MB_OK); 
+            return;
+        }
+        csbiInfo.dwCursorPosition.X = 0; 
+        // If it is the last line in the screen buffer, scroll 
+        // the buffer up. 
+        if ((csbiInfo.dwSize.Y-1) == csbiInfo.dwCursorPosition.Y) 
+        { 
+            scrollScreenBuffer(hStdout, 1); 
+        } 
+        // Otherwise, advance the cursor to the next line. 
+        else csbiInfo.dwCursorPosition.Y += 1; 
 
-    if (! SetConsoleCursorPosition(hStdout, 
-        csbiInfo.dwCursorPosition)) 
+        if (! SetConsoleCursorPosition(hStdout, 
+            csbiInfo.dwCursorPosition)) 
+        {
+            MessageBox(NULL, "SetConsoleCursorPosition", 
+                             "Console Error", MB_OK); 
+            return;
+        }
+    }
+    else
     {
-        MessageBox(NULL, "SetConsoleCursorPosition", 
-                         "Console Error", MB_OK); 
-        return;
+        printf( "\n" );
     }
 } 
 
 // Scroll
 void scrollScreenBuffer(HANDLE h, INT x)
 {
-    SMALL_RECT srctScrollRect, srctClipRect;
-    CHAR_INFO chiFill;
-    COORD coordDest;
-    srctScrollRect.Left = 0;
-    srctScrollRect.Top = 1;
-    srctScrollRect.Right = csbiInfo.dwSize.X - (SHORT)x; 
-    srctScrollRect.Bottom = csbiInfo.dwSize.Y - (SHORT)x; 
-    // The destination for the scroll rectangle is one row up. 
-    coordDest.X = 0; 
-    coordDest.Y = 0; 
-    // The clipping rectangle is the same as the scrolling rectangle. 
-    // The destination row is left unchanged. 
-    srctClipRect = srctScrollRect; 
-    // Set the fill character and attributes. 
-    chiFill.Attributes = FOREGROUND_RED|FOREGROUND_INTENSITY; 
-    chiFill.Char.AsciiChar = (char)' '; 
-    // Scroll up one line. 
-    ScrollConsoleScreenBuffer( 
-        h,               // screen buffer handle 
-        &srctScrollRect, // scrolling rectangle 
-        &srctClipRect,   // clipping rectangle 
-        coordDest,       // top left destination cell 
-        &chiFill);       // fill character and color 
+    if ( dialogueMode )
+    {
+        SMALL_RECT srctScrollRect, srctClipRect;
+        CHAR_INFO chiFill;
+        COORD coordDest;
+        srctScrollRect.Left = 0;
+        srctScrollRect.Top = 1;
+        srctScrollRect.Right = csbiInfo.dwSize.X - (SHORT)x; 
+        srctScrollRect.Bottom = csbiInfo.dwSize.Y - (SHORT)x; 
+        // The destination for the scroll rectangle is one row up. 
+        coordDest.X = 0; 
+        coordDest.Y = 0; 
+        // The clipping rectangle is the same as the scrolling rectangle. 
+        // The destination row is left unchanged. 
+        srctClipRect = srctScrollRect; 
+        // Set the fill character and attributes. 
+        chiFill.Attributes = FOREGROUND_RED|FOREGROUND_INTENSITY; 
+        chiFill.Char.AsciiChar = (char)' '; 
+        // Scroll up one line. 
+        ScrollConsoleScreenBuffer( 
+            h,               // screen buffer handle 
+            &srctScrollRect, // scrolling rectangle 
+            &srctClipRect,   // clipping rectangle 
+            coordDest,       // top left destination cell 
+            &chiFill);       // fill character and color 
+    }
 }
 
 // Helper routine: wait any key
 void waitAnyKey( LPSTR promptString )
 {
-    if ( promptString != NULL )
+    if ( dialogueMode )
     {
-        printf(promptString);
-    }
-    BOOL keepRunning = 1;
-    while(keepRunning)
-    {
-        INPUT_RECORD event = {0};
-        DWORD readCount = 0;
-        if( PeekConsoleInput( hStdin, &event, 1, &readCount ) && readCount>0 )
+        if ( promptString != NULL )
         {
-            if( ReadConsoleInput( hStdin, &event, 1, &readCount ) )
+            printf(promptString);
+        }
+        BOOL keepRunning = 1;
+        while(keepRunning)
+        {
+            INPUT_RECORD event = {0};
+            DWORD readCount = 0;
+            if( PeekConsoleInput( hStdin, &event, 1, &readCount ) && readCount>0 )
             {
-                if( event.EventType == KEY_EVENT )
+                if( ReadConsoleInput( hStdin, &event, 1, &readCount ) )
                 {
-                    KEY_EVENT_RECORD keyEvent = event.Event.KeyEvent;
-                    if ( keyEvent.bKeyDown == TRUE )
+                    if( event.EventType == KEY_EVENT )
                     {
-                        keepRunning = 0;
+                        KEY_EVENT_RECORD keyEvent = event.Event.KeyEvent;
+                        if ( keyEvent.bKeyDown == TRUE )
+                        {
+                            keepRunning = 0;
+                        }
                     }
                 }
             }
         }
+    }
+    else
+    {
+        printf( "\nWait key skipped in the redirect mode.\n" );
     }
 }
 
@@ -343,22 +373,33 @@ void lineOfTable( int charsCount )
 // Helper routine: color output 
 BOOL colorPrint( CSTRP colorStrings )
 {
-    BOOL status1 = FALSE, status2 = FALSE;
+    BOOL status1 = TRUE, status2 = TRUE;
     int i = 0;
-    do {
-        status1 = SetConsoleTextAttribute( hStdout, 
-                                           colorStrings[i].attribute | ( defaultColor & DEFAULT_COLOR_MASK ) );
-        if (status1)
-        {
+    if ( dialogueMode )
+    {
+        do {
+            status1 = SetConsoleTextAttribute( hStdout, 
+                                               colorStrings[i].attribute | ( defaultColor & DEFAULT_COLOR_MASK ) );
+            if (status1)
+            {
+                printf(colorStrings[i].text);
+            }
+            else
+            {
+                break;
+            }
+        i++;
+        } while ( colorStrings[i].text != NULL );
+        status2 = SetConsoleTextAttribute(hStdout, defaultColor);
+    }
+    else
+    {
+        do {
             printf(colorStrings[i].text);
-        }
-        else
-        {
-            break;
-        }
-    i++;
-    } while ( colorStrings[i].text != NULL );
-    status2 = SetConsoleTextAttribute(hStdout, defaultColor);
+            i++;
+        } while ( colorStrings[i].text != NULL );
+    }
+    
     return status1 && status2;
 }
 
@@ -374,11 +415,11 @@ void exitWithSystemError( CHAR* operationName )
     DWORD status;
     // Build message string = f (error code)
     status = FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                            FORMAT_MESSAGE_FROM_SYSTEM |
-                            FORMAT_MESSAGE_IGNORE_INSERTS,
-                            NULL, dwError,
-                            MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-                            (LPTSTR)&lpvMessageBuffer, 0, NULL );
+                  		    FORMAT_MESSAGE_FROM_SYSTEM |
+                  		    FORMAT_MESSAGE_IGNORE_INSERTS,
+                  		    NULL, dwError,
+                  		    MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+                  		    (LPTSTR)&lpvMessageBuffer, 0, NULL );
     if ( status != 0)
     {
         // this visualized if error string build OK
@@ -393,9 +434,11 @@ void exitWithSystemError( CHAR* operationName )
     // Free the buffer allocated by the system API function
     LocalFree( lpvMessageBuffer );
     // Terminate application
-    waitAnyKey( stringAnyKey );
-    SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
-    printf( "\n" );
+    if ( dialogueMode )
+    {
+        waitAnyKey( stringAnyKey );
+        SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    }
     ExitProcess( 1 );
 }
 
@@ -407,9 +450,11 @@ void exitWithInternalError( CHAR* messageName )
     {
         printf( "\nERROR: %s\n", messageName );
     }
-    waitAnyKey( stringAnyKey );
-    SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
-    printf( "\n" );
+    if ( dialogueMode )
+    {
+        waitAnyKey( stringAnyKey );
+        SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    }
     ExitProcess( 2 );
 }
 
@@ -420,15 +465,22 @@ void exitWithMessage( CHAR* messageName )
     {
         printf( "%s\n", messageName );
     }
-    waitAnyKey( stringAnyKey );
-    SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+	if ( dialogueMode )
+	{
+        waitAnyKey( stringAnyKey );
+        SetConsoleTextAttribute( hStdout, oldWAttributes );  	// OLD: initializeScreen( oldWAttributes );
+    }
     printf( "\n" );
     ExitProcess( 0 );
 }
 
+
 // Console application entry point
+
 int main( int argc, char** argv ) 
 {
+    // Initial mode is dialogue
+    dialogueMode = TRUE;
     // Initializing console support, save original settings
     hStdin = GetStdHandle(STD_INPUT_HANDLE);
     if ( hStdin == NULL ) 
@@ -442,32 +494,46 @@ int main( int argc, char** argv )
     }
     if (! GetConsoleScreenBufferInfo(hStdout, &csbiInfo))
     {
-        exitWithSystemError( "get screen buffer configuration" );
+        // exitWithSystemError( "get screen buffer configuration" );
+        // changed to skip dialogue mode instead error exit
+        dialogueMode = FALSE;
+        printf( "\nUse console redirect mode.\n" );
     }
-    oldDwSize = csbiInfo.dwSize;
-    oldDwCursorPosition = csbiInfo.dwCursorPosition;
-    oldWAttributes = csbiInfo.wAttributes;
-    oldSrWindow = csbiInfo.srWindow;
-    oldDwMaximumWindowSize = csbiInfo.dwMaximumWindowSize;
-    dwConSize = oldDwSize.X * oldDwSize.Y;
-    // Clear screen with set default color, set cursor position
-    defaultColor = oldWAttributes;   // can use constant DEFAULT_COLOR
-    if ( ! initializeScreen( defaultColor ) )
+    
+    if ( dialogueMode )
     {
-        exitWithSystemError( "clear screen and set cursor position" );
+        oldDwSize = csbiInfo.dwSize;
+        oldDwCursorPosition = csbiInfo.dwCursorPosition;
+        oldWAttributes = csbiInfo.wAttributes;
+        oldSrWindow = csbiInfo.srWindow;
+        oldDwMaximumWindowSize = csbiInfo.dwMaximumWindowSize;
+        dwConSize = oldDwSize.X * oldDwSize.Y;
+        // Clear screen with set default color, set cursor position
+        defaultColor = oldWAttributes;   // can use constant DEFAULT_COLOR
+        if ( ! initializeScreen( defaultColor ) )
+        {
+            exitWithSystemError( "clear screen and set cursor position" );
+        }
+        // Set console title string
+        if ( ! SetConsoleTitle( stringTitle1 ) )
+        {
+            exitWithSystemError( "set console title" );
+        }
     }
-    // Set console title string
-    if ( ! SetConsoleTitle( stringTitle1 ) )
-    {
-        exitWithSystemError( "set console title" );
-    }
+    
     // First message with console parameters
     CSTR cstrStarting[] = {	{ BOLD_COLOR , "\nStarting..." } , { 0, NULL } };
     colorPrint ( cstrStarting );
-    printf( "\nsize(%d,%d) cursor(%d,%d) attribute %04xh window(%d,%d,%d,%d) maximum(%d,%d)" , 
-            oldDwSize.X, oldDwSize.Y, oldDwCursorPosition.X, oldDwCursorPosition.Y, oldWAttributes,
-            oldSrWindow.Left, oldSrWindow.Top, oldSrWindow.Right, oldSrWindow.Bottom,
-            oldDwMaximumWindowSize.X, oldDwMaximumWindowSize.Y );
+    
+    // Message about console output parameters
+    if ( dialogueMode )
+    {
+        printf( "\nsize(%d,%d) cursor(%d,%d) attribute %04xh window(%d,%d,%d,%d) maximum(%d,%d)" , 
+                oldDwSize.X, oldDwSize.Y, oldDwCursorPosition.X, oldDwCursorPosition.Y, oldWAttributes,
+                oldSrWindow.Left, oldSrWindow.Top, oldSrWindow.Right, oldSrWindow.Bottom,
+                oldDwMaximumWindowSize.X, oldDwMaximumWindowSize.Y );
+    }
+    
     // Print application first message strings
     printf( "\n%s %s %s\n", stringTitle1, stringTitle2, stringTitle3 );
     
@@ -480,6 +546,8 @@ int main( int argc, char** argv )
     // Exit console application
     CSTR cstrExiting[] = {	{ BOLD_COLOR , "\n\nExiting...\n" } , { 0, NULL } };
     colorPrint ( cstrExiting );
+    
+    // Terminate console application
     exitWithMessage( NULL );
 }
 

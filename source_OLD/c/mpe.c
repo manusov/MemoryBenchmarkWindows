@@ -12,6 +12,7 @@ TODO (near):
 
 TODO (far):
 1...N) All options, next = Target Object, SMP/Caches list by WinAPI.
+N+1) Win32 port.
 
 TODO (bugs fix):
 
@@ -21,7 +22,12 @@ TODO (bugs fix):
 4) Interrogate delays for all exit scenarios, exit codes 0-3. 
 5) Accurate resources release for all exit points.
 6) Refactoring, example mbpsCount and arraySize duplicated. NOT DUPLICATED. DUPLICATED STEPS COUNT.
-7) ...
+7) De-Initializing context when "N" selected at "Run test (Y/N) ?" selection.
+8) ...
+
+TODO (other):
+1) Refactoring.
+2) Detail comments,
 
 */
 
@@ -61,9 +67,9 @@ CHAR* statusStrings[] =
 };
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "Build v0.00.01 for Windows ia32."
+#define BUILD_STRING "Build v0.00.02 for Windows ia32."
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "Build v0.00.01 for Windows x64."
+#define BUILD_STRING "Build v0.00.02 for Windows x64."
 #else
 #define BUILD_STRING "WRONG BUILD: UNSUPPORTED PLATFORM."
 #endif

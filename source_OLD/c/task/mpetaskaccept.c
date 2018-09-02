@@ -52,7 +52,9 @@ void taskAccept( int argc, char** argv )
                   platformData.platformFeatures.bitmapCpu, platformData.platformFeatures.bitmapOs,
                   rwMethodsDetails );
     // Detect platform configuration: SMP topology and Caches List by WinAPI
-    
+    CSTR cstrTopology[] = { { BOLD_COLOR , "\n\nGet platform topology and caches list..." } , { 0, NULL } };
+    colorPrint ( cstrTopology );
+    detectTopology ( NULL, &platformData.platformTopology );
     
     // Detect platform configuration: Non-temporal options
     
