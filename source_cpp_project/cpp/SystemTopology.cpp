@@ -21,9 +21,10 @@ SystemTopology::~SystemTopology( )
 // WinAPI function GetLogicalProcessorInformationEx not available at WinXP, required dynamical import,
 // this fact actual for future extensions
 // Cache detection (by WinAPI) and topology scan method
-BOOL SystemTopology::detectTopology( SYSTEM_TOPOLOGY_DATA* xc )
+DWORD SystemTopology::detectTopology( SYSTEM_TOPOLOGY_DATA* xc )
 {
-    // Pre-blank output
+    DWORD error;
+	// Pre-blank output
     xc->pointL1 = 0;
     xc->pointL2 = 0;
     xc->pointL3 = 0;
@@ -34,12 +35,13 @@ BOOL SystemTopology::detectTopology( SYSTEM_TOPOLOGY_DATA* xc )
     PSYSTEM_LOGICAL_PROCESSOR_INFORMATION bufferPtr = NULL;
     DWORD bufferSize = 0;
     // Get information into buffer, note required memory allocation for buffer
-    while (!done)
+    while ( !done )
     {
         BOOL valid = GetLogicalProcessorInformation( bufferPtr, &bufferSize );
         if ( !valid ) 
-        {
-            if ( GetLastError() == ERROR_INSUFFICIENT_BUFFER ) 
+		{
+			error = GetLastError( );
+            if ( error == ERROR_INSUFFICIENT_BUFFER ) 
             {
                 if ( bufferPtr ) 
                     free( bufferPtr );
@@ -48,14 +50,15 @@ BOOL SystemTopology::detectTopology( SYSTEM_TOPOLOGY_DATA* xc )
 
                 if ( bufferPtr == NULL ) 
                 {
-                    snprintf( s, NS, "allocate buffer for logical processors descriptors" );
-                    return FALSE;
+                    error = GetLastError( );
+					snprintf( s, NS, "allocate buffer for logical processors descriptors" );
+                    return error;
                 }
             } 
             else 
             {
                 snprintf( s, NS, "get logical processors information" );
-                return FALSE;
+                return error;
             }
         } 
         else
@@ -116,6 +119,7 @@ BOOL SystemTopology::detectTopology( SYSTEM_TOPOLOGY_DATA* xc )
         }
     bufferPtr++;
     }
+	return 0;
 }
 
 // Method returns status string, valid if error returned

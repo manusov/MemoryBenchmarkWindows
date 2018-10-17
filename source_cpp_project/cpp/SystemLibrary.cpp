@@ -21,11 +21,13 @@ SYSTEM_FUNCTIONS_LIST SystemLibrary::f;
 char SystemLibrary::s[NS];
 
 // Helper method for verify dll functions load
-BOOL SystemLibrary::functionCheck( void *functionPointer, const char *functionName, const char *dllName )
+BOOL SystemLibrary::functionCheck( void *functionPointer, const char *functionName, const char *dllName, DWORD &errorCode )
 {
-    if ( functionPointer == NULL )
+    errorCode = 0;
+	if ( functionPointer == NULL )
     {
-    	snprintf( s, NS, "load function=%s from module=%s", functionName, dllName );
+    	errorCode = GetLastError( );
+		snprintf( s, NS, "load function=%s from module=%s", functionName, dllName );
 		return FALSE;
 	}
 	return TRUE;
@@ -52,54 +54,56 @@ SystemLibrary::~SystemLibrary( )
 }
 
 // Method loads native library and functions
-BOOL SystemLibrary::loadSystemLibrary( )
+DWORD SystemLibrary::loadSystemLibrary( )
 {
     BOOL status;
+    DWORD error;
     // Load DLL
     snprintf( s, NS, "Load %s...", dllName );
     dllHandle = LoadLibrary( dllName );
 	if( dllHandle == NULL )
     {
+		error = GetLastError( );
         snprintf( s, NS, "load module=%s", dllName );
-        return FALSE;
+        return error;
     }
     // Load function: GetDllStrings
     f.DLL_GetDllStrings = ( void (__stdcall *) ( char** , char** , char** ) )
     GetProcAddress( dllHandle, fname1 );
-    status = functionCheck( ( void* )f.DLL_GetDllStrings, fname1, dllName );
-    if (!status) return FALSE;
+    status = functionCheck( ( void* )f.DLL_GetDllStrings, fname1, dllName, error );
+    if ( !status ) return error;
     // Load function: CheckCpuid
     f.DLL_CheckCpuid = ( BOOL (__stdcall *) ( void ) )
     GetProcAddress( dllHandle, fname2 );
-    status = functionCheck( ( void* )f.DLL_CheckCpuid, fname2, dllName );
-    if (!status) return FALSE;
+    status = functionCheck( ( void* )f.DLL_CheckCpuid, fname2, dllName, error );
+    if ( !status ) return error;
     // Load function: ExecuteCpuid
     f.DLL_ExecuteCpuid = ( void (__stdcall *) ( DWORD, DWORD, DWORD*, DWORD*, DWORD*, DWORD* ) )
     GetProcAddress( dllHandle, fname3 );
-    status = functionCheck( ( void* )f.DLL_ExecuteCpuid, fname3, dllName );
-    if (!status) return FALSE;
+    status = functionCheck( ( void* )f.DLL_ExecuteCpuid, fname3, dllName, error );
+    if ( !status ) return error;
     // Load function: ExecuteRdtsc
     f.DLL_ExecuteRdtsc = ( void (__stdcall *) ( DWORDLONG* ) )
 	GetProcAddress( dllHandle, fname4 );
-	status = functionCheck( ( void* )f.DLL_ExecuteRdtsc, fname4, dllName );
-	if (!status) return FALSE;
+	status = functionCheck( ( void* )f.DLL_ExecuteRdtsc, fname4, dllName, error );
+	if ( !status ) return error;
     // Load function: ExecuteXgetbv
     f.DLL_ExecuteXgetbv = ( void (__stdcall *) ( DWORDLONG* ) )
 	GetProcAddress( dllHandle, fname5 );
-	status = functionCheck( ( void* )f.DLL_ExecuteXgetbv, fname5, dllName );
-	if (!status) return FALSE;
+	status = functionCheck( ( void* )f.DLL_ExecuteXgetbv, fname5, dllName, error );
+	if ( !status ) return error;
     // Load function: MeasureTsc
     f.DLL_MeasureTsc = ( BOOL (__stdcall *) ( DWORDLONG* ) )
 	GetProcAddress( dllHandle, fname6 );
-	status = functionCheck( ( void* )f.DLL_MeasureTsc, fname6, dllName );
-	if (!status) return FALSE;
+	status = functionCheck( ( void* )f.DLL_MeasureTsc, fname6, dllName, error );
+	if ( !status ) return error;
     // Load function: PerformanceGate
     f.DLL_PerformanceGate = ( BOOL (__stdcall *) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* ) )
 	GetProcAddress( dllHandle, fname7 );
-	status = functionCheck( ( void* )f.DLL_PerformanceGate, fname7, dllName );
-	if (!status) return FALSE;
+	status = functionCheck( ( void* )f.DLL_PerformanceGate, fname7, dllName, error );
+	if ( !status ) return error;
     // Return
-    return TRUE;
+    return 0;
 }
 
 // Method returns native library entry points list, valid if no errors

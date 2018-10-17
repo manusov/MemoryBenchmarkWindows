@@ -20,6 +20,22 @@ Performer::~Performer( )
 	
 }
 
+// Helper for block size alignment
+DWORD64 Performer::alignByFactor( DWORD64 value, DWORD64 factor )
+{
+	DWORD64 x = value % factor;
+	if ( x )
+	{
+		x = factor - x;
+	}
+	else
+	{
+		x = 0;
+	}
+	value += x;
+	return value;
+}
+
 // This procedure used as callback for threads run by OS
 DWORD WINAPI threadEntry( LPVOID threadControl )
 {
@@ -59,8 +75,9 @@ DWORD WINAPI threadEntry( LPVOID threadControl )
 }
 
 // Initializing list, fill given (allocated by caller) thread list memory
-BOOL Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
+DWORD Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 {
+	DWORD error;
 	// Initializing variables
 	int i = 0;
 	int n = pScenario->nThreadsList;
@@ -71,8 +88,24 @@ BOOL Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 	DWORD_PTR ba = pScenario->maxSizeBytes * 2;
 	DWORD_PTR mp;
 	
+	DWORD allocType = MEM_COMMIT;
+	size_t allocSize = ba * n;                   // ( memory per thread ) * ( number of threads )
+	DWORD alignFactor = pScenario->pageSize;
+	allocSize = alignByFactor( allocSize, alignFactor );  // alignment by selected page size
+	
+	if ( pScenario->pagingMode != 0 )
+	{
+		allocType |= MEM_LARGE_PAGES;
+	}
+	
 	// Memory allocation, for non-NUMA
-	mp = ( DWORD_PTR )VirtualAlloc( NULL, ba*n, MEM_COMMIT, PAGE_READWRITE );
+	mp = ( DWORD_PTR )VirtualAlloc( NULL, allocSize, allocType, PAGE_READWRITE );
+	if ( mp == NULL )
+	{
+		error = GetLastError( );
+		snprintf( s, NS, "memory allocation" );
+		return error;
+	}
 	
 	// Cycle for threads list entries
 	for( i=0; i<n; i++ )
@@ -80,29 +113,32 @@ BOOL Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 		pThreads->rxEventHandle = CreateEvent( NULL, TRUE, FALSE, NULL );   // Event Handle for this thread operation complete signal
 		if ( pThreads->rxEventHandle == NULL )
 		{
+			error = GetLastError( );
 			snprintf( s, NS, "create receive complete event" );
-			return FALSE;
+			return error;
 		}
 
 		pThreads->txEventHandle = CreateEvent( NULL, TRUE, FALSE, NULL );   // Event Handle for this thread continue enable signal
 		if ( pThreads->txEventHandle == NULL )
 		{
+			error = GetLastError( );
 			snprintf( s, NS, "create transmit continue event" );
-			return FALSE;
+			return error;
 		}
 		
 		pThreads->threadHandle = CreateThread( NULL, 0, threadEntry, pThreads, CREATE_SUSPENDED, 0 );   // This thread handle
 		if ( pThreads->threadHandle == NULL )
 		{
+			error = GetLastError( );
 			snprintf( s, NS, "create thread" );
-			return FALSE;
+			return error;
 		}
 		
 		pThreads->base1 = ( LPVOID )( mp + b1 );
 		pThreads->base2 = ( LPVOID )( mp + b2 );
 		if ( i == 0 )
 		{
-			pThreads->trueBase = (LPVOID )mp;
+			pThreads->trueBase = ( LPVOID )mp;
 		}
 		else
 		{
@@ -126,12 +162,13 @@ BOOL Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 		pSignals++;
 	}
 	// Done if no errors
-	return TRUE;	
+	return 0;	
 }
 
 // De-initializing list, release objects, but list allocated by caller 
-BOOL Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
+DWORD Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
 {
+	DWORD error;
 	// Initializing variables
 	int i = 0;
 	int n = pScenario->nThreadsList;
@@ -148,8 +185,9 @@ BOOL Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
 			status = TerminateThread( handle, 0 );  // Terminate thread
 			if ( !status )
 			{
+				error = GetLastError( );
 				snprintf( s, NS, "terminate thread" );
-				return FALSE;
+				return error;
 			}
 		}
 
@@ -159,8 +197,9 @@ BOOL Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
 			status = CloseHandle( handle );  // Close event handle
 			if ( !status )
 			{
+				error = GetLastError( );
 				snprintf( s, NS, "close receive complete event handle" );
-				return FALSE;
+				return error;
 			}
 		}
 
@@ -170,8 +209,9 @@ BOOL Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
 			status = CloseHandle( handle );  // Close event handle
 			if ( !status )
 			{
+				error = GetLastError( );
 				snprintf( s, NS, "close transmit continue event handle" );
-				return FALSE;
+				return error;
 			}
 		}
 
@@ -181,20 +221,22 @@ BOOL Performer::releaseThreadsList( BENCHMARK_SCENARIO* pScenario )
 			status = CloseHandle( handle );  // Close thread handle
 			if ( !status )
 			{
+				error = GetLastError( );
 				snprintf( s, NS, "close thread handle" );
-				return FALSE;
+				return error;
 			}
 		}
 
 		p++;
 	}
 	// Done if no errors
-	return TRUE;	
+	return 0;	
 }
 
 // First run performance pattern
-BOOL Performer::threadsRun( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
+DWORD Performer::threadsRun( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
 {
+	DWORD error;
 	// Initializing variables
 	int i = 0;
 	int n = pScenario->nThreadsList;
@@ -215,8 +257,9 @@ BOOL Performer::threadsRun( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
         result = ResumeThread( handle );   // Resume this thread, means Run for this context
         if( result == -1 )
         {
-        	snprintf( s, NS, "resume thread" );
-        	return FALSE;
+        	error = GetLastError( );
+			snprintf( s, NS, "resume thread" );
+        	return error;
 		}
 		pThreads++;
 	}
@@ -225,13 +268,15 @@ BOOL Performer::threadsRun( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
     result = WaitForMultipleObjects( n, pSignals, TRUE, 60000 );
     if ( result == WAIT_FAILED )
     {
-        snprintf( s, NS, "wait failed" );
-        return FALSE;
+        error = GetLastError( );
+		snprintf( s, NS, "wait failed" );
+        return error;
 	}
 	if ( result == WAIT_TIMEOUT )
 	{
+		error = GetLastError( );
 		snprintf( s, NS, "wait timeout" );
-		return FALSE;
+		return error;
 	}
 	
     // Get end TSC, calculate delta-TSC, update result variable
@@ -239,12 +284,13 @@ BOOL Performer::threadsRun( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
     deltaTsc = tsc2 - tsc1;
 	
 	// Done if no errors
-	return TRUE;	
+	return 0;	
 }
 
 // Continued (non-first) run performance pattern
-BOOL Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
+DWORD Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc )
 {
+	DWORD error;
 	// Initializing variables
 	int i = 0;
 	int n = pScenario->nThreadsList;
@@ -264,8 +310,9 @@ BOOL Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc
         status = ResetEvent( handle );        // Reset this event, enable continue thread execution
         if( !status )
         {
-        	snprintf( s, NS, "reset event after acknowledge" );
-        	return FALSE;
+        	error = GetLastError( );
+			snprintf( s, NS, "reset event after acknowledge" );
+        	return error;
 		}
 		pThreads1++;
 	}
@@ -280,8 +327,9 @@ BOOL Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc
         status = SetEvent( handle );          // Set this event, enable continue thread execution
         if( !status )
         {
-        	snprintf( s, NS, "set event for continue" );
-        	return FALSE;
+        	error = GetLastError( );
+			snprintf( s, NS, "set event for continue" );
+        	return error;
 		}
 		pThreads2++;
 	}
@@ -290,13 +338,15 @@ BOOL Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc
     result = WaitForMultipleObjects( n, pSignals, TRUE, 60000 );
     if ( result == WAIT_FAILED )
     {
-        snprintf( s, NS, "wait failed" );
-        return FALSE;
+        error = GetLastError( );
+		snprintf( s, NS, "wait failed" );
+        return error;
 	}
 	if ( result == WAIT_TIMEOUT )
 	{
+		error = GetLastError( );
 		snprintf( s, NS, "wait timeout" );
-		return FALSE;
+		return error;
 	}
 	
     // Get end TSC, calculate delta-TSC, update result variable
@@ -304,7 +354,7 @@ BOOL Performer::threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc
     deltaTsc = tsc2 - tsc1;
 	
 	// Done if no errors
-	return TRUE;	
+	return 0;	
 }	
 
 // Update threads list for block size changes at measurement cycle

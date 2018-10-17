@@ -39,6 +39,13 @@ const char* CommandLine::keysMemory[] = {
     NULL
 };
 
+// Page size control
+const char* CommandLine::keysPage[] = {
+    "default", "large",
+    NULL
+};
+
+
 // Pointer command line parameters structure
 COMMAND_LINE_PARMS CommandLine::parms;
 
@@ -47,6 +54,7 @@ const OPTION_ENTRY CommandLine::options[] = {
     { "asm"             , keysAsm         , &parms.optionAsm         , SELPARM } ,
     { "memory"          , keysMemory      , &parms.optionMemory      , SELPARM } ,
     { "threads"         , NULL            , &parms.optionThreads     , INTPARM } ,
+    { "page"            , keysPage        , &parms.optionPageSize    , SELPARM } ,
     { "repeats"         , NULL            , &parms.optionRepeats     , INTPARM } ,
     { "start"           , NULL            , &parms.optionBlockStart  , MEMPARM } ,
     { "end"             , NULL            , &parms.optionBlockStop   , MEMPARM } ,
@@ -100,7 +108,7 @@ void CommandLine::correctAfterParse( )
 #define SMAX 81          // maximum option and status string length
 
 // Parse command line, extract parameters, override defaults by user settings
-BOOL CommandLine::parseCommandLine( int argc, char** argv )
+DWORD CommandLine::parseCommandLine( int argc, char** argv )
 {
     // Regular data input support: command line parameters extract and parsing.
     int i=0, j=0, k=0, k1=0, k2=0;  // miscellaneous counters and variables
@@ -134,12 +142,12 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
         if ( k<SMIN )
         {
             snprintf( s, NS, "option too short: %s", pAll );
-            return FALSE;
+            return -1;
         }
         if ( j>SMAX )
         {
             snprintf( s, NS, "option too long: %s", pAll );
-            return FALSE;
+            return -1;
         }
         // Parse command line parameters, setup input parameters, visual
         // extract option name and option value substrings
@@ -156,7 +164,7 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
         if ( ( k1==0 )||( k2==0 ) )
         {
             snprintf( s, NS, "invalid option: %s", pAll );
-            return FALSE;
+            return -1;
         }
         // detect option by comparision from list, cycle for supported options
         j = 0;
@@ -178,7 +186,7 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
                             if ( isdigit( pValue[k] ) == 0 )
                             {
                                 snprintf( s, NS, "not a number: %s", pValue );
-                                return FALSE;
+                                return -1;
                             }
                         }
                         k = atoi( pValue );   // convert string to integer
@@ -220,7 +228,7 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
                         if ( k1==0 )
                         {
                             snprintf( s, NS, "not a block size: %s", pValue );
-                            return FALSE;
+                            return -1;
                         }
                         k = atoi( pValue );   // convert string to integer
                         k64 = k;
@@ -249,7 +257,7 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
                         if ( k2 != 0 )
                         {
                             snprintf( s, NS, "value invalid: %s", pAll );
-                            return FALSE;
+                            return -1;
                         }
                         break;
                     }
@@ -270,10 +278,10 @@ BOOL CommandLine::parseCommandLine( int argc, char** argv )
         if ( recognized != 0 )
         {
             snprintf( s, NS, "option not recognized: %s", pName );
-            return FALSE;
+            return -1;
         }
     }
-    return TRUE;
+    return 0;
 }
 
 // Method returns status string, valid if error returned

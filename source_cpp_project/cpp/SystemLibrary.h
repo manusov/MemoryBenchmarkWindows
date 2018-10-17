@@ -11,7 +11,7 @@ class SystemLibrary
 	public:
 	    SystemLibrary( );
         ~SystemLibrary( );
-        BOOL loadSystemLibrary( );
+        DWORD loadSystemLibrary( );
         SYSTEM_FUNCTIONS_LIST* getSystemFunctionsList( );
         char* getStatusString( );
 	private:
@@ -26,7 +26,8 @@ class SystemLibrary
         static HMODULE dllHandle;
         static SYSTEM_FUNCTIONS_LIST f;
         static char s[];
-        BOOL functionCheck( void *functionPointer, const char *functionName, const char *dllName );
+        // Helpers functions
+        BOOL functionCheck( void *functionPointer, const char *functionName, const char *dllName, DWORD &errorCode );
 };
 
 #endif  // SYSTEMLIBRARY_H

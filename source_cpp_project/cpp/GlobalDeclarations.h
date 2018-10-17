@@ -3,11 +3,11 @@
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.50.01 for Windows ia32."
+#define BUILD_STRING "v0.50.02 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.50.01 for Windows x64."
+#define BUILD_STRING "v0.50.02 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -112,8 +112,10 @@ typedef struct
 	LONG64 currentSizeInstructions;
 	LONG64 measurementRepeats;
 	LONG64 methodId;
+	LONG64 pageSize;
+	DWORD pagingMode;
 	// Threads list
-	size_t nThreadsList;
+	DWORD nThreadsList;
 	THREAD_CONTROL_ENTRY* pThreadsList;
 	HANDLE* pSignalsList;
 } BENCHMARK_SCENARIO;
@@ -124,6 +126,7 @@ typedef struct {
     DWORD optionAsm;
     DWORD optionMemory;
     DWORD optionThreads;
+    DWORD optionPageSize;
     DWORD optionRepeats;
     // Reserved for extensions
     DWORD64 optionBlockStart; 
@@ -180,6 +183,12 @@ typedef struct {
     DWORD32 hyperThreadingFlag;
 } SYSTEM_TOPOLOGY_DATA;
 
+// Paging information data
+typedef struct {
+    DWORD32 defaultPage;
+    DWORD32 largePage;
+    DWORD32 pagingRights;
+} PAGING_OPTIONS_DATA;
 
 
 #endif  // GLOBALDECLARATIONS_H

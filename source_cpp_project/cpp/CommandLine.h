@@ -14,11 +14,12 @@ class CommandLine
 		COMMAND_LINE_PARMS* getCommandLineParms( );
 	    void resetBeforeParse( );
 	    void correctAfterParse( );
-	    BOOL parseCommandLine( int argc, char** argv );
+	    DWORD parseCommandLine( int argc, char** argv );
 		char* getStatusString( );
 	private:
 		static const char* keysAsm[];
 		static const char* keysMemory[];
+		static const char* keysPage[];
 		static const OPTION_ENTRY options[];
 		static COMMAND_LINE_PARMS parms;
 		static char s[];

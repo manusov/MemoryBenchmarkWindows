@@ -20,7 +20,7 @@ SystemMemory::~SystemMemory( )
 }
 
 // Memory detection root method
-BOOL SystemMemory::detectMemory( SYSTEM_MEMORY_DATA* xm )
+DWORD SystemMemory::detectMemory( SYSTEM_MEMORY_DATA* xm )
 {
     // Pre-blank output
     BOOL status = FALSE;
@@ -31,12 +31,13 @@ BOOL SystemMemory::detectMemory( SYSTEM_MEMORY_DATA* xm )
 	status = GlobalMemoryStatusEx ( &memstatus );
 	if ( !status )
 	{
+		DWORD error = GetLastError( );
 		snprintf( s, NS, "get system memory information" );
-		return FALSE;
+		return error;
 	}
     xm->physicalMemory = memstatus.ullTotalPhys;
     xm->freeMemory = memstatus.ullAvailPhys;
-    return TRUE;    
+    return 0;    
 }
 
 // Method returns status string, valid if error returned

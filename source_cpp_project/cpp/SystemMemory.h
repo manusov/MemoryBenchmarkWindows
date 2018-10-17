@@ -11,7 +11,7 @@ class SystemMemory
 	public:
 		SystemMemory( );
 		~SystemMemory( );
-		BOOL detectMemory( SYSTEM_MEMORY_DATA* xm );
+		DWORD detectMemory( SYSTEM_MEMORY_DATA* xm );
 		char* getStatusString( );
 	private:
 		static MEMORYSTATUSEX memstatus;

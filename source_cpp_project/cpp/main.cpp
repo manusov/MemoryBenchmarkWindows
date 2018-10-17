@@ -16,29 +16,50 @@ TODO features:
  	 + count number of CPU cores at this function, print before HT.
      + option memory=value, include block size, number of threads and temporal mode
      + option threads=value, auto for multithread by topology info (if -1) ?
- ---
+ 10) + Auto select repeats, use pre-defined constants and calibration.
+     + repeats override logic.
+ 11) + Add and debug class: DetectorPaging (PagingOptions), for Large pages. Add option.
+     + required size alignment by 2/4 MB.
+     + show paging option state when start.
  
- 10) Auto select repeats, use pre-defined constants and calibration.
-     - repeats override logic.
+ ---
   
+ 12) + Improve command line errors reporting: required report both option name and value.
+ 13) + Detail error reporting by OS API. Debug error handling branches.
+     + add decode subroutine.
+     + replace variable "status" to "errorCode", replace interpreting.
+ 
  ---
  
- 11) Fast read-write-copy option or "read", "write", "copy", "ntread", "ntwrite", "ntcopy" for existed option.
- 12) Add and debug class: DetectorPaging, for Large pages. Add option.
- 13) Add and debug class: DetectorNuma, for NUMA affinitization. Add option.
- 14) Improve command line errors reporting: required report both option name and value.
- 15) Output coloring.
- 16) Show all options values and wait user press key (y/n).
- 17) Detail error reporting by OS API.
- 18) Show user help.
- 19) Scripting.
+ 14) ( ? ) Output coloring.
+ 15) Show all options values and wait user press key (y/n).
  
+ 
+ ---
+ 
+ 16) Add and debug class: DetectorNuma (NumaOptions), for NUMA affinitization. Add option.
+     - required platform for verify this
+ 
+ ---
+ 
+ 17) Show user help.
+ 18) Scripting.
+ 19) Fast read-write-copy option or "read", "write", "copy", "ntread", "ntwrite", "ntcopy" for existed option.
+  
  TODO bugs fix:
  1) BUG Threads count manual set with memory=dram.
  2) Start, End, Step set manually with memory=object (non default). But can without memory=object size only.
  3) Correct sequence.
  4) Correct data types, example size_t use.
-  
+ 5) Check for overflows when measurement.
+ 6) Check for BOOL return error, but GetLastError( ) returns 0.
+ 
+ TODO strategy:
+ 1) Measure latency.
+ 2) Scripting data reports model.
+    - auto bandwidth=f(size), for all memory types.
+    - auto latency=f(size), for all memory types.
+ 3) Refactoring by defined scripting data model. 
 
 */
 
@@ -50,6 +71,7 @@ TODO features:
 #include "DecoderCpuid.h"
 #include "SystemMemory.h"
 #include "SystemTopology.h"
+#include "PagingOptions.h"
 #include "Performer.h"
 
 // Title and service strings include copyright
@@ -64,13 +86,17 @@ SystemLibrary*  pSystemLibrary  = NULL;
 DecoderCpuid*   pDecoderCpuid   = NULL;
 SystemMemory*   pSystemMemory   = NULL;
 SystemTopology* pSystemTopology = NULL;
+PagingOptions*  pPagingOptions  = NULL;
 Performer*      pPerformer      = NULL;
 
 // Variables and structures
 COMMAND_LINE_PARMS* pp = NULL;
 SYSTEM_FUNCTIONS_LIST* pf = NULL;
 BENCHMARK_SCENARIO scenario;
-BOOL status;
+
+// Status variables
+BOOL opStatus;
+DWORD osErrorCode;
 
 // CPUID/XGETBW/RDTSC variables
 DWORD rEax;
@@ -88,6 +114,9 @@ SYSTEM_MEMORY_DATA sysMemory;
 
 // System Topology and cache levels (by WinAPI) configuration variables
 SYSTEM_TOPOLOGY_DATA sysTopology;
+
+// Paging information data
+PAGING_OPTIONS_DATA pagingOptions;
 
 // Benchmark process and calculation variables
 double megabytes;
@@ -131,6 +160,7 @@ int printMemorySize( char* s, size_t n, DWORD64 x );
 void printLine( char* s, size_t n, int m );
 void calculateStatistics( int length , double results[] , 
                           double* min , double* max , double* average , double* median );
+void printSystemError( DWORD osErrorCode );
 
 // Print hex value = x to output string = s with size limit = n
 int print64( char* s, size_t n, DWORD64 x )
@@ -263,6 +293,37 @@ void calculateStatistics( int length , double results[] ,
     }
 }
 
+// Helper for print decoded OS error code
+void printSystemError( DWORD x )
+{
+	if ( ( x > 0 ) && ( x < 0x7FFFFFFF ) )  // reject 0 = no OS errors, -1 = error without OS API code
+	{
+		// Local variables
+    	LPVOID lpvMessageBuffer;
+    	DWORD status;
+    	// Build message string = f (error code)
+    	status = FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        	          		    FORMAT_MESSAGE_FROM_SYSTEM |
+            	      		    FORMAT_MESSAGE_IGNORE_INSERTS,
+                	  		    NULL, x,
+                  			    MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
+                  			    ( LPTSTR )&lpvMessageBuffer, 0, NULL );
+    	if ( status )
+    	{
+        	// this visualized if error string build OK
+        	printf( "OS API reports error %d = %s\n", x, lpvMessageBuffer );
+    	}
+    	else
+    	{
+        	DWORD dwError = GetLastError( );
+        	// this visualized if build error string FAILED
+        	printf( "Decode OS error failed, format message error %d\n", dwError );
+    	}
+    	// Free the buffer allocated by the system API function
+    	LocalFree( lpvMessageBuffer );
+	}
+}
+
 // Application entry point
 int main(int argc, char** argv) 
 {
@@ -278,12 +339,13 @@ int main(int argc, char** argv)
 	printf( "get command line parameters..." );
 	pCommandLine = new CommandLine( );
 	pCommandLine->resetBeforeParse( );
-	status = pCommandLine->parseCommandLine( argc, argv );
-	if ( !status )
+	osErrorCode = pCommandLine->parseCommandLine( argc, argv );
+	if ( osErrorCode )
 	{
 		printf( "FAILED.\n" );
 		statusString = pCommandLine->getStatusString( );
-        printf( "Error at %s\n", statusString );
+        printf( "ERROR: %s\n", statusString );
+        printSystemError( osErrorCode );
 		return 1;
 	}
 	printf( "OK.\n" );
@@ -293,12 +355,13 @@ int main(int argc, char** argv)
 	// Load library, check validity
 	printf( "load library..." );
 	pSystemLibrary = new SystemLibrary( );
-	status = pSystemLibrary->loadSystemLibrary( );
-	if ( !status )
+	osErrorCode = pSystemLibrary->loadSystemLibrary( );
+	if ( osErrorCode )
 	{
 		printf( "FAILED.\n" );
 		statusString = pSystemLibrary->getStatusString( );
         printf( "Error at %s\n", statusString );
+        printSystemError( osErrorCode );
 		return 1;
 	}
 	printf( "OK.\n" );
@@ -336,10 +399,13 @@ int main(int argc, char** argv)
 	// Create SystemTopology class
 	pSystemTopology = new SystemTopology( );
 	
+	// Create PagingOptions class
+	pPagingOptions = new PagingOptions( );
+	
 	// Check CPUID support
 	printf( "check CPUID support..." );
-	status = ( pf->DLL_CheckCpuid )( );
-	if ( !status )
+	opStatus = ( pf->DLL_CheckCpuid )( );
+	if ( !opStatus )
 	{
 		printf( "FAILED.\nCPUID instruction not supported or locked by VMM.\n" );
 		return 1;
@@ -348,8 +414,8 @@ int main(int argc, char** argv)
 	
 	// Detect CPU vendor and model
 	char sVendor[13], sModel[49];
-	status = pDecoderCpuid->getVendorAndModel( sVendor, sModel, 13, 49 );
-	if ( !status )
+	opStatus = pDecoderCpuid->getVendorAndModel( sVendor, sModel, 13, 49 );
+	if ( !opStatus )
 	{
 		printf( "Get CPU vendor and model FAILED.\n" );
 	}
@@ -425,8 +491,8 @@ int main(int argc, char** argv)
 	
 	// TSC clock frequency measurement, update variables
 	printf( "measure TSC clock..." );
-	status = ( pf->DLL_MeasureTsc )( &deltaTsc );
-	if ( !status )
+	opStatus = ( pf->DLL_MeasureTsc )( &deltaTsc );
+	if ( !opStatus )
 	{
 		printf( "FAILED.\nTSC clock measurement error.\n" );
 		return 1;
@@ -445,11 +511,12 @@ int main(int argc, char** argv)
 	printf( "OK.\nTSC frequency=%.3f MHz, period=%.3f ns\n", frequencyMHz, periodNs );
 	
 	// Detect and print system memory configuration info
-	status = pSystemMemory->detectMemory( &sysMemory );
-    if( !status )
+	osErrorCode = pSystemMemory->detectMemory( &sysMemory );
+    if( osErrorCode )
     {
         statusString = pSystemMemory->getStatusString( );
         printf( "\nError at %s\n", statusString );
+        printSystemError( osErrorCode );
         return 1;
     }
     DWORD64 x1 = sysMemory.physicalMemory;
@@ -465,11 +532,12 @@ int main(int argc, char** argv)
     printf( "Memory: total physical=%s , free=%s\n", sMem1, sMem2 );
     
     // Detect and print cache (by WinAPI) and system topology configuration info
-    status = pSystemTopology->detectTopology( &sysTopology );
-    if( !status )
+    osErrorCode = pSystemTopology->detectTopology( &sysTopology );
+    if( osErrorCode )
     {
         statusString = pSystemTopology->getStatusString( );
         printf( "\nError at %s\n", statusString );
+        printSystemError( osErrorCode );
         return 1;
     }
     x1 = sysTopology.pointL1;
@@ -531,7 +599,36 @@ int main(int argc, char** argv)
 		pp->optionBlockDelta = mSize / 8;
 	}
 
-	// Setup variables, changed under benchmark scenario
+	// Detect paging options
+	opStatus = pPagingOptions->detectPaging( &pagingOptions );
+	if ( !opStatus )
+	{
+		statusString = pPagingOptions->getStatusString( );
+        printf( "\nError at %s\n", statusString );
+		return 1;
+	}
+	char sPage1[81];
+	char sPage2[81];
+	DWORD y1 = pagingOptions.defaultPage;
+	DWORD y2 = pagingOptions.largePage;
+	DWORD y3 = pagingOptions.pagingRights;
+    printMemorySize( sPage1, 80, y1 );
+    printMemorySize( sPage2, 80, y2 );
+    printf( "default page=%s, large page=%s, rights=%d\n", sPage1, sPage2, y3 );
+    
+    // Check selected paging option available
+    if ( ( pp->optionPageSize != 0 ) && ( pagingOptions.largePage == 0 ) )
+    {
+    	printf( "Error: large pages not supported by platform.\n" );
+    	return 1;
+	}
+	if ( ( pp->optionPageSize != 0 ) && ( pagingOptions.pagingRights == 0 ) )
+	{
+    	printf( "Error: no privileges for large pages.\n" );
+    	return 1;
+	}
+	
+	// Setup variables for benchmark scenario
 	size_t bpi = bytesPerInstruction[a];
 	scenario.startSize = pp->optionBlockStart;
 	scenario.endSize = pp->optionBlockStop;
@@ -540,6 +637,16 @@ int main(int argc, char** argv)
 	scenario.currentSizeInstructions = scenario.startSize / bpi;
 	scenario.measurementRepeats = r1;
 	scenario.methodId = a;
+	
+	scenario.pagingMode = pp->optionPageSize;
+	if ( scenario.pagingMode )
+	{
+		scenario.pageSize = pagingOptions.largePage;
+	}
+	else
+	{
+		scenario.pageSize = pagingOptions.defaultPage;
+	}
 	
 	// Build threads list, print allocation
 	// n = threads count, mt = threads list size in bytes, pt = pointer to threads list
@@ -572,21 +679,23 @@ int main(int argc, char** argv)
 	pPerformer = new Performer( pf );
 	
 	// Build threads context
-	status = pPerformer->buildThreadsList( &scenario );
-	if ( !status )
+	osErrorCode = pPerformer->buildThreadsList( &scenario );
+	if ( osErrorCode )
 	{
 		statusString = pPerformer->getStatusString( );
         printf( "\nError at %s\n", statusString );
+        printSystemError( osErrorCode );
 		return 1;
 	}
 
 	// Benchmark scenario, run threads
 	printf( "running threads...\n" );
-	status = pPerformer->threadsRun( &scenario, deltaTsc );
-	if ( !status )
+	osErrorCode = pPerformer->threadsRun( &scenario, deltaTsc );
+	if ( osErrorCode )
 	{
 		statusString = pPerformer->getStatusString( );
         printf( "\nError at %s\n", statusString );
+        printSystemError( osErrorCode );
 		return 1;
 	}
 	print64( s, NS, deltaTsc );
@@ -617,7 +726,10 @@ int main(int argc, char** argv)
 	printf( "statistics array allocated: %s\n", s );
 	
 	// print benchmark conditions, before calibration.
-	printf( "\nRUN: method=%d, threads=%d, repeats=%d, buffer=%d\n", a, n, r1, b );
+	char sPage[81];
+	printMemorySize( sPage, 80, scenario.pageSize );
+	printf( "\nRUN: method=%d, threads=%d, repeats=%d\n     buffer=%d, large pages=%d, page size=%s\n", 
+	        a, n, r1, b, scenario.pagingMode, sPage );
 	printf( "     start=%d, end=%d, delta=%d, bpi=%d\n", 
 	        ( int )scenario.startSize, ( int )scenario.endSize, ( int )scenario.deltaSize, bpi );
 
@@ -626,11 +738,12 @@ int main(int argc, char** argv)
 	{
 		printf( "     calibration..." );
 		pPerformer->threadsUpdate( &scenario, scenario.endSize / bpi );
-		status = pPerformer->threadsRestart( &scenario, deltaTsc );
-		if ( !status )
+		osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+		if ( osErrorCode )
 		{
 			statusString = pPerformer->getStatusString( );
        		printf( "\nCalibration error at %s\n", statusString );
+       		printSystemError( osErrorCode );
 			return 1;
 		}
 		double cTime = deltaTsc * periodSeconds;
@@ -651,11 +764,12 @@ int main(int argc, char** argv)
 	for( blockCount=0; blockCount<=blockMax; blockCount++ )
 	{
 		pPerformer->threadsUpdate( &scenario, blockSize / bpi );
-		status = pPerformer->threadsRestart( &scenario, deltaTsc );
-		if ( !status )
+		osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+		if ( osErrorCode )
 		{
 			statusString = pPerformer->getStatusString( );
         	printf( "\nBenchmark error at %s\n", statusString );
+        	printSystemError( osErrorCode );
 			return 1;
 		}
 		
@@ -681,11 +795,12 @@ int main(int argc, char** argv)
 	printf( "%s\n", s );
 	
 	// Delete threads context
-	status = pPerformer->releaseThreadsList( &scenario );
-	if( !status )
+	osErrorCode = pPerformer->releaseThreadsList( &scenario );
+	if( osErrorCode )
 	{
 		statusString = pPerformer->getStatusString( );
        	printf( "\nError at %s\n", statusString );
+       	printSystemError( osErrorCode );
 		return 1;
 	}
 
@@ -700,6 +815,7 @@ int main(int argc, char** argv)
 	delete pPerformer;
 	free( scenario.pSignalsList );
 	free( scenario.pThreadsList );
+	delete pPagingOptions;
 	delete pSystemTopology;
 	delete pSystemMemory;
 	delete pDecoderCpuid;
