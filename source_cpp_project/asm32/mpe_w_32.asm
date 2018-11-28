@@ -257,11 +257,15 @@ include 'ntrcopy_avx512.inc'
 ; Non-temporal (non-cacheable read-by-prefetch and write) mode
 include 'ntpread_sse128.inc'
 include 'ntpread_avx256.inc'
+; Latency measurement
+include 'latency_lcm.inc'
+include 'latency_rdrand.inc'
+include 'latency_walk.inc'
 
 ; Data section
 section '.data' data readable writeable
 StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.20.01 for Windows ia32.',0
+StringVersion    DB 'v0.21.00 for Windows ia32.',0
 StringCopyright  DB '(C)2018 IC Book Labs.',0
 
 ; Pointers to performance patterns
@@ -305,7 +309,11 @@ DD  Pattern_NtCopy_SSE128   ; This duplicated 1
 DD  Pattern_NtpRead_AVX256
 ; Reserved for same 256-512 bit operations
 ; FMA with non-temporal store
-; Reserved 
+; ... reserved ...
+; Latency measurement
+DD  Pattern_Latency_LCM
+DD  Pattern_Latency_RDRAND  
+DD  Pattern_Latency_Walk   
 
 ; Export section
 section '.edata' export data readable

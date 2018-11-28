@@ -395,6 +395,21 @@ void Performer::repeatsUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x )
 	}
 }
 
+// Update threads list for r/w method-routine changes by latency measure algorithm
+void Performer::routineUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x )
+{
+	// Initializing variables
+	int i = 0;
+	int n = pScenario->nThreadsList;
+	THREAD_CONTROL_ENTRY* pThreads = pScenario->pThreadsList;
+	
+	// Cycle for threads entries
+	for( i=0; i<n; i++ )
+	{
+		pThreads->methodId = x;
+		pThreads++;
+	}
+}
 
 // Method returns status string, valid if error returned
 char* Performer::getStatusString( )

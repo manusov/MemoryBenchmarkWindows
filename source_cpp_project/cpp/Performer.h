@@ -17,6 +17,7 @@ class Performer
 		DWORD threadsRestart( BENCHMARK_SCENARIO* pScenario, DWORD64 &deltaTsc );
 		void threadsUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
 		void repeatsUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
+		void routineUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
 		char* getStatusString( );
 	private:
 		static SYSTEM_FUNCTIONS_LIST* pF;

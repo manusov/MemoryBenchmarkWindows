@@ -1,6 +1,6 @@
 #include "DecoderCpuid.h"
 
-// Pointer to native DLL
+// Pointer to native DLL functions list
 SYSTEM_FUNCTIONS_LIST* DecoderCpuid::pF;
 
 // Status string
@@ -9,37 +9,40 @@ char DecoderCpuid::s[NS];
 
 // Control structure for detect optional supported CPU features
 const CPUID_CONDITION DecoderCpuid::x[] = {
-	// Unconditional x86-64 instructions
-	{ ORMASK      , 0          , 0          , NOREG  , 0                       , CPU_FEATURES_UNCONDITIONAL },
+	// Unconditional x86-64 base instruction set
+	{ ORMASK      , 0          , 0          , NOREG  , 0                       , CPU_FEATURES_UNCONDITIONAL } ,
 	// SSE required
-	{ ORMASK      , 0x00000001 , 0x00000000 , EDX    , 1<<25                   , CPU_FEATURES_SSE128        },
+	{ ORMASK      , 0x00000001 , 0x00000000 , EDX    , 1<<25                   , CPU_FEATURES_SSE128        } ,
 	// AVX256 include context management required
-	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<28)         , CPU_FEATURES_AVX256        },
+	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<28)         , CPU_FEATURES_AVX256        } ,
 	// AVX512 include context management required
-	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<16                   , CPU_FEATURES_AVX512        },
-    { ANDMASK     , 0x00000001 , 0x00000000 , ECX    , 1<<27                   , CPU_FEATURES_AVX512        },
+	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<16                   , CPU_FEATURES_AVX512        } ,
+    { ANDMASK     , 0x00000001 , 0x00000000 , ECX    , 1<<27                   , CPU_FEATURES_AVX512        } ,
     // FMA256 include context management required
-	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<28)|(1<<12) , CPU_FEATURES_FMA256        },
+	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<28)|(1<<12) , CPU_FEATURES_FMA256        } ,
 	// FMA512 include context management required
-	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<16                   , CPU_FEATURES_FMA512        },
-	{ ANDMASK     , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<12)         , CPU_FEATURES_FMA512        },
+	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<16                   , CPU_FEATURES_FMA512        } ,
+	{ ANDMASK     , 0x00000001 , 0x00000000 , ECX    , (1<<27)|(1<<12)         , CPU_FEATURES_FMA512        } ,
 	// SSE non-temporal read by MOVNTDQA (SSE4.1)
-	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , 1<<19                   , CPU_FEATURES_MOVNTDQA128   },
+	{ ORMASK      , 0x00000001 , 0x00000000 , ECX    , 1<<19                   , CPU_FEATURES_MOVNTDQA128   } ,
 	// AVX256 non-temporal read by VMOVNTDQA (AVX2) include context management required
-	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<5                    , CPU_FEATURES_MOVNTDQA256   },
-	{ ANDMASKLAST , 0x00000001 , 0x00000000 , ECX    , 1<<27                   , CPU_FEATURES_AVX512        }
+	{ ORMASK      , 0x00000007 , 0x00000000 , EBX    , 1<<5                    , CPU_FEATURES_MOVNTDQA256   } ,
+	{ ANDMASK     , 0x00000001 , 0x00000000 , ECX    , 1<<27                   , CPU_FEATURES_AVX512        } ,
+	// RDRAND instruction required
+	{ ORMASKLAST  , 0x00000001 , 0x00000000 , ECX    , 1<<30                   , CPU_FEATURES_RDRAND        }
 };
 
 // Control structure for detect optional supported OS context management features
 const XGETBV_CONDITION DecoderCpuid::y[] = {
-	{ UNCOND     , 0                           , CPU_FEATURES_UNCONDITIONAL },
-	{ UNCOND     , 0                           , CPU_FEATURES_SSE128        },
-	{ UNCOND     , 0                           , CPU_FEATURES_MOVNTDQA128   },
-	{ ORMASK     , 1<<2                        , CPU_FEATURES_AVX256        },
-	{ ORMASK     , (1<<2)|(1<<5)|(1<<6)|(1<<7) , CPU_FEATURES_AVX512        },
-	{ ORMASK     , 1<<2                        , CPU_FEATURES_FMA256        },
-	{ ORMASK     , (1<<2)|(1<<5)|(1<<6)|(1<<7) , CPU_FEATURES_FMA512        },
-	{ ORMASKLAST , 1<<2                        , CPU_FEATURES_MOVNTDQA256   }
+	{ UNCOND     , 0                           , CPU_FEATURES_UNCONDITIONAL } ,
+	{ UNCOND     , 0                           , CPU_FEATURES_SSE128        } ,
+	{ UNCOND     , 0                           , CPU_FEATURES_MOVNTDQA128   } ,
+	{ ORMASK     , 1<<2                        , CPU_FEATURES_AVX256        } ,
+	{ ORMASK     , (1<<2)|(1<<5)|(1<<6)|(1<<7) , CPU_FEATURES_AVX512        } ,
+	{ ORMASK     , 1<<2                        , CPU_FEATURES_FMA256        } ,
+	{ ORMASK     , (1<<2)|(1<<5)|(1<<6)|(1<<7) , CPU_FEATURES_FMA512        } ,
+	{ ORMASK     , 1<<2                        , CPU_FEATURES_MOVNTDQA256   } ,
+	{ UNCONDLAST , 0                           , CPU_FEATURES_RDRAND        }
 };
 
 
@@ -128,7 +131,7 @@ void DecoderCpuid::buildCpuBitmap( DWORD64 &cpuBitmap )
 	do
 	{
 		featureSupported = getCpuidFeature( x[i].function, x[i].subfunction, x[i].reg, x[i].testBitmap );
-		if ( x[i].maskType == UNCOND )
+		if ( ( x[i].maskType == UNCOND ) || ( x[i].maskType == UNCONDLAST ) )
 		{
 			cpuBitmap |= x[i].patchBitmap;
 		}
@@ -194,7 +197,7 @@ void DecoderCpuid::buldOsBitmap( DWORD64 &osBitmap )
 	do
 	{
 	featureSupported = getXgetbvFeature( y[i].testBitmap );
-	if ( y[i].maskType == UNCOND )
+	if ( ( y[i].maskType == UNCOND ) || ( y[i].maskType == UNCONDLAST ) )
 		{
 			osBitmap |= y[i].patchBitmap;
 		}

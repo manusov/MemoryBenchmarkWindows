@@ -1,6 +1,9 @@
 /* 
-
 UNDER CONSTRUCTION.
+
+BREAK.
+Dynamical Calibration.
+
 Memory Performance Engine.
 Debug sample, without technologies support pre-check.
 TODO features:
@@ -21,9 +24,6 @@ TODO features:
  11) + Add and debug class: DetectorPaging (PagingOptions), for Large pages. Add option.
      + required size alignment by 2/4 MB.
      + show paging option state when start.
- 
- ---
-  
  12) + Improve command line errors reporting: required report both option name and value.
  13) + Detail error reporting by OS API. Debug error handling branches.
      + add decode subroutine.
@@ -31,20 +31,26 @@ TODO features:
  
  ---
  
- 14) ( ? ) Output coloring.
- 15) Show all options values and wait user press key (y/n).
+ 14) + No divide to LATENCY_DIVISOR if direct set repeats.
+ 15) Negative memory size if selected >2GB (arithmetic overflow), example "end=2G". blockSize / bpi overflow. Yet 32-bit limit.
  
  
  ---
  
- 16) Add and debug class: DetectorNuma (NumaOptions), for NUMA affinitization. Add option.
+ 16) ( ? ) Output coloring.
+ 17) Show all options values and wait user press key (y/n).
+ 
+ 
+ ---
+ 
+ 18) Add and debug class: DetectorNuma (NumaOptions), for NUMA affinitization. Add option.
      - required platform for verify this
  
  ---
  
- 17) Show user help.
- 18) Scripting.
- 19) Fast read-write-copy option or "read", "write", "copy", "ntread", "ntwrite", "ntcopy" for existed option.
+ 19) Show user help.
+ 20) Scripting.
+ 21) Fast read-write-copy option or "read", "write", "copy", "ntread", "ntwrite", "ntcopy" for existed option.
   
  TODO bugs fix:
  1) BUG Threads count manual set with memory=dram.
@@ -52,7 +58,8 @@ TODO features:
  3) Correct sequence.
  4) Correct data types, example size_t use.
  5) Check for overflows when measurement.
- 6) Check for BOOL return error, but GetLastError( ) returns 0.
+ 6) Check for BOOL return error, but GetLastError( ) returns 0
+ 7) Random offsets JA or JBE, wrong limit -1. For latency measure, both for x64 and ia32 DLLs.
  
  TODO strategy:
  1) Measure latency.
@@ -142,14 +149,16 @@ double median;
 BYTE bytesPerInstruction[] = 
 {
      4,  4,  4,  4,  4,  4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
-    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32
+    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32,
+     8,  8
 };
 #endif
 #if NATIVE_WIDTH == 64
 BYTE bytesPerInstruction[] = 
 {
      8,  8,  8,  8,  8,  8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
-    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32
+    16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32,
+     8,  8
 };
 #endif
 
@@ -352,6 +361,13 @@ int main(int argc, char** argv)
 	pCommandLine->correctAfterParse( );
 	pp = pCommandLine->getCommandLineParms( );
 	
+// DEBUG
+// char sd[80];
+// DWORD64 wd = pp->optionBlockStop;
+// print64( sd, 80, wd );
+// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
+// DEBUG
+
 	// Load library, check validity
 	printf( "load library..." );
 	pSystemLibrary = new SystemLibrary( );
@@ -379,6 +395,7 @@ int main(int argc, char** argv)
 	
 	int r1 = pp->optionRepeats;
 	int r2 = r1;                        // r2 = OPTION_NOT_SET if no user override
+	DWORD64 r3 = pp->optionAdaptive;    // r3 = Adaptive repeat mode, OPTION_NOT_SET if not selected
 	if ( r1 == OPTION_NOT_SET )
 	{
 		r1 = APPROXIMATION_REPEATS;     // r1 = always valid counter
@@ -459,13 +476,17 @@ int main(int argc, char** argv)
 	{
 		a = pDecoderCpuid->findMaxMethodNonTemporal( cpuBitMap, osBitMap );
 	}
-	
+
 	// Check read-write method selection
 	if ( ( a > MAXIMUM_ASM_METHOD ) || ( a < 0 ) )
 	{
-		printf( "\nInternal error: wrong read-write method selector.\n" );
+		printf( "\nInternal error: wrong read-write method selector (%d).\n", a );
 		return 1;
 	}
+
+// DEBUG
+// a = CPU_FEATURE_LATENCY_LCM;
+// DEBUG
 
 	// Check selected read-write method supported by CPUID features
 	DWORD a1 = a;
@@ -575,18 +596,36 @@ int main(int argc, char** argv)
 		default:
 			break;
 	}
-
-	// Check for automatically set number of threads
-	if ( ( n == -1 ) || ( m == DRAM ) )
+	
+	// Select reduced repeats mode for measure latency
+	if ( ( r2 == OPTION_NOT_SET ) && 
+	     ( ( a == CPU_FEATURE_LATENCY_LCM ) || ( a == CPU_FEATURE_LATENCY_RDRAND ) ) )
 	{
-		n = sysTopology.coreCount;
-		if ( sysTopology.hyperThreadingFlag )
-		{
-			n *= 2;
-		}
-		pp->optionThreads = n;
+		r1 /= REPEATS_DIVISOR_LATENCY;
 	}
 
+	// Check for automatically set number of threads, if command line parameter not set
+	if ( n == OPTION_NOT_SET )
+	{
+		if ( ( m == DRAM ) &&
+		     ( a != CPU_FEATURE_LATENCY_LCM ) &&
+		     ( a != CPU_FEATURE_LATENCY_RDRAND ) )
+		{   // object=dram, not a latency measurement, means bandwidth measurement
+			n = sysTopology.coreCount;
+			if ( sysTopology.hyperThreadingFlag )
+			{
+				n *= 2;
+			}
+			// pp->optionThreads = n;   // multi-thread by platform topology
+		}
+		else
+		{   // other situations
+			// pp->optionThreads = 1;   // single-thread for selected scenario
+			n = 1;
+		}
+	}
+
+	// Check Cache or DRAM detection status
 	if ( ( mSize == 0 ) && ( m != OPTION_NOT_SET ) )
 	{
 		printf( "ERROR: selected memory object not detected, use settings start/end/step.\n" );
@@ -728,17 +767,46 @@ int main(int argc, char** argv)
 	// print benchmark conditions, before calibration.
 	char sPage[81];
 	printMemorySize( sPage, 80, scenario.pageSize );
-	printf( "\nRUN: method=%d, threads=%d, repeats=%d\n     buffer=%d, large pages=%d, page size=%s\n", 
+	
+	if ( r3 == OPTION_NOT_SET )
+	{
+		printf( "\nRUN: method=%d, threads=%d, repeats=%d\n     buffer=%d, large pages=%d, page size=%s\n", 
 	        a, n, r1, b, scenario.pagingMode, sPage );
+	}
+	else
+	{
+		printf( "\nRUN: method=%d, threads=%d, repeats=ADAPTIVE\n     buffer=%d, large pages=%d, page size=%s\n", 
+	        a, n, b, scenario.pagingMode, sPage );
+	}
+	        
 	printf( "     start=%d, end=%d, delta=%d, bpi=%d\n", 
 	        ( int )scenario.startSize, ( int )scenario.endSize, ( int )scenario.deltaSize, bpi );
 
+// DEBUG
+// char sd[80];
+// DWORD64 wd = scenario.endSize / bpi;
+// print64( sd, 80, wd );
+// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
+// DEBUG
+
+
 	// Calibration
-	if ( r2 == OPTION_NOT_SET )
+	if ( ( r2 == OPTION_NOT_SET ) && ( r3 == OPTION_NOT_SET ) )
 	{
 		printf( "     calibration..." );
+		
 		pPerformer->threadsUpdate( &scenario, scenario.endSize / bpi );
 		osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+
+		if ( ( !osErrorCode ) && 
+		     ( ( scenario.methodId == CPU_FEATURE_LATENCY_LCM    ) || 
+		       ( scenario.methodId == CPU_FEATURE_LATENCY_RDRAND )  )  )
+		{
+			pPerformer->routineUpdate( &scenario, CPU_FEATURE_LATENCY_WALK );
+			osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+			pPerformer->routineUpdate( &scenario, scenario.methodId );
+		}
+
 		if ( osErrorCode )
 		{
 			statusString = pPerformer->getStatusString( );
@@ -763,8 +831,36 @@ int main(int argc, char** argv)
 	double* pa1 = pa;
 	for( blockCount=0; blockCount<=blockMax; blockCount++ )
 	{
+
+		DWORD64 r3min=0, r3max=0, r3value=0;
+		if ( r3 != OPTION_NOT_SET )
+		{
+			r3min = 1;
+			r3max = 0xFFFFFFFFL;
+			r3value = r3 / ( blockSize / bpi );       // approximate constant number of instructions = measurementRepeats * blockSize
+			if ( r3value < r3min ) r3value = r3min;
+			if ( r3value > r3max ) r3value = r3max;
+			// DEBUG
+ 			// char sd[80];
+ 			// DWORD64 wd = r3value;  // r3max;  // blockSize / bpi;
+ 			// print64( sd, 80, wd );
+ 			// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
+			// DEBUG
+			pPerformer->repeatsUpdate( &scenario, r3value );
+		}
+
 		pPerformer->threadsUpdate( &scenario, blockSize / bpi );
 		osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+		
+		if ( ( !osErrorCode ) && 
+		     ( ( scenario.methodId == CPU_FEATURE_LATENCY_LCM    ) || 
+		       ( scenario.methodId == CPU_FEATURE_LATENCY_RDRAND )  )  )
+		{
+			pPerformer->routineUpdate( &scenario, CPU_FEATURE_LATENCY_WALK );
+			osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
+			pPerformer->routineUpdate( &scenario, scenario.methodId );
+		}
+		
 		if ( osErrorCode )
 		{
 			statusString = pPerformer->getStatusString( );
@@ -773,10 +869,11 @@ int main(int argc, char** argv)
 			return 1;
 		}
 		
-		DWORD64 x1 = blockSize;
-		DWORD64 x2 = r1;
-		DWORD64 x3 = n;
-		double x4 = deltaTsc;
+		DWORD64 x1 = blockSize;             // block size, bytes
+		DWORD64 x2 = r1;                    // number of measurement repeats
+		if ( r3value > 0 ) x2 = r3value;    // this for adaptive repeats mode
+		DWORD64 x3 = n;                     // number of threads
+		double x4 = deltaTsc;               // time interval in TSC clocks
 		cpi = x4 / ( x1 * x2 * x3 / bpi );
 		nspi = cpi * periodSeconds * 1000000000.0;
 		

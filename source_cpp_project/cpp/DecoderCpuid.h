@@ -36,7 +36,14 @@ typedef struct {
 ((DWORDLONG)1) << CPU_FEATURE_COPY_IA32_X64 |           \
 ((DWORDLONG)1) << CPU_FEATURE_MODIFY_IA32_X64 |         \
 ((DWORDLONG)1) << CPU_FEATURE_WRITE_STRINGS_IA32_X64 |  \
-((DWORDLONG)1) << CPU_FEATURE_COPY_STRINGS_IA32_X64
+((DWORDLONG)1) << CPU_FEATURE_COPY_STRINGS_IA32_X64 |   \
+((DWORDLONG)1) << CPU_FEATURE_LATENCY_LCM |             \
+((DWORDLONG)1) << CPU_FEATURE_LATENCY_WALK
+
+// This features validated by RDRAND feature bit
+// CPUID function 00000001h register ECX bit 30
+#define CPU_FEATURES_RDRAND                            \
+((DWORDLONG)1) << CPU_FEATURE_LATENCY_RDRAND
 
 // This features validated by SSE feature bit:
 // CPUID function 00000001h register EDX bit 25

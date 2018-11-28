@@ -1,0 +1,52 @@
+
+Memory Performance Engine. v0.51.00 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...OK.
+load library...OK.
+MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
+check CPUID support...OK.
+CPU vendor = GenuineIntel
+CPU model  = Intel(R) Core(TM) i7-4700HQ CPU @ 2.40GHz
+check RDTSC support...OK.
+check platform features...OK.
+CPU bitmap=00000007E79E8FFFh , OS bitmap=00000007E79E8FFFh
+measure TSC clock...OK.
+TSC frequency=2394.793 MHz, period=0.418 ns
+Memory: total physical=15.89GB , free=12.30GB
+Cache points for data read/write:
+L1=32.00KB, L2=256.00KB, L3=6.00MB
+CPU core count=4 HyperThreading=1
+default page=4.00KB, large page=2.00MB, rights=0
+threads list allocated: base=0000000000BD1740h, size=0000000000000060h
+handles list allocated: base=0000000000BD17B0h, size=0000000000000008h
+running threads...
+run OK, dTSC=0000000005C182C7h
+statistics array allocated: base=0000000000BD1AD0h, size=0000000000000080h
+
+RUN: method=9, threads=1, repeats=2000000
+     buffer=65536, large pages=0, page size=4.00KB
+     start=4096, end=65536, delta=4096, bpi=32
+     calibration...OK. delay=1.403 seconds, update repeats=1425565. 
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1        4096   0.362   0.151   211917.249
+   2        8192   0.359   0.150   213181.821
+   3       12288   0.358   0.150   213787.265
+   4       16384   0.361   0.151   212314.926
+   5       20480   0.376   0.157   203572.435
+   6       24576   0.389   0.162   197053.904
+   7       28672   0.373   0.156   205528.665
+   8       32768   0.374   0.156   204791.027
+   9       36864   0.794   0.332   96506.058 
+  10       40960   0.810   0.338   94664.382 
+  11       45056   0.815   0.340   94014.872 
+  12       49152   0.814   0.340   94173.195 
+  13       53248   0.807   0.337   94987.598 
+  14       57344   0.803   0.335   95404.989 
+  15       61440   0.817   0.341   93825.695 
+  16       65536   0.811   0.339   94519.995 
+-------------------------------------------------------
+
+ max=213787.265, min=93825.695 , average=151265.255, median=146779.981
+
+-------------------------------------------------------
