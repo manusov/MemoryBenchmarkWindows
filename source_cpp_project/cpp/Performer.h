@@ -18,6 +18,7 @@ class Performer
 		void threadsUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
 		void repeatsUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
 		void routineUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x );
+		BOOL freeThreadsList( BENCHMARK_SCENARIO* pScenario );
 		char* getStatusString( );
 	private:
 		static SYSTEM_FUNCTIONS_LIST* pF;

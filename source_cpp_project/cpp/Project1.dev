@@ -27,9 +27,9 @@ CommandLine=
 Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=3
-CompilerSettings=0000000100000000000001000
-UnitCount=16
+CompilerSet=0
+CompilerSettings=0000000000000000000001000
+UnitCount=18
 
 [VersionInfo]
 Major=1
@@ -202,6 +202,26 @@ BuildCmd=
 
 [Unit16]
 FileName=PagingOptions.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit17]
+FileName=NumaTopology.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit18]
+FileName=NumaTopology.cpp
 CompileCpp=1
 Folder=
 Compile=1

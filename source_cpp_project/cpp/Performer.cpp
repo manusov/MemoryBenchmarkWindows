@@ -147,10 +147,10 @@ DWORD Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 		
 		pThreads->sizeInstructions = pScenario->currentSizeInstructions;
 		pThreads->measurementRepeats = pScenario->measurementRepeats;
-		pThreads->threadAffinity = 0;
-		pThreads->trueAffinity = 0;
-		pThreads->threadGroup = 0;
-		pThreads->trueGroup = 0;
+		pThreads->optimalGaff.Mask = 0;
+		pThreads->optimalGaff.Group = 0;
+		pThreads->originalGaff.Mask = 0;
+		pThreads->originalGaff.Group = 0;
 		pThreads->largePages = 0;
 		pThreads->methodId = pScenario->methodId;
 		pThreads->DLL_PerformanceGate = pF->DLL_PerformanceGate;
@@ -409,6 +409,30 @@ void Performer::routineUpdate( BENCHMARK_SCENARIO* pScenario, DWORD64 x )
 		pThreads->methodId = x;
 		pThreads++;
 	}
+}
+
+// Free memory, allocated for threads list
+BOOL Performer::freeThreadsList( BENCHMARK_SCENARIO* pScenario )
+{
+	// Initializing variables
+	BOOL status = TRUE;
+	int i = 0;
+	int n = pScenario->nThreadsList;
+	THREAD_CONTROL_ENTRY* pThreads = pScenario->pThreadsList;
+	
+	// Cycle for threads entries
+	for( i=0; i<n; i++ )
+	{
+		LPVOID trueBase = pThreads->trueBase;
+		if ( trueBase != NULL )
+		{
+			BOOL status1 = VirtualFree( trueBase, 0, MEM_RELEASE );
+			status = status && status1;
+		}
+		pThreads++;
+	}
+	
+	return status;
 }
 
 // Method returns status string, valid if error returned

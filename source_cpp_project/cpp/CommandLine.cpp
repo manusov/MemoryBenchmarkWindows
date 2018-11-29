@@ -49,6 +49,11 @@ const char* CommandLine::keysPage[] = {
     NULL
 };
 
+// NUMA topology mode control
+const char* CommandLine::keysNuma[] = {
+    "unaware", "local", "remote",
+    NULL
+};
 
 // Pointer command line parameters structure
 COMMAND_LINE_PARMS CommandLine::parms;
@@ -61,6 +66,7 @@ const OPTION_ENTRY CommandLine::options[] = {
     { "page"            , keysPage        , &parms.optionPageSize    , SELPARM } ,
     { "repeats"         , NULL            , &parms.optionRepeats     , INTPARM } ,
     { "adaptive"        , NULL            , &parms.optionAdaptive    , MEMPARM } ,
+    { "numa"            , keysNuma        , &parms.optionNuma        , SELPARM } ,
     { "start"           , NULL            , &parms.optionBlockStart  , MEMPARM } ,
     { "end"             , NULL            , &parms.optionBlockStop   , MEMPARM } ,
     { "step"            , NULL            , &parms.optionBlockDelta  , MEMPARM } ,
@@ -98,6 +104,7 @@ void CommandLine::resetBeforeParse( )
     parms.optionThreads = DEFAULT_THREADS_COUNT;
     parms.optionRepeats = DEFAULT_MEASUREMENT_REPEATS;
     parms.optionAdaptive = DEFAULT_ADAPTIVE_REPEATS;
+    parms.optionNuma = DEFAULT_NUMA_MODE;
     parms.optionBlockStart = DEFAULT_START_SIZE_BYTES;
     parms.optionBlockStop = DEFAULT_END_SIZE_BYTES;
     parms.optionBlockDelta = DEFAULT_DELTA_SIZE_BYTES;

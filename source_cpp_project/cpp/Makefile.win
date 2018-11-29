@@ -4,14 +4,14 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = main.o SystemLibrary.o Performer.o CommandLine.o DecoderCpuid.o SystemMemory.o SystemTopology.o PagingOptions.o
-LINKOBJ  = main.o SystemLibrary.o Performer.o CommandLine.o DecoderCpuid.o SystemMemory.o SystemTopology.o PagingOptions.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -m32 -s
+OBJ      = main.o SystemLibrary.o Performer.o CommandLine.o DecoderCpuid.o SystemMemory.o SystemTopology.o PagingOptions.o NumaTopology.o
+LINKOBJ  = main.o SystemLibrary.o Performer.o CommandLine.o DecoderCpuid.o SystemMemory.o SystemTopology.o PagingOptions.o NumaTopology.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -s
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
 BIN      = Project1.exe
-CXXFLAGS = $(CXXINCS) -m32
-CFLAGS   = $(INCS) -m32
+CXXFLAGS = $(CXXINCS) 
+CFLAGS   = $(INCS) 
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -47,3 +47,6 @@ SystemTopology.o: SystemTopology.cpp
 
 PagingOptions.o: PagingOptions.cpp
 	$(CPP) -c PagingOptions.cpp -o PagingOptions.o $(CXXFLAGS)
+
+NumaTopology.o: NumaTopology.cpp
+	$(CPP) -c NumaTopology.cpp -o NumaTopology.o $(CXXFLAGS)

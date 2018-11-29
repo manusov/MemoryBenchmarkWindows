@@ -3,11 +3,11 @@
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.51.00 for Windows ia32."
+#define BUILD_STRING "v0.51.01 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.51.00 for Windows x64."
+#define BUILD_STRING "v0.51.01 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -73,6 +73,15 @@ typedef enum {
 	L1_CACHE, L2_CACHE, L3_CACHE, DRAM
 } MEMORY_OBJECTS;
 
+typedef enum {
+	PAGES_NORMAL, PAGES_LARGE
+} PAGING_MODES;
+
+// Enumeration of NUMA modes
+typedef enum {
+	NUMA_UNAWARE, NUMA_LOCAL, NUMA_REMOTE
+} NUMA_MODES;
+
 // Structure for native DLL functions entry points list,
 typedef struct {
     void ( __stdcall *DLL_GetDllStrings   ) ( char** , char** , char** );
@@ -84,31 +93,58 @@ typedef struct {
     BOOL ( __stdcall *DLL_PerformanceGate ) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );
 } SYSTEM_FUNCTIONS_LIST;
 
-// This control structure used per thread.
-// Array of this structures is multithread context. 
-typedef struct
-{
-    HANDLE rxEventHandle;       // Event Handle for daughter thread operation complete signal
-    HANDLE txEventHandle;       // Event Handle for daughter thread operation continue enable signal
-    HANDLE threadHandle;        // Thread Handle for execution thread
-    LPVOID base1;               // Source for read, destination for write and modify
-    LPVOID base2;               // Destination for copy
-    LPVOID trueBase;            // True (before alignment) memory block base for release
-    SIZE_T sizeInstructions;    // Block size, units = instructions, for benchmarking
-    SIZE_T measurementRepeats;  // Number of measurement repeats
-    KAFFINITY threadAffinity;   // Affinity Mask = F (True Affinity Mask, Options)
-    KAFFINITY trueAffinity;     // True affinity mask, because modified as f(options)
-    WORD threadGroup;           // Processor group, associated with set affinity mask
-    WORD trueGroup;             // Processor group, associated with true affinity mask
-    WORD largePages;            // Bit D0=Large Pages, other bits [1-31/63] = reserved
-    WORD methodId;              // Entry point to Target operation method subroutine ID
+// Load functions, used for NUMA, by dynamical import
+typedef struct {
+	BOOL      ( __stdcall *API_GlobalMemoryStatusEx           ) ( LPMEMORYSTATUSEX );
+	BOOL      ( __stdcall *API_GetNumaHighestNodeNumber       ) ( PULONG );
+	BOOL      ( __stdcall *API_GetNumaNodeProcessorMask       ) ( UCHAR, PULONGLONG );
+	LPVOID    ( __stdcall *API_VirtualAllocExNuma             ) ( HANDLE, LPVOID, SIZE_T, DWORD, DWORD, DWORD );
+	DWORD_PTR ( __stdcall *API_SetThreadAffinityMask          ) ( HANDLE, DWORD_PTR );
+	UINT      ( __stdcall *API_GetSystemFirmwareTable         ) ( DWORD, DWORD, PVOID, DWORD );
+	BOOL      ( __stdcall *API_GetLogicalProcessorInformation ) ( PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, PDWORD );
+	SIZE_T    ( __stdcall *API_GetLargePageMinimum            ) ( );
+	DWORD     ( __stdcall *API_GetActiveProcessorCount        ) ( WORD );
+	WORD      ( __stdcall *API_GetActiveProcessorGroupCount   ) ( );
+	BOOL      ( __stdcall *API_GetNumaNodeProcessorMaskEx     ) ( USHORT, PGROUP_AFFINITY );
+	BOOL      ( __stdcall *API_SetThreadGroupAffinity         ) ( HANDLE, GROUP_AFFINITY, PGROUP_AFFINITY );
+} NUMA_CONTROL_SET;
+
+// This structure used per thread.
+// Array of this structures is multithread context control data. 
+typedef struct {
+    HANDLE rxEventHandle;         // Event Handle for daughter thread operation complete signal
+    HANDLE txEventHandle;         // Event Handle for daughter thread operation continue enable signal
+    HANDLE threadHandle;          // Thread Handle for execution thread
+    LPVOID base1;                 // Source for read, destination for write and modify
+    LPVOID base2;                 // Destination for copy
+    LPVOID trueBase;              // True (before alignment) memory block base for release
+    SIZE_T sizeInstructions;      // Block size, units = instructions, for benchmarking
+    SIZE_T measurementRepeats;    // Number of measurement repeats
+//
+	GROUP_AFFINITY optimalGaff;   // Affinity mask and group id, OPTIMAL for this thread
+    GROUP_AFFINITY originalGaff;  // Affinity mask and group id, ORIGINAL for this thread
+//  KAFFINITY threadAffinity;     // Affinity Mask = F (True Affinity Mask, Options)
+//  KAFFINITY trueAffinity;       // True affinity mask, because modified as f(options)
+//  WORD threadGroup;             // Processor group, associated with set affinity mask
+//  WORD trueGroup;               // Processor group, associated with true affinity mask
+    WORD largePages;              // Bit D0=Large Pages, other bits [1-31/63] = reserved
+    WORD methodId;                // Entry point to Target operation method subroutine ID
     BOOL ( __stdcall *DLL_PerformanceGate )
          ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );  // Low-level function entry point
 } THREAD_CONTROL_ENTRY;
 
+// This structure used per NUMA node.
+// Array of this structures is get platform topology result.
+typedef struct {
+	DWORD nodeId;              // NUMA Node number, if no NUMA, this field = 0 for all entries
+	GROUP_AFFINITY nodeGaff;   // NUMA Node affinity mask and processor group id
+	LPVOID baseAtNode;         // Block base address after alignment, useable for r/w operation 
+	SIZE_T sizeAtNode;         // Block size after alignment, useable for read/write operation
+	LPVOID trueBaseAtNode;     // Base address, returned when allocated, for release, 0=not used 
+} NUMA_NODE_ENTRY;
+
 // Multithread context: pointer to structures list and number of structures
-typedef struct
-{
+typedef struct {
 	// Variables for build threads list
 	LONG64 startSize;
 	LONG64 endSize;
@@ -119,7 +155,10 @@ typedef struct
 	LONG64 methodId;
 	LONG64 pageSize;
 	DWORD pagingMode;
-	// Threads list
+	// NUMA nodes list reference
+	DWORD nNodesList;
+	NUMA_NODE_ENTRY* pNodesList;
+	// Threads list reference
 	DWORD nThreadsList;
 	THREAD_CONTROL_ENTRY* pThreadsList;
 	HANDLE* pSignalsList;
@@ -138,6 +177,8 @@ typedef struct {
     DWORD optionRepeats;
     // Advanced adaptive repeats control
     DWORD64 optionAdaptive;
+    // Topology options
+    DWORD optionNuma;
     // Block sizes explicit set
     DWORD64 optionBlockStart; 
     DWORD64 optionBlockStop;
@@ -157,6 +198,11 @@ typedef struct {
     const OPTION_TYPES routine;   // select handling method for this entry
 } OPTION_ENTRY;
 
+
+#define MAXIMUM_THREADS           256
+#define MAXIMUM_THREADS_PER_NODE  64
+#define MAXIMUM_NODES             64
+
 #define OPTION_NOT_SET -1
 #define CONST_DRAM_BLOCK 32*1024*1024
 
@@ -165,15 +211,17 @@ typedef struct {
 #define DEFAULT_THREADS_COUNT OPTION_NOT_SET
 #define DEFAULT_MEASUREMENT_REPEATS OPTION_NOT_SET
 #define DEFAULT_ADAPTIVE_REPEATS OPTION_NOT_SET
+#define DEFAULT_NUMA_MODE OPTION_NOT_SET
+
 #define MAXIMUM_ASM_METHOD 33
 
-#define APPROXIMATION_REPEATS      2000000
-#define APPROXIMATION_REPEATS_L1   2000000
-#define APPROXIMATION_REPEATS_L2   500000
-#define APPROXIMATION_REPEATS_L3   10000
-#define APPROXIMATION_REPEATS_DRAM 200
-#define REPEATS_DIVISOR_LATENCY    20
-#define CALIBRATION_TARGET_TIME    1.0
+#define APPROXIMATION_REPEATS       2000000
+#define APPROXIMATION_REPEATS_L1    2000000
+#define APPROXIMATION_REPEATS_L2    500000
+#define APPROXIMATION_REPEATS_L3    10000
+#define APPROXIMATION_REPEATS_DRAM  200
+#define REPEATS_DIVISOR_LATENCY     20
+#define CALIBRATION_TARGET_TIME     1.0
 
 #define DEFAULT_START_SIZE_BYTES 4096
 #define DEFAULT_END_SIZE_BYTES 65536

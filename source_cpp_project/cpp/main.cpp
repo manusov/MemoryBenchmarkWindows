@@ -1,9 +1,25 @@
 /* 
 UNDER CONSTRUCTION.
 
-BREAK.
-Dynamical Calibration.
+BREAK at HT, NUMA and Processor Groups support,
+TODO:
++ Required sequental KAFFINITY, Group Number, yet interleaved at THREAD_CONTROL_ENTRY struct.
++ Required memory allocation for NUMA nodes list.
++ Required functions control set, NUMA_CONTROL_SET struct.
++ Required memory free after allocation: for NUMA and non-NUMA branches.
++ NUMA branch must be conditional, by user option.
+---
+Required Large Pages support at NUMA mode. Make enum at GlobalDefinitions.h.
+Required regular alignment support for NUMA and non-NUMA.
+Required HT support, affinity masks = f (user settings, platform configuration).
+Modify Performer: Affinity masks for HT.
+Modify Performer: Affinity masks for NUMA.
+Modify Performer: override memory allocation by NUMA-allocation result.
+Support Local and Remote modes for NUMA, different affinity masks
 
+---
+Some functions, used in this control list, previously used ! Refactor for single loader of functions or remove redundant.
+---
 Memory Performance Engine.
 Debug sample, without technologies support pre-check.
 TODO features:
@@ -28,30 +44,20 @@ TODO features:
  13) + Detail error reporting by OS API. Debug error handling branches.
      + add decode subroutine.
      + replace variable "status" to "errorCode", replace interpreting.
- 
  ---
- 
  14) + No divide to LATENCY_DIVISOR if direct set repeats.
  15) Negative memory size if selected >2GB (arithmetic overflow), example "end=2G". blockSize / bpi overflow. Yet 32-bit limit.
- 
- 
  ---
- 
  16) ( ? ) Output coloring.
  17) Show all options values and wait user press key (y/n).
- 
- 
  ---
- 
  18) Add and debug class: DetectorNuma (NumaOptions), for NUMA affinitization. Add option.
      - required platform for verify this
- 
  ---
- 
  19) Show user help.
  20) Scripting.
  21) Fast read-write-copy option or "read", "write", "copy", "ntread", "ntwrite", "ntcopy" for existed option.
-  
+---  
  TODO bugs fix:
  1) BUG Threads count manual set with memory=dram.
  2) Start, End, Step set manually with memory=object (non default). But can without memory=object size only.
@@ -60,15 +66,27 @@ TODO features:
  5) Check for overflows when measurement.
  6) Check for BOOL return error, but GetLastError( ) returns 0
  7) Random offsets JA or JBE, wrong limit -1. For latency measure, both for x64 and ia32 DLLs.
- 
+ ---
  TODO strategy:
  1) Measure latency.
  2) Scripting data reports model.
     - auto bandwidth=f(size), for all memory types.
     - auto latency=f(size), for all memory types.
  3) Refactoring by defined scripting data model. 
-
+---
+// DEBUG
+// BOOL status1 = pNumaTopology->freeNodesList( nndetected, pnn );
+// printf("\n\n [ DEBUG = %d ]\n\n", status1 );
+// DEBUG
+// char sd1[80], sd2[80];
+// DWORD64 wd1 = ( DWORD64 )( pnn->baseAtNode ), wd2 = ( DWORD64 )( pnn->sizeAtNode );
+// print64( sd1, 80, wd1 );
+// print64( sd2, 80, wd2 );
+// printf("\n  [ DEBUG VALUES, BASE = %s , SIZE = %s ]\n\n", sd1, sd2 );
+// DEBUG
+---
 */
+
 
 #include <cstdio>
 #include <windows.h>
@@ -78,6 +96,7 @@ TODO features:
 #include "DecoderCpuid.h"
 #include "SystemMemory.h"
 #include "SystemTopology.h"
+#include "NumaTopology.h"
 #include "PagingOptions.h"
 #include "Performer.h"
 
@@ -93,12 +112,14 @@ SystemLibrary*  pSystemLibrary  = NULL;
 DecoderCpuid*   pDecoderCpuid   = NULL;
 SystemMemory*   pSystemMemory   = NULL;
 SystemTopology* pSystemTopology = NULL;
+NumaTopology*   pNumaTopology   = NULL;
 PagingOptions*  pPagingOptions  = NULL;
 Performer*      pPerformer      = NULL;
 
 // Variables and structures
 COMMAND_LINE_PARMS* pp = NULL;
-SYSTEM_FUNCTIONS_LIST* pf = NULL;
+SYSTEM_FUNCTIONS_LIST* psfl = NULL;
+NUMA_CONTROL_SET* pncs = NULL;
 BENCHMARK_SCENARIO scenario;
 
 // Status variables
@@ -360,13 +381,6 @@ int main(int argc, char** argv)
 	printf( "OK.\n" );
 	pCommandLine->correctAfterParse( );
 	pp = pCommandLine->getCommandLineParms( );
-	
-// DEBUG
-// char sd[80];
-// DWORD64 wd = pp->optionBlockStop;
-// print64( sd, 80, wd );
-// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
-// DEBUG
 
 	// Load library, check validity
 	printf( "load library..." );
@@ -381,17 +395,18 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	printf( "OK.\n" );
-	pf = pSystemLibrary->getSystemFunctionsList( );
+	psfl = pSystemLibrary->getSystemFunctionsList( );
 	
 	// Get library info, show string
 	char *dllProduct, *dllVersion, *dllVendor;
-	pf->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
+	psfl->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
 	printf( "%s %s %s\n", dllProduct, dllVersion, dllVendor );
 	
 	// Setup variables not changed when executed benchmark scenario
 	int a = pp->optionAsm;
 	int m = pp->optionMemory;
 	int n = pp->optionThreads;
+	int u = pp->optionNuma;
 	
 	int r1 = pp->optionRepeats;
 	int r2 = r1;                        // r2 = OPTION_NOT_SET if no user override
@@ -408,20 +423,19 @@ int main(int argc, char** argv)
 	}
 	
 	// Create DecoderCpuid class
-	pDecoderCpuid = new DecoderCpuid( pf );
-	
+	pDecoderCpuid = new DecoderCpuid( psfl );
 	// Create SystemMemory class
 	pSystemMemory = new SystemMemory( );
-	
 	// Create SystemTopology class
 	pSystemTopology = new SystemTopology( );
-	
+	// Create NumaTopology class
+	pNumaTopology = new NumaTopology( );
 	// Create PagingOptions class
 	pPagingOptions = new PagingOptions( );
 	
 	// Check CPUID support
 	printf( "check CPUID support..." );
-	opStatus = ( pf->DLL_CheckCpuid )( );
+	opStatus = ( psfl->DLL_CheckCpuid )( );
 	if ( !opStatus )
 	{
 		printf( "FAILED.\nCPUID instruction not supported or locked by VMM.\n" );
@@ -443,11 +457,11 @@ int main(int argc, char** argv)
 	
 	// Check TSC (Time Stamp Counter) support
 	printf( "check RDTSC support..." );
-	( pf->DLL_ExecuteCpuid )( 0, 0, &rEax, &rEbx, &rEcx, &rEdx );  // CPUID function=0, subfunction=n/a
+	( psfl->DLL_ExecuteCpuid )( 0, 0, &rEax, &rEbx, &rEcx, &rEdx );  // CPUID function=0, subfunction=n/a
 	rEdx = 0;
 	if ( rEax >= 1 )
 	{
-		( pf->DLL_ExecuteCpuid )( 1, 0, &rEax, &rEbx, &rEcx, &rEdx );  // CPUID function=1, subfunction=n/a
+		( psfl->DLL_ExecuteCpuid )( 1, 0, &rEax, &rEbx, &rEcx, &rEdx );  // CPUID function=1, subfunction=n/a
 	}
 	if ( ( rEdx & 0x00000010 ) == 0 )
 	{
@@ -484,10 +498,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-// DEBUG
-// a = CPU_FEATURE_LATENCY_LCM;
-// DEBUG
-
 	// Check selected read-write method supported by CPUID features
 	DWORD a1 = a;
 	DWORD64 mask = 1;
@@ -512,7 +522,7 @@ int main(int argc, char** argv)
 	
 	// TSC clock frequency measurement, update variables
 	printf( "measure TSC clock..." );
-	opStatus = ( pf->DLL_MeasureTsc )( &deltaTsc );
+	opStatus = ( psfl->DLL_MeasureTsc )( &deltaTsc );
 	if ( !opStatus )
 	{
 		printf( "FAILED.\nTSC clock measurement error.\n" );
@@ -689,6 +699,11 @@ int main(int argc, char** argv)
 	
 	// Build threads list, print allocation
 	// n = threads count, mt = threads list size in bytes, pt = pointer to threads list
+	if ( ( n > MAXIMUM_THREADS ) || ( n <= 0 ) )
+	{
+		printf( "\nError: wrong number of threads (%d), can be 1-%d\n", n, MAXIMUM_THREADS );
+		return 1;
+	}
 	int mt = sizeof( THREAD_CONTROL_ENTRY ) * n;
 	THREAD_CONTROL_ENTRY* pt = ( THREAD_CONTROL_ENTRY* )malloc( mt );
 	scenario.nThreadsList = n;
@@ -714,8 +729,57 @@ int main(int argc, char** argv)
 	printBaseAndSize( s, NS, ( DWORD64 )ps, ms );
 	printf( "handles list allocated: %s\n", s );
 
+	// Build NUMA nodes list, print allocation
+	// nn = NUMA nodes count, mnn = nodes list size in bytes, pnn = pointer to nodes list
+	int nn = MAXIMUM_NODES;
+	int mnn = sizeof( NUMA_NODE_ENTRY ) * nn;
+	NUMA_NODE_ENTRY* pnn = ( NUMA_NODE_ENTRY* )malloc( mnn );
+	scenario.nNodesList = nn;
+	scenario.pNodesList = pnn;
+	if ( pnn == NULL )
+	{
+		printf( "\nError at memory allocation for NUMA nodes list.\n" );
+		return 1;
+	}
+	printBaseAndSize( s, NS, ( DWORD64 )pnn, mnn );
+	printf( "nodes list allocated:   %s\n", s );
+	
+	// Detect NUMA topology and extended set of OS/NUMA API
+	// Note this operations for all systems, include non-NUMA, results used on memory release
+	printf( "detect NUMA...\n" );
+	pNumaTopology->loadControlSet();
+	pncs = pNumaTopology->getControlSet();
+	int nndetected = pNumaTopology->buildNodesList( pnn );
+
+	// Note this operations for NUMA-aware branch selected by user option
+	if ( ( u == NUMA_LOCAL ) || ( u == NUMA_REMOTE ) )
+	{
+		printf( "selected NUMA-aware memory allocation...\n" );
+		if ( nndetected > 0 )
+		{
+			DWORD64 sizePerNode = scenario.maxSizeBytes * n / nndetected;
+			BOOL status = pNumaTopology->allocateNodesList( sizePerNode, nndetected, pnn );
+			if ( !status )
+			{
+				printf( "\nError at NUMA-aware at-nodes memory allocation.\n" );
+				return 1;
+			}
+			status = pNumaTopology->allocateThreadsList( nndetected, n, pnn, pt );
+			if ( !status )
+			{
+				printf( "\nError at NUMA-aware at-threads memory allocation.\n" );
+				return 1;
+			}
+		}
+		else
+		{
+			printf( "\nError: NUMA not supported.\n" );
+			return 1;
+		}
+	}
+
 	// Create Performer class
-	pPerformer = new Performer( pf );
+	pPerformer = new Performer( psfl );
 	
 	// Build threads context
 	osErrorCode = pPerformer->buildThreadsList( &scenario );
@@ -782,14 +846,6 @@ int main(int argc, char** argv)
 	printf( "     start=%d, end=%d, delta=%d, bpi=%d\n", 
 	        ( int )scenario.startSize, ( int )scenario.endSize, ( int )scenario.deltaSize, bpi );
 
-// DEBUG
-// char sd[80];
-// DWORD64 wd = scenario.endSize / bpi;
-// print64( sd, 80, wd );
-// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
-// DEBUG
-
-
 	// Calibration
 	if ( ( r2 == OPTION_NOT_SET ) && ( r3 == OPTION_NOT_SET ) )
 	{
@@ -840,12 +896,6 @@ int main(int argc, char** argv)
 			r3value = r3 / ( blockSize / bpi );       // approximate constant number of instructions = measurementRepeats * blockSize
 			if ( r3value < r3min ) r3value = r3min;
 			if ( r3value > r3max ) r3value = r3max;
-			// DEBUG
- 			// char sd[80];
- 			// DWORD64 wd = r3value;  // r3max;  // blockSize / bpi;
- 			// print64( sd, 80, wd );
- 			// printf("\n  [ DEBUG VALUE = %s ]\n\n", sd );
-			// DEBUG
 			pPerformer->repeatsUpdate( &scenario, r3value );
 		}
 
@@ -909,10 +959,14 @@ int main(int argc, char** argv)
 	
 	// Delete created objects and termination
 	free( pa );
+	pPerformer->freeThreadsList( &scenario );         // This memory release for NUMA-unaware allocation
 	delete pPerformer;
+	pNumaTopology->freeNodesList( nndetected, pnn );  // This memory release for NUMA-aware allocation
+	free( scenario.pNodesList );
 	free( scenario.pSignalsList );
 	free( scenario.pThreadsList );
 	delete pPagingOptions;
+	delete pNumaTopology;
 	delete pSystemTopology;
 	delete pSystemMemory;
 	delete pDecoderCpuid;
