@@ -14,17 +14,19 @@ TODO:
 + Modify Performer/NumaTopology: Affinity masks for NUMA.
 + Modify Performer/NumaTopology: override memory allocation by NUMA-allocation result: 
 + for this allocation option: Performer = disable allocation , NumaTopology = enable allocation.
-
-
-Modify Performer/NumaTopology: Affinity masks for HT.
-Group-Aware HT control supported only if NUMA option = NUMA_LOCAL or NUMA_REMOTE.
-
++ Modify Performer/NumaTopology: Affinity masks for HT.
++ Summary, see above, required HT and NUMA support, affinity masks = f (user settings, platform configuration).
 
 ---
+
 Support Local and Remote modes for NUMA, different affinity masks
-Summary, see above, required HT and NUMA support, affinity masks = f (user settings, platform configuration).
+REMEMBER IMPORTANT DEBUG DUMP AT THREAD ROUTINE.
+
 ---
+
+Group-Aware HT control supported only if NUMA option = NUMA_LOCAL or NUMA_REMOTE.
 Some functions, used in this control list, previously used ! Refactor for single loader of functions or remove redundant.
+
 ---
 Memory Performance Engine.
 Debug sample, without technologies support pre-check.
@@ -769,6 +771,25 @@ int main(int argc, char** argv)
 	pncs = pNumaTopology->getControlSet();
 	int nndetected = pNumaTopology->buildNodesList( pnn );
 	pNumaTopology->blankThreadsList( n, pt, maskFlag );
+
+
+// DEBUG
+/*
+	GROUP_AFFINITY gaff1;
+	gaff1.Mask = 1;
+	gaff1.Group = 0;
+	gaff1.Reserved[0] = 0, gaff1.Reserved[1] = 0, gaff1.Reserved[2] = 0;
+	GROUP_AFFINITY gaff2;
+	gaff2.Mask = 1;
+	gaff2.Group = 0;
+	HANDLE th = GetCurrentThread( );
+	int dbgst1 = ( pncs->API_SetThreadGroupAffinity ) ( th, &gaff1, &gaff2 );
+	int dbgst2 = GetLastError( );
+	printf( " \n\n DEBUG STATUS = %d, %d \n\n ", dbgst1, dbgst2 );
+	return 2;
+*/
+// DEBUG
+
 
 	// Note this operations for NUMA-aware branch selected by user option
 	if ( ( u == NUMA_LOCAL ) || ( u == NUMA_REMOTE ) )

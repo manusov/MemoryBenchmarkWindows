@@ -3,11 +3,11 @@
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.51.02 for Windows ia32."
+#define BUILD_STRING "v0.51.03 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.51.02 for Windows x64."
+#define BUILD_STRING "v0.51.03 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -111,7 +111,7 @@ typedef struct {
 	DWORD     ( __stdcall *API_GetActiveProcessorCount        ) ( WORD );
 	WORD      ( __stdcall *API_GetActiveProcessorGroupCount   ) ( );
 	BOOL      ( __stdcall *API_GetNumaNodeProcessorMaskEx     ) ( USHORT, PGROUP_AFFINITY );
-	BOOL      ( __stdcall *API_SetThreadGroupAffinity         ) ( HANDLE, GROUP_AFFINITY, PGROUP_AFFINITY );
+	BOOL      ( __stdcall *API_SetThreadGroupAffinity         ) ( HANDLE, const GROUP_AFFINITY*, PGROUP_AFFINITY );
 } NUMA_CONTROL_SET;
 
 // This structure used per thread.
@@ -136,7 +136,7 @@ typedef struct {
     DWORD_PTR ( __stdcall *API_SetThreadAffinityMask )
 		( HANDLE, DWORD_PTR );
 	BOOL ( __stdcall *API_SetThreadGroupAffinity )
-		( HANDLE, GROUP_AFFINITY, PGROUP_AFFINITY );
+		( HANDLE, const GROUP_AFFINITY*, PGROUP_AFFINITY );
 } THREAD_CONTROL_ENTRY;
 
 // This structure used per NUMA node.

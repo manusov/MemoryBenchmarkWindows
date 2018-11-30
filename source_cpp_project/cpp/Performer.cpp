@@ -38,9 +38,7 @@ DWORD64 Performer::alignByFactor( DWORD64 value, DWORD64 factor )
 	return value;
 }
 
-
-// *** DEBUG ***
-
+/* // ********** DEBUG SUPPORT **********
 // Print hex value = x to output string = s with size limit = n
 int print64debug( char* s, size_t n, DWORD64 x )
 {
@@ -49,56 +47,58 @@ int print64debug( char* s, size_t n, DWORD64 x )
 	int m = snprintf( s, n, "%08X%08Xh", xHigh, xLow );
 	return m;
 }
-
-// *** DEBUG ***
-
+// ********** DEBUG **********  */
 
 // This procedure used as callback for threads run by OS
 DWORD WINAPI threadEntry( LPVOID threadControl )
 {
+	THREAD_CONTROL_ENTRY* p = ( THREAD_CONTROL_ENTRY* )threadControl;
 
-
-// *** DEBUG ***
-
+/* // ********** DEBUG, IMPORTANT POINT FOR TOPOLOGY SUPPORT DEBUG ! **********
 char sd1[80], sd2[80];
-DWORD64 wd1 = ( DWORD64 ) ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->base1 );
-DWORD64 wd2 = ( DWORD64 ) ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Mask );
-int wd3 = ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Group );
+DWORD64 wd1 = ( DWORD64 ) ( p->base1 );
+DWORD64 wd2 = ( DWORD64 ) ( p->optimalGaff.Mask );
+int wd3 = p->optimalGaff.Group;
 print64debug( sd1, 80, wd1 );
 print64debug( sd2, 80, wd2 );
 printf("  [ THREADS DEBUG DUMP: base=%s, mask=%s, group=%d ]\n", sd1, sd2, wd3 );
+// p->originalGaff.Mask = 0x1111;
+// ********** DEBUG ********** */
 
-// *** DEBUG ***
-
-
-
-    if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Mask ) != 0 )
+    if ( p->optimalGaff.Mask != 0 )  // If zero mask, affinitization skipped
     {
-    	if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->API_SetThreadGroupAffinity ) != NULL )
-    	{
-    		
+    	if ( p->API_SetThreadGroupAffinity != NULL )
+    	{	// This branch if Processor Groups supported, 256+ logical processors
+			( p->API_SetThreadGroupAffinity ) ( p->threadHandle, &( p->optimalGaff ), &( p->originalGaff ) );
 		}
-		else if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->API_SetThreadAffinityMask ) != NULL )
-		{
-			
+		else if ( p->API_SetThreadAffinityMask != NULL )
+		{	// This branch if Processor Groups not supported, maximum 64 logical processors
+			( p->API_SetThreadAffinityMask ) ( p->threadHandle, p->optimalGaff.Mask );
 		}
 	}
+
+/* // ********** DEBUG **********
+char sd10[80];
+DWORD64 wd10 = ( DWORD64 ) ( p->originalGaff.Mask );
+print64debug( sd10, 80, wd10 );
+printf("\n  [ THREADS DEBUG DUMP: updated original affinity mask=%s ]\n\n", sd10 );
+// ********** DEBUG ********** */
 	
 	while ( TRUE )
     {
 		// Thread parameters: handles
-    	HANDLE rxHandle = ( ( THREAD_CONTROL_ENTRY* )threadControl )->rxEventHandle;
-    	HANDLE txHandle = ( ( THREAD_CONTROL_ENTRY* )threadControl )->txEventHandle;
+    	HANDLE rxHandle = p->rxEventHandle;
+    	HANDLE txHandle = p->txEventHandle;
     	// Thread parameters: performance variables
-        DWORD rwMethodSelect = ( ( THREAD_CONTROL_ENTRY* )threadControl )->methodId;
-        LPVOID bufferAlignedSrc = ( ( THREAD_CONTROL_ENTRY* )threadControl )->base1;
-        LPVOID bufferAlignedDst = ( ( THREAD_CONTROL_ENTRY* )threadControl )->base2;
-        SIZE_T instructionsCount = ( ( THREAD_CONTROL_ENTRY* )threadControl )->sizeInstructions;
-        SIZE_T repeatsCount = ( ( THREAD_CONTROL_ENTRY* )threadControl )->measurementRepeats;
+        DWORD rwMethodSelect = p->methodId;
+        LPVOID bufferAlignedSrc = p->base1;
+        LPVOID bufferAlignedDst = p->base2;
+        SIZE_T instructionsCount = p->sizeInstructions;
+        SIZE_T repeatsCount = p->measurementRepeats;
         DWORD64 deltaTSC = 0;
         DWORD result = 0;
         // Thread main work
-        ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->DLL_PerformanceGate )
+        ( p->DLL_PerformanceGate )
         ( rwMethodSelect ,  ( BYTE* )bufferAlignedSrc , ( BYTE* )bufferAlignedDst ,
           instructionsCount , repeatsCount , &deltaTSC );
 		// Thread coordination

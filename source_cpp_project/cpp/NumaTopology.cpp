@@ -76,7 +76,7 @@ void NumaTopology::loadControlSet( )
 			GetProcAddress ( hmod, "GetActiveProcessorGroupCount" ); 
 		ncs.API_GetNumaNodeProcessorMaskEx = ( BOOL(*)( USHORT, PGROUP_AFFINITY ) )
 			GetProcAddress ( hmod, "GetNumaNodeProcessorMaskEx" ); 
-		ncs.API_SetThreadGroupAffinity = ( BOOL(*)( HANDLE, GROUP_AFFINITY, PGROUP_AFFINITY ) )
+		ncs.API_SetThreadGroupAffinity = ( BOOL(*)( HANDLE, const GROUP_AFFINITY*, PGROUP_AFFINITY ) )
 			GetProcAddress ( hmod, "SetThreadGroupAffinity" ); 
 	}
 }
@@ -232,6 +232,9 @@ void NumaTopology::blankThreadsList
 	{
 		pThreads->optimalGaff.Mask = mask;
 		pThreads->optimalGaff.Group = 0;
+		pThreads->optimalGaff.Reserved[0] = 0;  // If not blanked, API returns error
+		pThreads->optimalGaff.Reserved[1] = 0;
+		pThreads->optimalGaff.Reserved[2] = 0;
 		pThreads++;
 	}
 }
