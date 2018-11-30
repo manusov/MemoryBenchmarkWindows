@@ -49,6 +49,11 @@ const char* CommandLine::keysPage[] = {
     NULL
 };
 
+// Hyper-Threading (HT) mode control
+const char* CommandLine::keysHt[] = {
+	"off", "on"
+};
+
 // NUMA topology mode control
 const char* CommandLine::keysNuma[] = {
     "unaware", "local", "remote",
@@ -66,6 +71,7 @@ const OPTION_ENTRY CommandLine::options[] = {
     { "page"            , keysPage        , &parms.optionPageSize    , SELPARM } ,
     { "repeats"         , NULL            , &parms.optionRepeats     , INTPARM } ,
     { "adaptive"        , NULL            , &parms.optionAdaptive    , MEMPARM } ,
+    { "ht"              , keysHt          , &parms.optionHt          , SELPARM } ,
     { "numa"            , keysNuma        , &parms.optionNuma        , SELPARM } ,
     { "start"           , NULL            , &parms.optionBlockStart  , MEMPARM } ,
     { "end"             , NULL            , &parms.optionBlockStop   , MEMPARM } ,
@@ -104,6 +110,7 @@ void CommandLine::resetBeforeParse( )
     parms.optionThreads = DEFAULT_THREADS_COUNT;
     parms.optionRepeats = DEFAULT_MEASUREMENT_REPEATS;
     parms.optionAdaptive = DEFAULT_ADAPTIVE_REPEATS;
+    parms.optionHt = DEFAULT_HT_MODE;
     parms.optionNuma = DEFAULT_NUMA_MODE;
     parms.optionBlockStart = DEFAULT_START_SIZE_BYTES;
     parms.optionBlockStop = DEFAULT_END_SIZE_BYTES;

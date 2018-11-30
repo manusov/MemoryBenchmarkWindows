@@ -1,16 +1,18 @@
 #include "Performer.h"
 
-// Pointer to native DLL
+// Pointers to native DLL functions and dynamical imported WinAPI functions
 SYSTEM_FUNCTIONS_LIST* Performer::pF;
+NUMA_CONTROL_SET* Performer::pN;
 
 // Status string
 #define NS 81
 char Performer::s[NS];
 
 // Class constructor
-Performer::Performer( SYSTEM_FUNCTIONS_LIST* pFunctions )
+Performer::Performer( SYSTEM_FUNCTIONS_LIST* pFunctions, NUMA_CONTROL_SET* nFunctions )
 {
 	pF = pFunctions;
+	pN = nFunctions;
 	snprintf( s, NS, "no data" );
 }
 
@@ -36,13 +38,54 @@ DWORD64 Performer::alignByFactor( DWORD64 value, DWORD64 factor )
 	return value;
 }
 
+
+// *** DEBUG ***
+
+// Print hex value = x to output string = s with size limit = n
+int print64debug( char* s, size_t n, DWORD64 x )
+{
+	DWORD32 xLow = x;
+	DWORD32 xHigh = ( x >> 16 ) >> 16;
+	int m = snprintf( s, n, "%08X%08Xh", xHigh, xLow );
+	return m;
+}
+
+// *** DEBUG ***
+
+
 // This procedure used as callback for threads run by OS
 DWORD WINAPI threadEntry( LPVOID threadControl )
 {
-    while ( TRUE )
+
+
+// *** DEBUG ***
+
+char sd1[80], sd2[80];
+DWORD64 wd1 = ( DWORD64 ) ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->base1 );
+DWORD64 wd2 = ( DWORD64 ) ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Mask );
+int wd3 = ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Group );
+print64debug( sd1, 80, wd1 );
+print64debug( sd2, 80, wd2 );
+printf("  [ THREADS DEBUG DUMP: base=%s, mask=%s, group=%d ]\n", sd1, sd2, wd3 );
+
+// *** DEBUG ***
+
+
+
+    if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->optimalGaff.Mask ) != 0 )
     {
-		// DEBUG: printf( "DEBUG, P=%p\n", threadControl );
-		
+    	if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->API_SetThreadGroupAffinity ) != NULL )
+    	{
+    		
+		}
+		else if ( ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->API_SetThreadAffinityMask ) != NULL )
+		{
+			
+		}
+	}
+	
+	while ( TRUE )
+    {
 		// Thread parameters: handles
     	HANDLE rxHandle = ( ( THREAD_CONTROL_ENTRY* )threadControl )->rxEventHandle;
     	HANDLE txHandle = ( ( THREAD_CONTROL_ENTRY* )threadControl )->txEventHandle;
@@ -54,23 +97,14 @@ DWORD WINAPI threadEntry( LPVOID threadControl )
         SIZE_T repeatsCount = ( ( THREAD_CONTROL_ENTRY* )threadControl )->measurementRepeats;
         DWORD64 deltaTSC = 0;
         DWORD result = 0;
-        
         // Thread main work
         ( ( ( THREAD_CONTROL_ENTRY* )threadControl )->DLL_PerformanceGate )
         ( rwMethodSelect ,  ( BYTE* )bufferAlignedSrc , ( BYTE* )bufferAlignedDst ,
           instructionsCount , repeatsCount , &deltaTSC );
-
 		// Thread coordination
         SetEvent( rxHandle );
         WaitForSingleObject( txHandle, INFINITE );
         ResetEvent( txHandle );
-        /*
-        result = WAIT_OBJECT_0;
-        while ( result == WAIT_OBJECT_0 )
-        {
-            result = WaitForSingleObject( handle, 0 );
-        }
-        */
 	}
 }
 
@@ -86,25 +120,28 @@ DWORD Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 	DWORD_PTR b1 = 0;
 	DWORD_PTR b2 = pScenario->maxSizeBytes;
 	DWORD_PTR ba = pScenario->maxSizeBytes * 2;
-	DWORD_PTR mp;
+	DWORD_PTR mp = NULL;
 	
 	DWORD allocType = MEM_COMMIT;
 	size_t allocSize = ba * n;                   // ( memory per thread ) * ( number of threads )
 	DWORD alignFactor = pScenario->pageSize;
 	allocSize = alignByFactor( allocSize, alignFactor );  // alignment by selected page size
 	
-	if ( pScenario->pagingMode != 0 )
+	if ( ( pScenario->numaMode != NUMA_LOCAL ) && ( pScenario->numaMode != NUMA_REMOTE ) )
 	{
-		allocType |= MEM_LARGE_PAGES;
-	}
-	
-	// Memory allocation, for non-NUMA
-	mp = ( DWORD_PTR )VirtualAlloc( NULL, allocSize, allocType, PAGE_READWRITE );
-	if ( mp == NULL )
-	{
-		error = GetLastError( );
-		snprintf( s, NS, "memory allocation" );
-		return error;
+		// Initializing memory allocation options, this branch actual for non-NUMA only
+		if ( pScenario->pagingMode != 0 )
+		{
+			allocType |= MEM_LARGE_PAGES;
+		}
+		// Memory allocation, this branch actual for non-NUMA only
+		mp = ( DWORD_PTR )VirtualAlloc( NULL, allocSize, allocType, PAGE_READWRITE );
+		if ( mp == NULL )
+		{
+			error = GetLastError( );
+			snprintf( s, NS, "memory allocation" );
+			return error;
+		}
 	}
 	
 	// Cycle for threads list entries
@@ -134,26 +171,33 @@ DWORD Performer::buildThreadsList( BENCHMARK_SCENARIO* pScenario )
 			return error;
 		}
 		
-		pThreads->base1 = ( LPVOID )( mp + b1 );
-		pThreads->base2 = ( LPVOID )( mp + b2 );
-		if ( i == 0 )
+		if ( ( pScenario->numaMode != NUMA_LOCAL ) && ( pScenario->numaMode != NUMA_REMOTE ) )
 		{
-			pThreads->trueBase = ( LPVOID )mp;
-		}
-		else
-		{
-			pThreads->trueBase = NULL;
+			pThreads->base1 = ( LPVOID )( mp + b1 );
+			pThreads->base2 = ( LPVOID )( mp + b2 );
+			if ( i == 0 )
+			{
+				pThreads->trueBase = ( LPVOID )mp;
+			}
+			else
+			{
+				pThreads->trueBase = NULL;
+			}
 		}
 		
 		pThreads->sizeInstructions = pScenario->currentSizeInstructions;
 		pThreads->measurementRepeats = pScenario->measurementRepeats;
-		pThreads->optimalGaff.Mask = 0;
-		pThreads->optimalGaff.Group = 0;
-		pThreads->originalGaff.Mask = 0;
-		pThreads->originalGaff.Group = 0;
+		// pThreads->optimalGaff.Mask = 0;  // Affinity masks = f(HT, NUMA) initialization moved to NumaTopology.cpp
+		// pThreads->optimalGaff.Group = 0;
+		// pThreads->originalGaff.Mask = 0;
+		// pThreads->originalGaff.Group = 0;
 		pThreads->largePages = 0;
 		pThreads->methodId = pScenario->methodId;
 		pThreads->DLL_PerformanceGate = pF->DLL_PerformanceGate;
+		//
+		pThreads->API_SetThreadAffinityMask = pN->API_SetThreadAffinityMask;
+		pThreads->API_SetThreadGroupAffinity = pN->API_SetThreadGroupAffinity;
+		//
 		b1 += ba;
 		b2 += ba;
 		*pSignals = pThreads->rxEventHandle;  // required separate sequental handles list

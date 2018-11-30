@@ -9,7 +9,7 @@
 class Performer
 {
 	public:
-		Performer( SYSTEM_FUNCTIONS_LIST* pFunctions );
+		Performer( SYSTEM_FUNCTIONS_LIST* pFunctions, NUMA_CONTROL_SET* nFunctions );
 		~Performer( );
 		DWORD buildThreadsList( BENCHMARK_SCENARIO* pScenario );
 		DWORD releaseThreadsList( BENCHMARK_SCENARIO* pScenario );
@@ -22,6 +22,7 @@ class Performer
 		char* getStatusString( );
 	private:
 		static SYSTEM_FUNCTIONS_LIST* pF;
+		static NUMA_CONTROL_SET* pN;
 		static char s[];
 		// Helpers methods
 		DWORD64 alignByFactor( DWORD64 value, DWORD64 factor );

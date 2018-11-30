@@ -19,6 +19,22 @@ NumaTopology::~NumaTopology( )
     
 }
 
+// Helper for block size alignment
+DWORD64 NumaTopology::alignByFactor( DWORD64 value, DWORD64 factor )
+{
+	DWORD64 x = value % factor;
+	if ( x )
+	{
+		x = factor - x;
+	}
+	else
+	{
+		x = 0;
+	}
+	value += x;
+	return value;
+}
+
 // Load functions, used for NUMA, by dynamical import
 void NumaTopology::loadControlSet( )
 {
@@ -137,22 +153,27 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 }
 
 // Allocate memory to NUMA nodes, enumerated by existed list
-BOOL NumaTopology::allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp )
+BOOL NumaTopology::allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp, DWORD pgMode, DWORD64 pgSize )
 {
 	// Initializing
+	SIZE_T allocSize = alignByFactor( xs, pgSize );  // alignment by selected page size
 	DWORD allocType = MEM_RESERVE + MEM_COMMIT;
-	int i = 0;
+	if ( pgMode != 0 )
+	{
+		allocType |= MEM_LARGE_PAGES;
+	}
 	// Get Process Handle
 	HANDLE h = GetCurrentProcess( );
 	if ( h == NULL ) return FALSE;
 	// Allocate memory for NUMA nodes
+	int i = 0;
 	if ( ncs.API_VirtualAllocExNuma != NULL )
 	{
 		for( i=0; i<n; i++ )
 		{
-			LPVOID base = ( ncs.API_VirtualAllocExNuma ) ( h, NULL, xs, allocType, PAGE_READWRITE, xp->nodeId );
+			LPVOID base = ( ncs.API_VirtualAllocExNuma ) ( h, NULL, allocSize, allocType, PAGE_READWRITE, xp->nodeId );
 			xp->baseAtNode = base;
-			xp->sizeAtNode = xs;
+			xp->sizeAtNode = allocSize;
 			xp->trueBaseAtNode = base;
 			if ( base == NULL ) return FALSE;
 			xp++;
@@ -188,7 +209,35 @@ BOOL NumaTopology::freeNodesList( int n, NUMA_NODE_ENTRY* xp )
 	return status;
 }
 
+// Pre-blank threads list
+// This routine must run UNCONDITIONALLY, even if NUMA mode not supported or not selected by command line option
+void NumaTopology::blankThreadsList
+	( int nThreads, THREAD_CONTROL_ENTRY* pThreads, BOOL mflag )
+{
+	SYSTEM_INFO x;
+	DWORD_PTR mask = 0;
+	if ( mflag )
+	{
+		GetSystemInfo( &x );
+		mask = x.dwActiveProcessorMask;
+		DWORD_PTR mask1 = mask & 0x5555555555555555L;
+		if ( mask1 != 0 )
+		{
+			mask = mask1;
+		}
+	}
+	
+	int i = 0;
+	for( i=0; i<nThreads; i++ )
+	{
+		pThreads->optimalGaff.Mask = mask;
+		pThreads->optimalGaff.Group = 0;
+		pThreads++;
+	}
+}
+
 // Allocate memory for threads by NUMA-allocation results
+// This routine must run CONDITIONALLY, if NUMA mode supported and selected by command line option
 BOOL NumaTopology::allocateThreadsList
 	( int nNodes, int nThreads, NUMA_NODE_ENTRY* pNodes, THREAD_CONTROL_ENTRY* pThreads )
 {
@@ -214,6 +263,18 @@ BOOL NumaTopology::allocateThreadsList
 			pThreads->base1 = base;
 			pThreads->base2 = base + halfSize;
 			base += size;
+			
+			KAFFINITY x = ( pNodes->nodeGaff.Mask ) & ( pThreads->optimalGaff.Mask );
+			if ( x != 0 )
+			{
+				pThreads->optimalGaff.Mask = x;
+			}
+			else
+			{
+				pThreads->optimalGaff.Mask = pNodes->nodeGaff.Mask;
+			}
+			
+			pThreads->optimalGaff.Group = pNodes->nodeGaff.Group;
 			pThreads++;
 		}
 		pNodes++;	

@@ -3,11 +3,11 @@
 
 // Build type string definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.51.01 for Windows ia32."
+#define BUILD_STRING "v0.51.02 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.51.01 for Windows x64."
+#define BUILD_STRING "v0.51.02 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -77,6 +77,11 @@ typedef enum {
 	PAGES_NORMAL, PAGES_LARGE
 } PAGING_MODES;
 
+// Enumeration of Hyper-Threading (HT) mode
+typedef enum {
+	HT_OFF, HT_ON
+} HT_MODES;
+
 // Enumeration of NUMA modes
 typedef enum {
 	NUMA_UNAWARE, NUMA_LOCAL, NUMA_REMOTE
@@ -120,17 +125,18 @@ typedef struct {
     LPVOID trueBase;              // True (before alignment) memory block base for release
     SIZE_T sizeInstructions;      // Block size, units = instructions, for benchmarking
     SIZE_T measurementRepeats;    // Number of measurement repeats
-//
 	GROUP_AFFINITY optimalGaff;   // Affinity mask and group id, OPTIMAL for this thread
     GROUP_AFFINITY originalGaff;  // Affinity mask and group id, ORIGINAL for this thread
-//  KAFFINITY threadAffinity;     // Affinity Mask = F (True Affinity Mask, Options)
-//  KAFFINITY trueAffinity;       // True affinity mask, because modified as f(options)
-//  WORD threadGroup;             // Processor group, associated with set affinity mask
-//  WORD trueGroup;               // Processor group, associated with true affinity mask
     WORD largePages;              // Bit D0=Large Pages, other bits [1-31/63] = reserved
     WORD methodId;                // Entry point to Target operation method subroutine ID
-    BOOL ( __stdcall *DLL_PerformanceGate )
+    // Performance gate
+	BOOL ( __stdcall *DLL_PerformanceGate )
          ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );  // Low-level function entry point
+    // Affinitization functions
+    DWORD_PTR ( __stdcall *API_SetThreadAffinityMask )
+		( HANDLE, DWORD_PTR );
+	BOOL ( __stdcall *API_SetThreadGroupAffinity )
+		( HANDLE, GROUP_AFFINITY, PGROUP_AFFINITY );
 } THREAD_CONTROL_ENTRY;
 
 // This structure used per NUMA node.
@@ -155,6 +161,8 @@ typedef struct {
 	LONG64 methodId;
 	LONG64 pageSize;
 	DWORD pagingMode;
+	DWORD htMode;
+	DWORD numaMode;
 	// NUMA nodes list reference
 	DWORD nNodesList;
 	NUMA_NODE_ENTRY* pNodesList;
@@ -178,6 +186,7 @@ typedef struct {
     // Advanced adaptive repeats control
     DWORD64 optionAdaptive;
     // Topology options
+    DWORD optionHt;
     DWORD optionNuma;
     // Block sizes explicit set
     DWORD64 optionBlockStart; 
@@ -211,6 +220,7 @@ typedef struct {
 #define DEFAULT_THREADS_COUNT OPTION_NOT_SET
 #define DEFAULT_MEASUREMENT_REPEATS OPTION_NOT_SET
 #define DEFAULT_ADAPTIVE_REPEATS OPTION_NOT_SET
+#define DEFAULT_HT_MODE OPTION_NOT_SET
 #define DEFAULT_NUMA_MODE OPTION_NOT_SET
 
 #define MAXIMUM_ASM_METHOD 33

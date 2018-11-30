@@ -8,15 +8,21 @@ TODO:
 + Required functions control set, NUMA_CONTROL_SET struct.
 + Required memory free after allocation: for NUMA and non-NUMA branches.
 + NUMA branch must be conditional, by user option.
++ Required Large Pages support at NUMA mode. Make enum at GlobalDefinitions.h.
++ Required regular alignment support for NUMA and non-NUMA.
 ---
-Required Large Pages support at NUMA mode. Make enum at GlobalDefinitions.h.
-Required regular alignment support for NUMA and non-NUMA.
-Required HT support, affinity masks = f (user settings, platform configuration).
-Modify Performer: Affinity masks for HT.
-Modify Performer: Affinity masks for NUMA.
-Modify Performer: override memory allocation by NUMA-allocation result.
-Support Local and Remote modes for NUMA, different affinity masks
++ Modify Performer/NumaTopology: Affinity masks for NUMA.
++ Modify Performer/NumaTopology: override memory allocation by NUMA-allocation result: 
++ for this allocation option: Performer = disable allocation , NumaTopology = enable allocation.
 
+
+Modify Performer/NumaTopology: Affinity masks for HT.
+Group-Aware HT control supported only if NUMA option = NUMA_LOCAL or NUMA_REMOTE.
+
+
+---
+Support Local and Remote modes for NUMA, different affinity masks
+Summary, see above, required HT and NUMA support, affinity masks = f (user settings, platform configuration).
 ---
 Some functions, used in this control list, previously used ! Refactor for single loader of functions or remove redundant.
 ---
@@ -67,23 +73,30 @@ TODO features:
  6) Check for BOOL return error, but GetLastError( ) returns 0
  7) Random offsets JA or JBE, wrong limit -1. For latency measure, both for x64 and ia32 DLLs.
  ---
+ TODO optimization.
+ 1) Subroutine alignByFactor replicated.
+ 2) Redesign per-thread entry, make pointer to part, common for all threads, routines pointers for example.
+ 3) 2) Redesign per-thread entry, reduce width of some parameters.
+ 4) Common reordering required.
+ ---
  TODO strategy:
- 1) Measure latency.
+ 1) + Measure latency.
  2) Scripting data reports model.
     - auto bandwidth=f(size), for all memory types.
     - auto latency=f(size), for all memory types.
  3) Refactoring by defined scripting data model. 
+
 ---
-// DEBUG
+// *** DEBUG ***
 // BOOL status1 = pNumaTopology->freeNodesList( nndetected, pnn );
 // printf("\n\n [ DEBUG = %d ]\n\n", status1 );
-// DEBUG
+// *** DEBUG ***
 // char sd1[80], sd2[80];
 // DWORD64 wd1 = ( DWORD64 )( pnn->baseAtNode ), wd2 = ( DWORD64 )( pnn->sizeAtNode );
 // print64( sd1, 80, wd1 );
 // print64( sd2, 80, wd2 );
 // printf("\n  [ DEBUG VALUES, BASE = %s , SIZE = %s ]\n\n", sd1, sd2 );
-// DEBUG
+// *** DEBUG ***
 ---
 */
 
@@ -406,6 +419,7 @@ int main(int argc, char** argv)
 	int a = pp->optionAsm;
 	int m = pp->optionMemory;
 	int n = pp->optionThreads;
+	int h = pp->optionHt;
 	int u = pp->optionNuma;
 	
 	int r1 = pp->optionRepeats;
@@ -622,7 +636,7 @@ int main(int argc, char** argv)
 		     ( a != CPU_FEATURE_LATENCY_RDRAND ) )
 		{   // object=dram, not a latency measurement, means bandwidth measurement
 			n = sysTopology.coreCount;
-			if ( sysTopology.hyperThreadingFlag )
+			if ( ( sysTopology.hyperThreadingFlag ) && ( h != HT_OFF ) )
 			{
 				n *= 2;
 			}
@@ -686,6 +700,7 @@ int main(int argc, char** argv)
 	scenario.currentSizeInstructions = scenario.startSize / bpi;
 	scenario.measurementRepeats = r1;
 	scenario.methodId = a;
+	scenario.numaMode = u;
 	
 	scenario.pagingMode = pp->optionPageSize;
 	if ( scenario.pagingMode )
@@ -744,12 +759,16 @@ int main(int argc, char** argv)
 	printBaseAndSize( s, NS, ( DWORD64 )pnn, mnn );
 	printf( "nodes list allocated:   %s\n", s );
 	
+	// Detect Hyper-Threading masking mode
+	BOOL maskFlag = ( ( sysTopology.hyperThreadingFlag != 0 ) && ( h == HT_OFF ) );
+	
 	// Detect NUMA topology and extended set of OS/NUMA API
 	// Note this operations for all systems, include non-NUMA, results used on memory release
 	printf( "detect NUMA...\n" );
 	pNumaTopology->loadControlSet();
 	pncs = pNumaTopology->getControlSet();
 	int nndetected = pNumaTopology->buildNodesList( pnn );
+	pNumaTopology->blankThreadsList( n, pt, maskFlag );
 
 	// Note this operations for NUMA-aware branch selected by user option
 	if ( ( u == NUMA_LOCAL ) || ( u == NUMA_REMOTE ) )
@@ -758,7 +777,8 @@ int main(int argc, char** argv)
 		if ( nndetected > 0 )
 		{
 			DWORD64 sizePerNode = scenario.maxSizeBytes * n / nndetected;
-			BOOL status = pNumaTopology->allocateNodesList( sizePerNode, nndetected, pnn );
+			BOOL status = pNumaTopology->allocateNodesList
+				( sizePerNode, nndetected, pnn, scenario.pagingMode, scenario.pageSize );
 			if ( !status )
 			{
 				printf( "\nError at NUMA-aware at-nodes memory allocation.\n" );
@@ -779,7 +799,7 @@ int main(int argc, char** argv)
 	}
 
 	// Create Performer class
-	pPerformer = new Performer( psfl );
+	pPerformer = new Performer( psfl, pncs );
 	
 	// Build threads context
 	osErrorCode = pPerformer->buildThreadsList( &scenario );
