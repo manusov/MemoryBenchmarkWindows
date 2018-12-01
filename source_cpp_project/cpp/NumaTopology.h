@@ -14,9 +14,9 @@ class NumaTopology
 		void loadControlSet( );
 		NUMA_CONTROL_SET* getControlSet( );
 		int buildNodesList( NUMA_NODE_ENTRY* xp );
-		BOOL allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp, DWORD pgMode, DWORD64 pgSize );
+		BOOL allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp, DWORD pgMode, DWORD64 pgSize, BOOL swapFlag );
 		BOOL freeNodesList( int n, NUMA_NODE_ENTRY* xp );
-		void blankThreadsList( int nThreads, THREAD_CONTROL_ENTRY* pThreads, BOOL mflag );
+		void blankThreadsList( int nThreads, THREAD_CONTROL_ENTRY* pThreads, BOOL maskFlag );
 		BOOL allocateThreadsList( int nx, int ny, NUMA_NODE_ENTRY* xp, THREAD_CONTROL_ENTRY* yp );
 		char* getStatusString( );
 	private:

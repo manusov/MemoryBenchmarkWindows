@@ -54,29 +54,29 @@ void NumaTopology::loadControlSet( )
 	hmod = GetModuleHandle( ncsLibrary );
     if ( hmod != NULL )
     {
-		ncs.API_GlobalMemoryStatusEx = ( BOOL(*)( LPMEMORYSTATUSEX ) )
+		ncs.API_GlobalMemoryStatusEx = ( BOOL( __attribute__((__stdcall__)) * ) ( LPMEMORYSTATUSEX ) )
 			GetProcAddress ( hmod, "GlobalMemoryStatusEx" );
-		ncs.API_GetNumaHighestNodeNumber = ( BOOL(*)( PULONG ) )
+		ncs.API_GetNumaHighestNodeNumber = ( BOOL( __attribute__((__stdcall__)) * )( PULONG ) )
 			GetProcAddress ( hmod, "GetNumaHighestNodeNumber" ); 
-		ncs.API_GetNumaNodeProcessorMask = ( BOOL(*)( UCHAR, PULONGLONG ) )
+		ncs.API_GetNumaNodeProcessorMask = ( BOOL( __attribute__((__stdcall__)) * )( UCHAR, PULONGLONG ) )
 			GetProcAddress ( hmod, "GetNumaNodeProcessorMask" ); 
-		ncs.API_VirtualAllocExNuma = ( LPVOID(*)( HANDLE, LPVOID, SIZE_T, DWORD, DWORD, DWORD ) )
+		ncs.API_VirtualAllocExNuma = ( LPVOID( __attribute__((__stdcall__)) * )( HANDLE, LPVOID, SIZE_T, DWORD, DWORD, DWORD ) )
 			GetProcAddress ( hmod, "VirtualAllocExNuma" ); 
-		ncs.API_SetThreadAffinityMask = ( DWORD_PTR(*)( HANDLE, DWORD_PTR ) )
+		ncs.API_SetThreadAffinityMask = ( DWORD_PTR( __attribute__((__stdcall__)) * )( HANDLE, DWORD_PTR ) )
 			GetProcAddress ( hmod, "SetThreadAffinityMask" ); 
-		ncs.API_GetSystemFirmwareTable = ( UINT(*)( DWORD, DWORD, PVOID, DWORD ) )
+		ncs.API_GetSystemFirmwareTable = ( UINT( __attribute__((__stdcall__)) * )( DWORD, DWORD, PVOID, DWORD ) )
 			GetProcAddress ( hmod, "GetSystemFirmwareTable" ); 
-		ncs.API_GetLogicalProcessorInformation = ( BOOL(*)( PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, PDWORD ) )
+		ncs.API_GetLogicalProcessorInformation = ( BOOL( __attribute__((__stdcall__)) * )( PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, PDWORD ) )
 			GetProcAddress ( hmod, "GetLogicalProcessorInformation" ); 
-		ncs.API_GetLargePageMinimum = ( SIZE_T(*)() )
+		ncs.API_GetLargePageMinimum = ( SIZE_T( __attribute__((__stdcall__)) * )() )
 			GetProcAddress ( hmod, "GetLargePageMinimum" ); 
-		ncs.API_GetActiveProcessorCount = ( DWORD(*)( WORD ) )
+		ncs.API_GetActiveProcessorCount = ( DWORD( __attribute__((__stdcall__)) * )( WORD ) )
 			GetProcAddress ( hmod, "GetActiveProcessorCount" ); 
-		ncs.API_GetActiveProcessorGroupCount = ( WORD(*)() )
+		ncs.API_GetActiveProcessorGroupCount = ( WORD( __attribute__((__stdcall__)) * )() )
 			GetProcAddress ( hmod, "GetActiveProcessorGroupCount" ); 
-		ncs.API_GetNumaNodeProcessorMaskEx = ( BOOL(*)( USHORT, PGROUP_AFFINITY ) )
+		ncs.API_GetNumaNodeProcessorMaskEx = ( BOOL( __attribute__((__stdcall__)) * )( USHORT, PGROUP_AFFINITY ) )
 			GetProcAddress ( hmod, "GetNumaNodeProcessorMaskEx" ); 
-		ncs.API_SetThreadGroupAffinity = ( BOOL(*)( HANDLE, const GROUP_AFFINITY*, PGROUP_AFFINITY ) )
+		ncs.API_SetThreadGroupAffinity = ( BOOL( __attribute__((__stdcall__)) * )( HANDLE, const GROUP_AFFINITY*, PGROUP_AFFINITY ) )
 			GetProcAddress ( hmod, "SetThreadGroupAffinity" ); 
 	}
 }
@@ -88,8 +88,10 @@ NUMA_CONTROL_SET* NumaTopology::getControlSet( )
 }
 
 // Scan platform configuration: build ;ist of NUMA nodes
-int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
+int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xbase )
 {
+	// Store pointer for re-use
+	NUMA_NODE_ENTRY* xp = xbase;
 	// Pre-blank nodes list
 	int i = 0;
 	for( i=0; i<MAXIMUM_NODES; i++ )
@@ -100,6 +102,7 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 		xp->trueBaseAtNode = 0;
 		xp->nodeGaff.Mask = 0;
 		xp->nodeGaff.Group = 0;
+		xp++;
 	}
 	
 	// Get maximum node number, 0-based
@@ -114,6 +117,7 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 	if ( !status ) return 0;
 	
 	// Initializing variables and select method for build node list with affinity mask
+	xp = xbase;
 	maxNode++;
 	int activeNodes = 0;
 	if ( ncs.API_GetNumaNodeProcessorMaskEx != NULL )
@@ -121,7 +125,7 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 		// Build node list with affinity mask, variant WITH Processor Group
 		for( i=0; i<maxNode; i++ )
 		{
-			status = ( ncs.API_GetNumaNodeProcessorMask ) ( i, &( xp->nodeGaff.Mask ) );
+			status = ( ncs.API_GetNumaNodeProcessorMaskEx ) ( i, &( xp->nodeGaff ) );
 			if ( status )
 			{
 				xp->nodeId = i;
@@ -135,7 +139,7 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 		// Build node list with affinity mask, variant WITHOUT Processor Group
 		for( i=0; i<maxNode; i++ )
 		{
-			status = ( ncs.API_GetNumaNodeProcessorMaskEx ) ( i, &( xp->nodeGaff ) );
+			status = ( ncs.API_GetNumaNodeProcessorMask ) ( i, ( PULONGLONG )( &( xp->nodeGaff.Mask ) ) );
 			if ( status )
 			{
 				xp->nodeId = i;
@@ -153,9 +157,10 @@ int NumaTopology::buildNodesList( NUMA_NODE_ENTRY* xp )
 }
 
 // Allocate memory to NUMA nodes, enumerated by existed list
-BOOL NumaTopology::allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp, DWORD pgMode, DWORD64 pgSize )
+BOOL NumaTopology::allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xbase, DWORD pgMode, DWORD64 pgSize, BOOL swapFlag )
 {
 	// Initializing
+	NUMA_NODE_ENTRY* xp = xbase;
 	SIZE_T allocSize = alignByFactor( xs, pgSize );  // alignment by selected page size
 	DWORD allocType = MEM_RESERVE + MEM_COMMIT;
 	if ( pgMode != 0 )
@@ -177,6 +182,30 @@ BOOL NumaTopology::allocateNodesList( size_t xs, int n, NUMA_NODE_ENTRY* xp, DWO
 			xp->trueBaseAtNode = base;
 			if ( base == NULL ) return FALSE;
 			xp++;
+		}
+		// Support domains swap mode for NUMA remote option
+		xp = xbase;
+		if ( swapFlag )
+		{
+			n--;
+			for( i=0; i<n; i++ )
+			{
+			LPVOID x1 = xp->baseAtNode;         // load X from entry[i]
+			SIZE_T x2 = xp->sizeAtNode;
+			LPVOID x3 = xp->trueBaseAtNode;
+			xp++;
+			LPVOID y1 = xp->baseAtNode;         // load Y from entry[i+1]
+			SIZE_T y2 = xp->sizeAtNode;
+			LPVOID y3 = xp->trueBaseAtNode;
+			xp->baseAtNode = x1;                // save X to entry[i+2]
+			xp->sizeAtNode = x2;
+			xp->trueBaseAtNode = x3;
+			xp--;
+			xp->baseAtNode = y1;                // save Y to entry[i]
+			xp->sizeAtNode = y2;
+			xp->trueBaseAtNode = y3;
+			xp++;                               // advance pointer to next pair
+			}
 		}
 		return TRUE;
 	}
@@ -212,11 +241,11 @@ BOOL NumaTopology::freeNodesList( int n, NUMA_NODE_ENTRY* xp )
 // Pre-blank threads list
 // This routine must run UNCONDITIONALLY, even if NUMA mode not supported or not selected by command line option
 void NumaTopology::blankThreadsList
-	( int nThreads, THREAD_CONTROL_ENTRY* pThreads, BOOL mflag )
+	( int nThreads, THREAD_CONTROL_ENTRY* pThreads, BOOL maskFlag )
 {
 	SYSTEM_INFO x;
 	DWORD_PTR mask = 0;
-	if ( mflag )
+	if ( maskFlag )
 	{
 		GetSystemInfo( &x );
 		mask = x.dwActiveProcessorMask;

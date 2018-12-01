@@ -1,8 +1,15 @@
 /* 
 UNDER CONSTRUCTION.
 
-BREAK at HT, NUMA and Processor Groups support,
 TODO:
+
+1) + Support Local and Remote modes for NUMA, different affinity masks
+2) Start, End, Step set manually with memory=object (non default). But can without memory=object size only.
+3) Big files (>2GB overflow) and mass storage. Stride select. MBPS and IOPS.
+4) Some small reoredring, members swap between classes, functional regularity.
+5) More debug information, make framework.
+
+---
 + Required sequental KAFFINITY, Group Number, yet interleaved at THREAD_CONTROL_ENTRY struct.
 + Required memory allocation for NUMA nodes list.
 + Required functions control set, NUMA_CONTROL_SET struct.
@@ -16,17 +23,9 @@ TODO:
 + for this allocation option: Performer = disable allocation , NumaTopology = enable allocation.
 + Modify Performer/NumaTopology: Affinity masks for HT.
 + Summary, see above, required HT and NUMA support, affinity masks = f (user settings, platform configuration).
-
 ---
-
-Support Local and Remote modes for NUMA, different affinity masks
-REMEMBER IMPORTANT DEBUG DUMP AT THREAD ROUTINE.
-
----
-
 Group-Aware HT control supported only if NUMA option = NUMA_LOCAL or NUMA_REMOTE.
 Some functions, used in this control list, previously used ! Refactor for single loader of functions or remove redundant.
-
 ---
 Memory Performance Engine.
 Debug sample, without technologies support pre-check.
@@ -68,12 +67,11 @@ TODO features:
 ---  
  TODO bugs fix:
  1) BUG Threads count manual set with memory=dram.
- 2) Start, End, Step set manually with memory=object (non default). But can without memory=object size only.
- 3) Correct sequence.
- 4) Correct data types, example size_t use.
- 5) Check for overflows when measurement.
- 6) Check for BOOL return error, but GetLastError( ) returns 0
- 7) Random offsets JA or JBE, wrong limit -1. For latency measure, both for x64 and ia32 DLLs.
+ 2) Correct sequence.
+ 3) Correct data types, example size_t use.
+ 4) Check for overflows when measurement.
+ 5) Check for BOOL return error, but GetLastError( ) returns 0
+ 6) Random offsets JA or JBE, wrong limit -1. For latency measure, both for x64 and ia32 DLLs.
  ---
  TODO optimization.
  1) Subroutine alignByFactor replicated.
@@ -88,18 +86,8 @@ TODO features:
     - auto latency=f(size), for all memory types.
  3) Refactoring by defined scripting data model. 
 
----
-// *** DEBUG ***
-// BOOL status1 = pNumaTopology->freeNodesList( nndetected, pnn );
-// printf("\n\n [ DEBUG = %d ]\n\n", status1 );
-// *** DEBUG ***
-// char sd1[80], sd2[80];
-// DWORD64 wd1 = ( DWORD64 )( pnn->baseAtNode ), wd2 = ( DWORD64 )( pnn->sizeAtNode );
-// print64( sd1, 80, wd1 );
-// print64( sd2, 80, wd2 );
-// printf("\n  [ DEBUG VALUES, BASE = %s , SIZE = %s ]\n\n", sd1, sd2 );
-// *** DEBUG ***
----
+REMEMBER IMPORTANT DEBUG DUMP AT THREAD ROUTINE.
+
 */
 
 
@@ -761,8 +749,9 @@ int main(int argc, char** argv)
 	printBaseAndSize( s, NS, ( DWORD64 )pnn, mnn );
 	printf( "nodes list allocated:   %s\n", s );
 	
-	// Detect Hyper-Threading masking mode
+	// Detect Hyper-Threading masking mode, detect NUMA remote domains swap mode
 	BOOL maskFlag = ( ( sysTopology.hyperThreadingFlag != 0 ) && ( h == HT_OFF ) );
+	BOOL swapFlag = ( u == NUMA_REMOTE );
 	
 	// Detect NUMA topology and extended set of OS/NUMA API
 	// Note this operations for all systems, include non-NUMA, results used on memory release
@@ -799,7 +788,7 @@ int main(int argc, char** argv)
 		{
 			DWORD64 sizePerNode = scenario.maxSizeBytes * n / nndetected;
 			BOOL status = pNumaTopology->allocateNodesList
-				( sizePerNode, nndetected, pnn, scenario.pagingMode, scenario.pageSize );
+				( sizePerNode, nndetected, pnn, scenario.pagingMode, scenario.pageSize, swapFlag );
 			if ( !status )
 			{
 				printf( "\nError at NUMA-aware at-nodes memory allocation.\n" );
