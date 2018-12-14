@@ -1,5 +1,5 @@
 
-Memory Performance Engine. v0.60.00 for Windows x64. (C)2018 IC Book Labs.
+Memory Performance Engine. v0.60.00 for Windows ia32. (C)2018 IC Book Labs.
 load API...done
 detect processor features...done
 detect SMP and cache levels...done
@@ -9,7 +9,7 @@ initializing domains builder...done
 initializing threads builder...done
 measure TSC clock...done
 get library data...done
-MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
+MPE native library. v0.21.00 for Windows ia32. (C)2018 IC Book Labs.
 get command line parameters...done
 run system information scenario.
 
@@ -17,17 +17,17 @@ run system information scenario.
 
 processor vendor = GenuineIntel
 processor model  = Intel(R) Core(TM) i7-4700HQ CPU @ 2.40GHz
-time stamp counter (TSC) frequency = 2398.7 MHz, period = 0.417 ns
+time stamp counter (TSC) frequency = 2395.7 MHz, period = 0.417 ns
 cpuid bitmap = 00000007E79E8FFFh , xgetbv bitmap = 00000007E79E8FFFh
 
  #    CPU  OS   cpu functionality and instructions
 ----------------------------------------------------------------------
- 0    1    1    read 64-bit MOV                                   
- 1    1    1    write 64-bit MOV                                  
- 2    1    1    copy 64-bit MOV                                   
- 3    1    1    modify 64-bit NOT                                 
- 4    1    1    write 64-bit REP STOSQ                            
- 5    1    1    copy 64-bit REP MOVSQ                             
+ 0    1    1    read 32-bit MOV                                   
+ 1    1    1    write 32-bit MOV                                  
+ 2    1    1    copy 32-bit MOV                                   
+ 3    1    1    modify 32-bit NOT                                 
+ 4    1    1    write 32-bit REP STOSD                            
+ 5    1    1    copy 32-bit REP MOVSD                             
  6    1    1    read 128-bit SSE MOVAPS                           
  7    1    1    write 128-bit SSE MOVAPS                          
  8    1    1    copy 128-bit SSE MOVAPS                           
@@ -135,7 +135,7 @@ cpuid bitmap = 00000007E79E8FFFh , xgetbv bitmap = 00000007E79E8FFFh
 
 [ --- MEMORY INFORMATION --- ]
 
-installed memory = 16657448 KB, free = 12745512 KB
+installed memory = 16657448 KB, free = 12845944 KB
 
 [ --- PAGING INFORMATION --- ]
 
@@ -145,31 +145,31 @@ default page = 4 KB, large page = 2048 KB, privileges = 0
 
  module           function                            pointer (hex)
 -----------------------------------------------------------------------
- kernel32         GetLogicalProcessorInformation      00007FFF4FC5D520
- kernel32         GetLogicalProcessorInformationEx    00007FFF4CA2B1B0
- kernel32         GlobalMemoryStatusEx                00007FFF4FC5E080
- kernel32         GetActiveProcessorCount             00007FFF4FC5A790
- kernel32         GetActiveProcessorGroupCount        00007FFF4FC416F0
- kernel32         GetNumaHighestNodeNumber            00007FFF4FC5E400
- kernel32         GetNumaNodeProcessorMask            00007FFF4FC9F200
- kernel32         GetNumaNodeProcessorMaskEx          00007FFF4FC75190
- kernel32         VirtualAllocExNuma                  00007FFF4FC5FB80
- kernel32         SetThreadAffinityMask               00007FFF4FC57DF0
- kernel32         SetThreadGroupAffinity              00007FFF4FC5E620
- kernel32         GetLargePageMinimum                 00007FFF4FC75130
- kernel32         GetSystemFirmwareTable              00007FFF4FC5E520
- mpe_w_64.dll     GetDllStrings                       000000005F181006
- mpe_w_64.dll     CheckCpuid                          000000005F181036
- mpe_w_64.dll     ExecuteCpuid                        000000005F18105B
- mpe_w_64.dll     ExecuteRdtsc                        000000005F18107C
- mpe_w_64.dll     ExecuteXgetbv                       000000005F181086
- mpe_w_64.dll     MeasureTsc                          000000005F181098
- mpe_w_64.dll     PerformanceGate                     000000005F181106
+ kernel32         GetLogicalProcessorInformation      75526EE0
+ kernel32         GetLogicalProcessorInformationEx    74928B70
+ kernel32         GlobalMemoryStatusEx                755254A0
+ kernel32         GetActiveProcessorCount             75563F00
+ kernel32         GetActiveProcessorGroupCount        75563E80
+ kernel32         GetNumaHighestNodeNumber            75527310
+ kernel32         GetNumaNodeProcessorMask            75564E90
+ kernel32         GetNumaNodeProcessorMaskEx          75527330
+ kernel32         VirtualAllocExNuma                  755266E0
+ kernel32         SetThreadAffinityMask               75567F50
+ kernel32         SetThreadGroupAffinity              75527390
+ kernel32         GetLargePageMinimum                 75524AB0
+ kernel32         GetSystemFirmwareTable              75521E20
+ mpe_w_32.dll     GetDllStrings                       67261006
+ mpe_w_32.dll     CheckCpuid                          67261033
+ mpe_w_32.dll     ExecuteCpuid                        67261058
+ mpe_w_32.dll     ExecuteRdtsc                        67261081
+ mpe_w_32.dll     ExecuteXgetbv                       6726108F
+ mpe_w_32.dll     MeasureTsc                          672610A2
+ mpe_w_32.dll     PerformanceGate                     67261103
 -----------------------------------------------------------------------
 
 [ --- NUMA DOMAINS INFORMATION --- ]
 
-NUMA nodes detected = 1 , list allocated at base = 0000000000709090h
+NUMA nodes detected = 1 , list allocated at base = 00DF9458h
 
  ID affinity group\mask   allocated base   allocated size   original (all hex)
 -------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ NUMA nodes detected = 1 , list allocated at base = 0000000000709090h
 
 [ --- THREADS INFORMATION --- ]
 
-threads entries created = 0 , list allocated at base = 00000000006E6F80h
+threads entries created = 0 , list allocated at base = 00FB6DA8h
 
 delete global objects...done
 

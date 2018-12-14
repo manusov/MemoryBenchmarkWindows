@@ -1,0 +1,75 @@
+
+Memory Performance Engine. v0.60.00 for Windows x64. (C)2018 IC Book Labs.
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+run memory benchmark scenario.
+asm method ID=33, bytes per instruction BPI=8
+TSC frequency F=2400.252 MHz, period T=0.417 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000000D20000 0000000000020000 0000000000D20000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 1 , list allocated at base = 0000000000DF6F40h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=00000000000000CC rxevent=00000000000000D0 txevent=00000000000000D4
+     base1 =0000000000D20000 base2  =0000000000D30000 sizeins=0000000000000200
+     repeat=00000000000186A0 large page mode =0001    method id =0021
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done
+dTSC=00000000000845F0h
+allocate statistics array...done
+statistics array allocated: BASE=0000000000E1A7D0h, SIZE=0000000000000080h
+
+RUN: method=33, threads=1, repeats=ADAPTIVE
+     page mode=1, page size=4.00 KB
+     start=4096, end=65536, delta=4096, bpi=8
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1        4096   2.991   1.246   6420.043  
+   2        8192   2.896   1.207   6629.489  
+   3       12288   2.885   1.202   6655.651  
+   4       16384   2.890   1.204   6643.969  
+   5       20480   2.898   1.207   6626.060  
+   6       24576   2.896   1.206   6631.262  
+   7       28672   2.903   1.210   6614.239  
+   8       32768   2.904   1.210   6612.551  
+   9       36864   3.643   1.518   5270.637  
+  10       40960   4.274   1.780   4493.178  
+  11       45056   4.638   1.932   4140.418  
+  12       49152   5.061   2.108   3794.308  
+  13       53248   5.353   2.230   3587.206  
+  14       57344   5.539   2.308   3466.505  
+  15       61440   5.858   2.441   3277.674  
+  16       65536   6.004   2.501   3198.208  
+-------------------------------------------------------
+
+ | max=6655.651   | min=3198.208   | average=5253.837   | median=5845.340   |
+
+delete local objects...done
+delete global objects...done
+

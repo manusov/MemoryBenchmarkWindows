@@ -1,0 +1,98 @@
+
+Memory Performance Engine. v0.60.00 for Windows x64. (C)2018 IC Book Labs.
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+run memory benchmark scenario.
+asm method ID=31, bytes per instruction BPI=32
+TSC frequency F=2402.156 MHz, period T=0.416 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000000D30000 0000000020000000 0000000000D30000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 4 , list allocated at base = 00000000007D6F00h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=0000000000000088 rxevent=00000000000000CC txevent=00000000000000D0
+     base1 =0000000000D30000 base2  =0000000004D30000 sizeins=0000000000020000
+     repeat=00000000000000C8 large page mode =0001    method id =001F
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 1   thread=00000000000000D4 rxevent=00000000000000D8 txevent=00000000000000DC
+     base1 =0000000008D30000 base2  =000000000CD30000 sizeins=0000000000020000
+     repeat=00000000000000C8 large page mode =0001    method id =001F
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 2   thread=00000000000000E0 rxevent=00000000000000E4 txevent=00000000000000E8
+     base1 =0000000010D30000 base2  =0000000014D30000 sizeins=0000000000020000
+     repeat=00000000000000C8 large page mode =0001    method id =001F
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 3   thread=00000000000000EC rxevent=00000000000000F0 txevent=00000000000000F4
+     base1 =0000000018D30000 base2  =000000001CD30000 sizeins=0000000000020000
+     repeat=00000000000000C8 large page mode =0001    method id =001F
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done
+dTSC=00000000124F20F6h
+allocate statistics array...done
+statistics array allocated: BASE=000000000066AD50h, SIZE=0000000000000080h
+
+RUN: method=31, threads=4, repeats=200
+     page mode=1, page size=4.00 KB
+     start=4194304, end=67108864, delta=4194304, bpi=32
+calibration...done
+delay=2.337 seconds, update repeats=85. 
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1     4194304   2.466   1.026   31176.911 
+   2     8388608   3.259   1.357   23588.212 
+   3    12582912   3.264   1.359   23552.295 
+   4    16777216   3.331   1.387   23074.475 
+   5    20971520   3.313   1.379   23199.707 
+   6    25165824   3.369   1.403   22816.021 
+   7    29360128   3.288   1.369   23381.499 
+   8    33554432   3.302   1.375   23280.249 
+   9    37748736   3.320   1.382   23154.803 
+  10    41943040   3.289   1.369   23371.885 
+  11    46137344   3.376   1.405   22768.727 
+  12    50331648   3.373   1.404   22790.425 
+  13    54525952   3.350   1.395   22943.291 
+  14    58720256   3.289   1.369   23373.802 
+  15    62914560   3.292   1.371   23348.111 
+  16    67108864   3.317   1.381   23171.603 
+-------------------------------------------------------
+
+ | max=31176.911  | min=22768.727  | average=23687.001  | median=23239.978  |
+
+delete local objects...done
+delete global objects...done
+
