@@ -92,10 +92,17 @@ SYSTEM_PAGING_DATA* PagingDetector::getPagingList( )
 void PagingDetector::getPagingText( LPSTR &dst, size_t &max )
 {
 	int count = 0;
+	/*
 	DWORDLONG x1 = pagingData.defaultPage / 1024;
 	DWORDLONG x2 = pagingData.largePage / 1024;
 	int x3 = pagingData.pagingRights;
 	count = snprintf( dst, max, "default page = %I64d KB, large page = %I64d KB, privileges = %d\r\n", x1, x2, x3 );
+	*/
+	int x1 = pagingData.defaultPage / 1024;
+	int x2 = pagingData.largePage / 1024;
+	int x3 = pagingData.pagingRights;
+	count = snprintf( dst, max, "default page = %d KB, large page = %d KB, privileges = %d\r\n", x1, x2, x3 );
+	//
 	dst += count;
 	max -= count;
 }

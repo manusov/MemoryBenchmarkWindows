@@ -94,7 +94,8 @@ void MemoryScenario::execute( )
 		return;
 	}
 	size_t bytesPerInstruction = controlSet->pProcessorDetector->getBytesPerInstruction( opAsm );
-	printf( "asm method ID=%d, bytes per instruction BPI=%d\r\n", opAsm, bytesPerInstruction );
+	int bpi = bytesPerInstruction;
+	printf( "asm method ID=%d, bytes per instruction BPI=%d\r\n", opAsm, bpi );
 /*
 	// TSC clock frequency measurement, update variables
 	printf( "re-measure TSC clock for benchmarking..." );
@@ -121,10 +122,23 @@ void MemoryScenario::execute( )
 	printf( "TSC frequency F=%.3f MHz, period T=%.3f ns\r\n", frequencyMHz, periodNs );
 	// Get cache memory configuration
 	SYSTEM_TOPOLOGY_DATA* pTopology = controlSet->pTopologyDetector->getTopologyList( );
+	
+	/*
     printf( "cache points for data read/write:\r\nL1=%I64d KB, L2=%I64d KB, L3=%I64d KB, L4=%I64d KB\r\nCPU core count=%d, HyperThreading=%d\r\n",
     		pTopology->pointL1 / 1024 , pTopology->pointL2 / 1024 , pTopology->pointL3 / 1024 , pTopology->pointL4 / 1024 ,
     		pTopology->coresCount , pTopology->hyperThreadingFlag );
-    // Set memory regions and threads count by selected memory object
+    */
+	int kl1 = pTopology->pointL1 / 1024;
+	int kl2 = pTopology->pointL2 / 1024;
+	int kl3 = pTopology->pointL3 / 1024;
+	int kl4 = pTopology->pointL4 / 1024;
+	int kcc = pTopology->coresCount;
+	int kht = pTopology->hyperThreadingFlag;
+    printf( "cache points for data read/write:\r\nL1=%d KB, L2=%d KB, L3=%d KB, L4=%d KB\r\nCPU core count=%d, HyperThreading=%d\r\n",
+    		kl1, kl2, kl3, kl4, kcc, kht );
+    //
+	
+	// Set memory regions and threads count by selected memory object
 	DWORD64 mSize = 0;
 	switch ( opMemory )
 	{
@@ -299,14 +313,25 @@ void MemoryScenario::execute( )
 	// Benchmark scenario, run threads
 	printf( "\r\nrunning threads..." );
 	opStatus = controlSet->pThreadsBuilder->runThreads( &ov );
+	
+	/*
 	printf( "done\r\ndTSC=%016Xh\r\n", ov.resultDeltaTsc );
+	*/
+	dst = saveDst;
+	max = saveMax;
+	AppLib::print64( dst, max, ov.resultDeltaTsc, TRUE );
+	*dst = 0;
+	// printf( "done\r\ndTSC=%s\r\n", saveDst );
+	printf( "done ( dTSC=%s )\r\n", saveDst );
+	//
+	
 	if ( !opStatus )
 	{
 		printf( "\r\nrun threads error.\r\n\r\n" );
 		return;
 	}
 	// Benchmark process and calculation variables
-	printf( "allocate statistics array..." );
+	printf( "allocate statistics arrays..." );
 	double megabytes = 0.0;
 	double seconds = 0.0;
 	double mbps = 0.0;
@@ -334,26 +359,40 @@ void MemoryScenario::execute( )
 	blockSize = ic.startSize;
 	blockDelta = ic.deltaSize;
 	// Build statistics list, print allocation
-	// blockMax = elements count, ma = element size in bytes, pa = pointer to statistics array
+	// blockMax = elements count, ma = element size in bytes,
+	// pMbps = pointer to statistics array, bandwidth, megabytes per second
+	// pNs   = pointer to statistics array, latency, nanoseconds
 	int ma = sizeof( double ) * ( blockMax + 1 );
-	double* pa = ( double* )malloc( ma );
-	double* pa1 = pa;
-	// Blank statistics array
-	for( int i=0; i<(blockMax+1); i++ )
+	double* pMbps = ( double* )malloc( ma );
+	double* pNs =   ( double* )malloc( ma );
+
+	// Verify and show statistics arrays allocation	
+	if ( ( pMbps == NULL ) || ( pNs == NULL ) )
 	{
-		*pa1 = 0.0;
-		pa1++; 
+		printf( "FAILED\r\nError at memory allocation for statistics arrays.\r\n\r\n" );
+		return;
 	}
+	else
+	{
 	// Prepare for text write
 	dst = saveDst;
 	max = saveMax;
-	AppLib::printBaseAndSize( dst, max, ( DWORD64 )pa, ma );
+	AppLib::printString( dst, max, "done\r\nbandwidth statistics, " );
+	AppLib::printBaseAndSize( dst, max, ( DWORD64 )pMbps, ma );
+	AppLib::printString( dst, max, "\r\nlatency statistics,   " );
+	AppLib::printBaseAndSize( dst, max, ( DWORD64 )pNs, ma );
 	*dst = 0;
-	printf( "done\r\nstatistics array allocated: %s\n", saveDst );
-	if ( pa == NULL )
+	printf( "%s", saveDst );
+	}
+	// Blank both statistics arrays
+	double* pMbps1 = pMbps;
+	double* pNs1 = pNs;
+	for( int i=0; i<(blockMax+1); i++ )
 	{
-		printf( "\r\nError at memory allocation for statistics array.\r\n\r\n" );
-		return;
+		*pMbps1 = 0.0;
+		*pNs1 = 0.0;
+		pMbps1++; 
+		pNs1++;
 	}
 	// Prepare for print input conditions
 	dst = saveDst;
@@ -376,8 +415,25 @@ void MemoryScenario::execute( )
 	        opAsm, opThreads, ic.pagingMode, saveDst );
 		// otherwise printf crush in the 32-bit mode
 	}
+	
+	/*
 	printf( "     start=%d, end=%d, delta=%d, bpi=%d\n", 
 	        ( int )ic.startSize, ( int )ic.endSize, ( int )ic.deltaSize, bytesPerInstruction );
+	*/
+	dst = saveDst;
+	max = saveMax;
+	AppLib::printString( dst, max, "     start=" );
+	AppLib::printCellMemorySize( dst, max, ic.startSize, 1 );
+	AppLib::printString( dst, max, ", end=" );
+	AppLib::printCellMemorySize( dst, max, ic.endSize, 1 );
+	AppLib::printString( dst, max, ", delta=" );
+	AppLib::printCellMemorySize( dst, max, ic.deltaSize, 1 );
+	AppLib::printString( dst, max, ", bpi=" );
+	AppLib::printCellMemorySize( dst, max, bytesPerInstruction, 1 );
+	*dst=0;
+	printf( "%s\r\n", saveDst );
+	//
+	
 	// Calibration
 	if ( ( opRepeats2 == OPTION_NOT_SET ) && ( opRepeats3 == OPTION_NOT_SET ) )
 	{
@@ -405,12 +461,14 @@ void MemoryScenario::execute( )
 		double cTarget = CALIBRATION_TARGET_TIME;
 		double cRepeats = opRepeats1 * ( cTarget / cTime );
 		opRepeats1 = cRepeats;
-		printf( "done\r\ndelay=%.3f seconds, update repeats=%d. \n", cTime, opRepeats1 );
+		// printf( "done\r\ndelay=%.3f seconds, update repeats=%d. \n", cTime, opRepeats1 );
+		printf( "done ( delay=%.3f seconds, update repeats=%d )\r\n", cTime, opRepeats1 );
 		iv.currentMeasurementRepeats = opRepeats1;
 		controlSet->pThreadsBuilder->updateThreadsList( &iv );
 	}
 
 #define BENCHMARK_TABLE_WIDTH 55
+#define STATISTICS_TABLE_WIDTH 78
 
 	// Print parameters names and table up line
 	printf ( "\r\n   #        size   CPI     nsPI    MBPS\r\n" );
@@ -421,7 +479,8 @@ void MemoryScenario::execute( )
 	printf( "%s", saveDst );
 	        
 	// Start measurements cycle for different block sizes, show table: speed = f(size)
-	pa1 = pa;
+	pMbps1 = pMbps;
+	pNs1 = pNs;
 	for( blockCount=0; blockCount<=blockMax; blockCount++ )
 	{
 
@@ -477,26 +536,56 @@ void MemoryScenario::execute( )
 		seconds = ov.resultDeltaTsc * periodSeconds;
 		mbps = megabytes / seconds;
 		
-		printf ( "%4d%12d%8.3f%8.3f   %-10.3f\n", blockCount+1, blockSize, cpi, nspi, mbps );
+		printf ( "%4d%12d%8.3f%8.3f   %-10.3f\r\n", blockCount+1, blockSize, cpi, nspi, mbps );
 		
-		*pa1++ = mbps;
+		*pMbps1++ = mbps;
+		*pNs1++ = nspi;
 		blockSize += blockDelta;
 	}
 
-	// Statistics calculate and show
+	// Results table down line
 	dst = saveDst;
 	max = saveMax;
 	AppLib::printLine( dst, max, BENCHMARK_TABLE_WIDTH );
 	*dst = 0;
 	printf( "%s", saveDst );
-	AppLib::calculateStatistics( blockMax+1, pa, &resultMin, &resultMax, &resultAverage, &resultMedian );
-	*dst = 0;
-	printf( "\n | max=%-10.3f | min=%-10.3f | average=%-10.3f | median=%-10.3f |\n", 
+	
+	// Statistics calculate and show, select branches for bandwidth or latency
+	const char* statisticsName = NULL;
+	double* statisticsPointer = NULL;
+	if ( ( iv.currentMethodId != CPU_FEATURE_LATENCY_LCM    ) &&
+	   ( iv.currentMethodId != CPU_FEATURE_LATENCY_RDRAND )  )
+	{
+		statisticsName = "Bandwidth ( megabytes per second )";
+		statisticsPointer = pMbps;
+	}
+	else
+	{
+		statisticsName = "Latency ( nanoseconds )";
+		statisticsPointer = pNs;
+	}
+	// Statistics calculate and show, f(selected method)
+	AppLib::calculateStatistics( blockMax+1, statisticsPointer, 
+								 &resultMin, &resultMax, &resultAverage, &resultMedian );
+	dst = saveDst;
+	max = saveMax;
+	int nchars = 0;
+	nchars = snprintf ( dst, max, "\r\n %s\r\n", statisticsName );
+	dst += nchars;
+	max -= nchars;
+	AppLib::printLine( dst, max, STATISTICS_TABLE_WIDTH );
+	nchars = snprintf( dst, max, " | max=%-10.3f | min=%-10.3f | average=%-10.3f | median=%-10.3f |\r\n", 
 			resultMax, resultMin, resultAverage, resultMedian );
+	dst += nchars;
+	max -= nchars;
+	AppLib::printLine( dst, max, STATISTICS_TABLE_WIDTH );
+	*dst = 0;
+	printf( "%s", saveDst );
 	
 	// Delete created objects and termination
 	printf( "\r\ndelete local objects..." );
-	free ( pa );
+	free ( pMbps );
+	free ( pNs );
 	controlSet->pThreadsBuilder->releaseThreadsList( );
 	if ( ( opNuma == NUMA_LOCAL ) || ( opNuma == NUMA_REMOTE ) )
 	{

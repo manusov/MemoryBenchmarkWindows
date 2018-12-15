@@ -8,11 +8,11 @@
 
 // Build type strings definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.60.00 for Windows ia32."
+#define BUILD_STRING "v0.60.01 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.60.00 for Windows x64."
+#define BUILD_STRING "v0.60.01 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -129,13 +129,13 @@ typedef struct {
 	SIZE_T    ( __stdcall *API_GetLargePageMinimum              ) ( );
 	UINT      ( __stdcall *API_GetSystemFirmwareTable           ) ( DWORD, DWORD, PVOID, DWORD );
 	// This application DLL functions
-    void ( __stdcall *DLL_GetDllStrings   ) ( char** , char** , char** );
-    BOOL ( __stdcall *DLL_CheckCpuid      ) ( void );
-    void ( __stdcall *DLL_ExecuteCpuid    ) ( DWORD, DWORD, DWORD* , DWORD* , DWORD* , DWORD* );
-    void ( __stdcall *DLL_ExecuteRdtsc    ) ( DWORDLONG* );
-    void ( __stdcall *DLL_ExecuteXgetbv   ) ( DWORDLONG* );
-    BOOL ( __stdcall *DLL_MeasureTsc      ) ( DWORDLONG* );
-    BOOL ( __stdcall *DLL_PerformanceGate ) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );
+	void ( __stdcall *DLL_GetDllStrings   ) ( char** , char** , char** );
+	BOOL ( __stdcall *DLL_CheckCpuid      ) ( void );
+	void ( __stdcall *DLL_ExecuteCpuid    ) ( DWORD, DWORD, DWORD* , DWORD* , DWORD* , DWORD* );
+	void ( __stdcall *DLL_ExecuteRdtsc    ) ( DWORDLONG* );
+	void ( __stdcall *DLL_ExecuteXgetbv   ) ( DWORDLONG* );
+	BOOL ( __stdcall *DLL_MeasureTsc      ) ( DWORDLONG* );
+	BOOL ( __stdcall *DLL_PerformanceGate ) ( DWORD, byte* , byte* , size_t , size_t , DWORDLONG* );
 } FUNCTIONS_LIST;
 
 // Processor information, required for benchmarks scenarios

@@ -1,25 +1,27 @@
 /*
-     MEMORY PERFORMANCE ENGINE FRAMEWORK DEBUG MODULE
+     MEMORY PERFORMANCE ENGINE FRAMEWORK DEBUG MODULE.
 */
 
 /*
 
 TODO:
 1)  + Make minimal user help.
-2)  Test builds ia32 and x64, verify at some options set.
-3)  64-bit verify all options.
-4)  32-bit verify all options.
-5)  Bug return from memory test scenario when objects not released.
-6)  Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
-7)  Special visualization for latency.
-8)  Some format changes, reduce number of strings, ( data ) after done, example ...done( dTSC= ... ).
-9)  Detalize WinAPI errors codes.
-10) Detailze status string error codes, use "s" at classes.
-11) Return some log, rejected when go from v0.5x to v0.6x.
-12) File report modes.
-13) MMX modes.
-14) Find optimal method for blank structures and arrays.
-15) %I64d and 64-bit printf arguments can crush printf in the 32-bit mode.
+2)  + Test builds ia32 and x64, verify at some options set.
+3)  + Inspect printf/snprintf usage. 64-bit printf arguments can crush printf in the 32-bit mode. Not use %I64D.
+4)  + Some format changes, reduce number of strings, ( data ) after done, example ...done( dTSC= ... ).
+5)  + Special visualization for latency.
+
+6)  64-bit verify all options.
+7)  32-bit verify all options.
+8)  Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
+9)  Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
+10) Detalize WinAPI errors codes.
+11) Detailze status string error codes, use "s" at classes.
+12) Return some log, rejected when go from v0.5x to v0.6x. Status string "s", plus OS error code.
+13) File report modes.
+14) Add MMX modes. This can be highest speed for 32-bit CPU, example Athlon/Duron for socket A (Socket 462).
+15) Find optimal method for blank structures and arrays.
+
 
 */
 

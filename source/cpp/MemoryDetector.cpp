@@ -53,11 +53,22 @@ SYSTEM_MEMORY_DATA* MemoryDetector::getMemoryList( )
 void MemoryDetector::getMemoryText( LPSTR &dst, size_t &max )
 {
 	int count = 0;
+	
+	/*
 	DWORDLONG x1 = memoryData.physicalMemory / 1024;
 	DWORDLONG x2 = memoryData.freeMemory / 1024;
 	count = snprintf( dst, max, "installed memory = %I64d KB, free = %I64d KB\r\n", x1, x2 );
 	dst += count;
 	max -= count;
+	*/
+	
+	DWORD64 x1 = memoryData.physicalMemory;
+	DWORD64 x2 = memoryData.freeMemory;
+	AppLib::printString( dst, max, "installed memory = " );
+	AppLib::printCellMemorySize( dst, max, x1, 1 );
+	AppLib::printString( dst, max, ", free = " );
+	AppLib::printCellMemorySize( dst, max, x2, 1 );
+	AppLib::printCrLf( dst, max );
 }
 
 // Method returns status string, valid if error returned
