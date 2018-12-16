@@ -14,7 +14,9 @@ char ProcessorDetector::s[NS];
 #if NATIVE_WIDTH == 32
 const BYTE ProcessorDetector::bytesPerInstruction[] = 
 {
-     4,  4,  4,  4,  4,  4, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
+     4,  4,  4,  4,  4,  4,
+	 8,  8,  8, 
+	16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
     16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32,
      8,  8
 };
@@ -22,7 +24,9 @@ const BYTE ProcessorDetector::bytesPerInstruction[] =
 #if NATIVE_WIDTH == 64
 const BYTE ProcessorDetector::bytesPerInstruction[] = 
 {
-     8,  8,  8,  8,  8,  8, 16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
+     8,  8,  8,  8,  8,  8,
+	 8,  8,  8, 
+	16, 16, 16, 32, 32, 32, 64, 64, 64, 32, 64,
     16, 16, 32, 32, 64, 64, 16, 16, 32, 32, 64, 64, 16, 16, 32,
      8,  8
 };
@@ -47,6 +51,11 @@ const char* ProcessorDetector::instructionStrings[] =
 	"write 64-bit REP STOSQ",
 	"copy 64-bit REP MOVSQ",
 #endif
+// start of added at v0.60.03
+	"read 64-bit MMX MOVQ",
+	"write 64-bit MMX MOVQ",
+	"copy 64-bit MMX MOVQ",
+// end of added at v0.60.03
 	"read 128-bit SSE MOVAPS",
 	"write 128-bit SSE MOVAPS",
 	"copy 128-bit SSE MOVAPS",
@@ -83,6 +92,10 @@ const char* ProcessorDetector::instructionStrings[] =
 const CPUID_CONDITION ProcessorDetector::x[] = {
 	// Unconditional x86-64 base instruction set
 	{ ORMASK      , 0          , 0          , NOREG  , 0                       , CPU_FEATURES_UNCONDITIONAL } ,
+// start of added at v0.60.03
+	// MMX required
+	{ ORMASK      , 0x00000001 , 0x00000000 , EDX    , 1<<23                   , CPU_FEATURES_MMX64         } ,
+// end of added at v0.60.03
 	// SSE required
 	{ ORMASK      , 0x00000001 , 0x00000000 , EDX    , 1<<25                   , CPU_FEATURES_SSE128        } ,
 	// AVX256 include context management required
@@ -107,6 +120,9 @@ const CPUID_CONDITION ProcessorDetector::x[] = {
 // Control structure for detect optional supported OS context management features, decoder for XGETBV results
 const XGETBV_CONDITION ProcessorDetector::y[] = {
 	{ UNCOND     , 0                           , CPU_FEATURES_UNCONDITIONAL } ,
+// start of added at v0.60.03
+	{ UNCOND     , 0                           , CPU_FEATURES_MMX64         } ,
+// end of added at v0.60.03
 	{ UNCOND     , 0                           , CPU_FEATURES_SSE128        } ,
 	{ UNCOND     , 0                           , CPU_FEATURES_MOVNTDQA128   } ,
 	{ ORMASK     , 1<<2                        , CPU_FEATURES_AVX256        } ,
@@ -279,11 +295,30 @@ BYTE ProcessorDetector::getBytesPerInstruction( int i )
 }
 
 
+const char* ProcessorDetector::getInstructionString( int i )
+{
+	return instructionStrings[i];
+}
+
 // ---------- Public methods for CPUID and XGETBV support (ported from v0.5x) ----------
 
 // This method used for auto select method, for temporal mode (cacheable)
 DWORD ProcessorDetector::findMaxMethodTemporal( DWORD64 bitmapCpu, DWORD64 bitmapOs )
 {
+    DWORD64 bitmap = bitmapCpu & bitmapOs;
+    int select = CPU_FEATURE_READ_AVX512;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_AVX256;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_SSE128;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_MMX64;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_IA32_X64;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    return OPTION_NOT_SET;
+
+/*
     DWORD64 bitmap = bitmapCpu & bitmapOs;
     DWORD mask = 0;
     DWORD select = 0;
@@ -300,12 +335,22 @@ DWORD ProcessorDetector::findMaxMethodTemporal( DWORD64 bitmapCpu, DWORD64 bitma
     {
         select = CPU_FEATURE_READ_SSE128;
     }
-    // Try SSE128 read memory method
+    
+	// start of changed at v0.60.03
+	// Try SSE128 read memory method
     mask = ( ( DWORDLONG )1 ) << select;
+    if ( ! ( mask & bitmap ) )
+    {
+        select = CPU_FEATURE_READ_MMX64;   // CPU_FEATURE_READ_IA32_X64;
+    }
+    // Try MMX64 read memory method
+	mask = ( ( DWORDLONG )1 ) << select;
     if ( ! ( mask & bitmap ) )
     {
         select = CPU_FEATURE_READ_IA32_X64;
     }
+	// end of changed at v0.60.03
+	 
     // Try common x86 or x86-64 read memory method
     mask = ( ( DWORDLONG )1 ) << select;
     if ( ! ( mask & bitmap ) )
@@ -313,11 +358,26 @@ DWORD ProcessorDetector::findMaxMethodTemporal( DWORD64 bitmapCpu, DWORD64 bitma
         select = OPTION_NOT_SET;
     }
     return select;
+*/
 }
 
 // This method used for auto select method, for non-temporal mode (uncacheable)
 DWORD ProcessorDetector::findMaxMethodNonTemporal( DWORD64 bitmapCpu, DWORD64 bitmapOs )
 {
+    DWORD64 bitmap = bitmapCpu & bitmapOs;
+    int select = CPU_FEATURE_NTRW_READ_AVX512;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_NTPRW_READ_AVX256;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_NTPRW_READ_SSE128;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_MMX64;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    select = CPU_FEATURE_READ_IA32_X64;
+    if ( mapCheck ( bitmap, select ) ) return select;
+    return OPTION_NOT_SET;
+
+/*
     DWORD64 bitmap = bitmapCpu & bitmapOs;
     DWORD mask = 0;
     DWORD select = 0;
@@ -334,19 +394,45 @@ DWORD ProcessorDetector::findMaxMethodNonTemporal( DWORD64 bitmapCpu, DWORD64 bi
     {
         select = CPU_FEATURE_NTPRW_READ_SSE128;
     }
+    
+    // start of changed at v0.60.03
     // Try SSE128 read memory method
+    mask = ( ( DWORDLONG )1 ) << select;
+    if ( ! ( mask & bitmap ) )
+    {
+        select = CPU_FEATURE_READ_MMX64;   // CPU_FEATURE_READ_IA32_X64;
+    }
+    // Try MMX64 read memory method
     mask = ( ( DWORDLONG )1 ) << select;
     if ( ! ( mask & bitmap ) )
     {
         select = CPU_FEATURE_READ_IA32_X64;
     }
-    // Try common x86 or x86-64 read memory method
+	// end of changed at v0.60.03
+	
+	// Try common x86 or x86-64 read memory method
     mask = ( ( DWORDLONG )1 ) << select;
     if ( ! ( mask & bitmap ) )
     {
         select = OPTION_NOT_SET;
     }
     return select;
+*/
+}
+
+// Helper method for test 64-bit map, prevent overflow of 32-bit operations
+BOOL ProcessorDetector::mapCheck( DWORD64 map, int index )
+{
+	int i1 = index;
+	int i2 = 0;
+	if ( index > 31 )
+	{
+		i1 = 31;
+		i2 = index - 31;
+	}
+	map = map >> i1;
+	map = map >> i2;
+	return ( map & 1L );
 }
 
 // ---------- Private helpers methods (ported from v0.5x) ----------

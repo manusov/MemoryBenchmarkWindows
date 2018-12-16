@@ -46,6 +46,15 @@ typedef struct {
 #define CPU_FEATURES_RDRAND                            \
 ((DWORDLONG)1) << CPU_FEATURE_LATENCY_RDRAND
 
+// start of added at v0.60.03
+// This features validated by MMX feature bit:
+// CPUID function 00000001h register EDX bit 23
+#define CPU_FEATURES_MMX64                         \
+((DWORDLONG)1) << CPU_FEATURE_READ_MMX64 |         \
+((DWORDLONG)1) << CPU_FEATURE_WRITE_MMX64 |        \
+((DWORDLONG)1) << CPU_FEATURE_COPY_MMX64
+// end of added at v0.60.03
+
 // This features validated by SSE feature bit:
 // CPUID function 00000001h register EDX bit 25
 #define CPU_FEATURES_SSE128                        \
@@ -128,6 +137,7 @@ class ProcessorDetector
 		DWORD findMaxMethodNonTemporal( DWORD64 bitmapCpu, DWORD64 bitmapOs );
 		BOOL measureTSC( );
 		BYTE getBytesPerInstruction( int i );
+		const char* getInstructionString( int i );
         char* getStatusString( );
 	private:
 		static const BYTE bytesPerInstruction[];
@@ -147,6 +157,8 @@ class ProcessorDetector
 		void buildOsBitmap( DWORD64 &osBitmap );
 		BOOL getCpuidFeature( DWORD function, DWORD subfunction, CPUID_OUTPUT reg, DWORD bitmask );
 		BOOL getXgetbvFeature( DWORD bitmask );
+		// Helper methods for 64-bit mask checks
+		BOOL mapCheck( DWORD64 map, int index );
 };
 
 #endif  // PROCESSORDETECTOR_H

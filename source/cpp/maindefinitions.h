@@ -8,11 +8,11 @@
 
 // Build type strings definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.60.01 for Windows ia32."
+#define BUILD_STRING "v0.60.03 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.60.01 for Windows x64."
+#define BUILD_STRING "v0.60.03 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
@@ -39,7 +39,8 @@
 #define DEFAULT_HT_MODE OPTION_NOT_SET
 #define DEFAULT_NUMA_MODE OPTION_NOT_SET
 
-#define MAXIMUM_ASM_METHOD 33
+// #define MAXIMUM_ASM_METHOD 33
+#define MAXIMUM_ASM_METHOD 36
 
 #define APPROXIMATION_REPEATS       2000000
 #define APPROXIMATION_REPEATS_L1    2000000
@@ -67,6 +68,11 @@ CPU_FEATURE_MODIFY_IA32_X64,
 CPU_FEATURE_WRITE_STRINGS_IA32_X64,
 CPU_FEATURE_COPY_STRINGS_IA32_X64,
 // Start optionally supported features
+// start of added at v0.60.03
+CPU_FEATURE_READ_MMX64,
+CPU_FEATURE_WRITE_MMX64,
+CPU_FEATURE_COPY_MMX64,
+// end of added at v0.60.03
 CPU_FEATURE_READ_SSE128,
 CPU_FEATURE_WRITE_SSE128,
 CPU_FEATURE_COPY_SSE128,

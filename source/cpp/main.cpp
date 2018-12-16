@@ -1,5 +1,7 @@
 /*
+
      MEMORY PERFORMANCE ENGINE FRAMEWORK DEBUG MODULE.
+     
 */
 
 /*
@@ -11,17 +13,32 @@ TODO:
 4)  + Some format changes, reduce number of strings, ( data ) after done, example ...done( dTSC= ... ).
 5)  + Special visualization for latency.
 
-6)  64-bit verify all options.
-7)  32-bit verify all options.
-8)  Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
-9)  Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
-10) Detalize WinAPI errors codes.
-11) Detailze status string error codes, use "s" at classes.
-12) Return some log, rejected when go from v0.5x to v0.6x. Status string "s", plus OS error code.
-13) File report modes.
-14) Add MMX modes. This can be highest speed for 32-bit CPU, example Athlon/Duron for socket A (Socket 462).
-15) Find optimal method for blank structures and arrays.
+6) + Bug with 32-bit copy, address *8, required *4.
+7) + Crush: 32-bit mode: writemmx64.
+8) + Crush: 32-bit mode: latencylcm, latencyrdrand.
+9) + Add MMX modes. This can be highest speed for 32-bit CPU, example Athlon/Duron for socket A (Socket 462).
+	  + backup v0.60.02 to "C:\2-cpp\06-mpe-v06x-OLD", update this version number to v0.60.03
+	  + add MMX methods to ia32 library, reorder methods list is INCOMPATIBLE modification, this application must be updated
+	  + add MMX methods to x64 library, reorder methods list is INCOMPATIBLE modification, this application must be updated.
+      + maindefinitions.h ( +42, +69 )
+      + commandline.cpp ( +38 )
+      + processordetector.h ( +49 )
+      + processordetector.cpp ( +18, +28, +54, +95, +123, +320, +364 ).
 
+10) + Asm method id must be decoded as routine name, otherwise user view unknown method, numeric id only.
+11) + Remove "GUI" option from DLLs. Recompile for 32/64.
+12) + Bug with select max temporal and max non temporal methods, shifts and comparing 32 instead 64.
+
+13) 64-bit verify all options.
+14) 32-bit verify all options.
+15) Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
+16) Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
+17) Detalize WinAPI errors codes.
+18) Detailze status string error codes, use "s" at classes.
+19) Return some log, rejected when go from v0.5x to v0.6x. Status string "s", plus OS error code. See 2 previous items.
+20) File report modes.
+21) Find optimal method for blank structures and arrays.
+22) Sequencing: user help must be without hardware initialization, get command line must be before hardware initialization.
 
 */
 

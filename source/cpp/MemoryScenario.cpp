@@ -466,6 +466,9 @@ void MemoryScenario::execute( )
 		iv.currentMeasurementRepeats = opRepeats1;
 		controlSet->pThreadsBuilder->updateThreadsList( &iv );
 	}
+	// decode read-write method name
+	const char* iname = controlSet->pProcessorDetector->getInstructionString( opAsm );
+	printf( "\r\n[ %s ]\r\n", iname );
 
 #define BENCHMARK_TABLE_WIDTH 55
 #define STATISTICS_TABLE_WIDTH 78

@@ -1,4 +1,4 @@
-format PE64 GUI 4.0 DLL
+format PE64 DLL
 entry  DllMain
 include 'win64a.inc'
 
@@ -211,6 +211,9 @@ include 'copy_mov64.inc'
 include 'modify_not64.inc'
 include 'write_stosq.inc'
 include 'copy_movsq.inc'
+include 'read_mmx64.inc'
+include 'write_mmx64.inc'
+include 'copy_mmx64.inc'
 include 'read_sse128.inc'
 include 'write_sse128.inc'
 include 'copy_sse128.inc'
@@ -247,7 +250,7 @@ include 'latency_walk.inc'
 ; Data section
 section '.data' data readable writeable
 StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.21.00 for Windows x64.',0
+StringVersion    DB 'v0.22.00 for Windows x64.',0
 StringCopyright  DB '(C)2018 IC Book Labs.',0
 
 ; Pointers to performance patterns
@@ -260,6 +263,11 @@ DQ  Pattern_Copy_MOV64
 DQ  Pattern_Modify_NOT64
 DQ  Pattern_Write_STOSQ
 DQ  Pattern_Copy_MOVSQ
+;
+DQ  Pattern_Read_MMX64
+DQ  Pattern_Write_MMX64
+DQ  Pattern_Copy_MMX64
+;
 DQ  Pattern_Read_SSE128
 DQ  Pattern_Write_SSE128
 DQ  Pattern_Copy_SSE128

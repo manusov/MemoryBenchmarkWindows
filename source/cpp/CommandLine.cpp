@@ -28,17 +28,20 @@ const char* CommandLine::keysTest[] = {
 const char* CommandLine::keysAsm[] = { 
 // default temporal methods
 #if NATIVE_WIDTH == 32
-    "readmov32", "writemov32", "copymov32", "modifynot32",
-    "writestring32", "copystring32",
+	"readmov32", "writemov32", "copymov32", "modifynot32",
+	"writestring32", "copystring32",
 #endif
 #if NATIVE_WIDTH == 64
-    "readmov64", "writemov64", "copymov64", "modifynot64",
-    "writestring64", "copystring64",
+	"readmov64", "writemov64", "copymov64", "modifynot64",
+	"writestring64", "copystring64",
 #endif
-    "readsse128", "writesse128", "copysse128",
-    "readavx256", "writeavx256", "copyavx256",
-    "readavx512", "writeavx512", "copyavx512",
-    "dotfma256",  "dotfma512",
+// start of added at v0.60.03
+	"readmmx64", "writemmx64", "copymmx64",
+// end of added at v0.60.03
+	"readsse128", "writesse128", "copysse128",
+	"readavx256", "writeavx256", "copyavx256",
+	"readavx512", "writeavx512", "copyavx512",
+	"dotfma256",  "dotfma512",
 // methods with nontemporal write ((v)movntps, ((v)movntpd)
 	"ntwwritesse128", "ntwcopysse128",
 	"ntwwriteavx256", "ntwcopyavx256",
