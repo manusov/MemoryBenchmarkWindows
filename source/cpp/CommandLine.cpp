@@ -24,6 +24,12 @@ const char* CommandLine::keysTest[] = {
 	NULL
 };
 
+// Keys for output mode select
+const char* CommandLine::keysOut[] = {
+	"screen", "file",
+	NULL
+};
+
 // Methods for read-write memory by CPU instruction set
 const char* CommandLine::keysAsm[] = { 
 // default temporal methods
@@ -95,6 +101,8 @@ const OPTION_ENTRY CommandLine::options[] = {
 	{ "help"            , keysHelp        , &parms.optionHelp        , SELPARM } ,
 	{ "info"            , keysInfo        , &parms.optionInfo        , SELPARM } ,
 	{ "test"            , keysTest        , &parms.optionTest        , SELPARM } ,
+	// key for output mode select, screen or file
+	{ "out"             , keysOut         , &parms.optionOut         , SELPARM } ,
 	// keys for benchmarking
     { "asm"             , keysAsm         , &parms.optionAsm         , SELPARM } ,
     { "memory"          , keysMemory      , &parms.optionMemory      , SELPARM } ,
@@ -167,6 +175,8 @@ void CommandLine::resetBeforeParse( )
 	parms.optionHelp = DEFAULT_HELP_SCENARIO;
 	parms.optionInfo = DEFAULT_INFO_SCENARIO;
 	parms.optionTest = DEFAULT_TEST_SCENARIO;
+	// Output options, screen or file
+	parms.optionOut = OUT_SCREEN;
     // Benchmark options
 	parms.optionAsm = DEFAULT_ASM_METHOD;
     parms.optionMemory = DEFAULT_MEMORY_OBJECT;

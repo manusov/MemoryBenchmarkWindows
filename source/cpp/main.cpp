@@ -12,7 +12,7 @@ TODO:
 3)  + Inspect printf/snprintf usage. 64-bit printf arguments can crush printf in the 32-bit mode. Not use %I64D.
 4)  + Some format changes, reduce number of strings, ( data ) after done, example ...done( dTSC= ... ).
 5)  + Special visualization for latency.
-
+--- v0.60.03 ---
 6) + Bug with 32-bit copy, address *8, required *4.
 7) + Crush: 32-bit mode: writemmx64.
 8) + Crush: 32-bit mode: latencylcm, latencyrdrand.
@@ -24,21 +24,29 @@ TODO:
       + commandline.cpp ( +38 )
       + processordetector.h ( +49 )
       + processordetector.cpp ( +18, +28, +54, +95, +123, +320, +364 ).
-
 10) + Asm method id must be decoded as routine name, otherwise user view unknown method, numeric id only.
 11) + Remove "GUI" option from DLLs. Recompile for 32/64.
 12) + Bug with select max temporal and max non temporal methods, shifts and comparing 32 instead 64.
 
-13) 64-bit verify all options.
-14) 32-bit verify all options.
-15) Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
-16) Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
-17) Detalize WinAPI errors codes.
-18) Detailze status string error codes, use "s" at classes.
-19) Return some log, rejected when go from v0.5x to v0.6x. Status string "s", plus OS error code. See 2 previous items.
-20) File report modes.
-21) Find optimal method for blank structures and arrays.
-22) Sequencing: user help must be without hardware initialization, get command line must be before hardware initialization.
+13) File report modes.
+	 - base functionality.
+     - refactor saveDst vs txp operations, sometimes can remove txp.
+		use saveDst, saveMax for AppConsole::transmit, REMOVE txp and MAX_TRANSIT.
+	 - report copyright when out=file.
+	 - number of spaces when exit on different scenarios.
+
+14) Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
+15) Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
+16) Detalize WinAPI errors codes. Function printSystemError, replace printf to snprintf at this routine.
+17) Detailze status string error codes, use "s" at classes.
+18) Return some log, rejected when go from v0.5x to v0.6x. Status string "s", plus OS error code. See 2 previous items.
+19) Find optimal method for blank structures and arrays.
+20) Sequencing: user help must be without hardware initialization, get command line must be before hardware initialization.
+21) Bug if ht=off when HT not supported, ThreadsBuilder.cpp, line 260. Or correct before call buildThreadsList().
+
+22) 64-bit verify all options. Include AVX512, NUMA, Processor Groups. Required platform.
+23) 32-bit verify all options. Include AVX512, NUMA, Processor Groups. Required platform.
+
 
 */
 
@@ -47,6 +55,7 @@ TODO:
 #include "maindefinitions.h"
 #include "maincontrolset.h"
 #include "AppLib.h"
+#include "AppConsole.h"
 #include "CommandLine.h"
 #include "SysinfoScenario.h"
 #include "MemoryScenario.h"
@@ -242,72 +251,90 @@ int main(int argc, char** argv)
 	END OF DEBUG
 */
 
-	// Show title
-	printf( "\r\n%s %s %s\r\n", stringTitle1, stringTitle2, stringTitle3 );
-	// Control and status variables
-	COMMAND_LINE_PARMS* pp = NULL;
-	BOOL opStatus;
-	DWORD osErrorCode;
-	LPCSTR statusString;
 	// Allocate memory for text buffer
 	int mText = sizeof( char ) * TEXT_SIZE;
 	pTextAlloc = ( char* )malloc( mText+1 );
 	if ( pTextAlloc == NULL )
 	{
-		printf( "\nError at memory allocation for text report buffer.\n" );
+		// Yet simple printf, because buffer not allocated
+		printf( "\r\nError at memory allocation for text report buffer.\r\n" );
 		return 1;
 	}
-	// Blank system classes pointers
-	s.pFunctionsLoader = NULL;
-	s.pProcessorDetector = NULL;
-	s.pTopologyDetector = NULL;
-	s.pMemoryDetector = NULL;
-	s.pPagingDetector = NULL;
-	s.pDomainsBuilder = NULL;
-	s.pThreadsBuilder = NULL;
-	// Create classes
-	printf( "load API..." );
-	s.pFunctionsLoader = new FunctionsLoader( );
-	pFunctionsList = s.pFunctionsLoader->getFunctionsList( );
-	printf( "done\r\ndetect processor features..." );
-	s.pProcessorDetector = new ProcessorDetector( pFunctionsList );
-	printf( "done\r\ndetect SMP and cache levels..." );
-	s.pTopologyDetector = new TopologyDetector( pFunctionsList );
-	printf( "done\r\ndetect memory..." );
-	s.pMemoryDetector = new MemoryDetector( pFunctionsList );
-	printf( "done\r\ndetect paging..." );
-	s.pPagingDetector = new PagingDetector( pFunctionsList );
-	printf( "done\r\ninitializing domains builder..." );
-	s.pDomainsBuilder = new DomainsBuilder( pFunctionsList );
-	printf( "done\r\ninitializing threads builder..." );
-	s.pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
-	printf( "done\r\nmeasure TSC clock..." );
-	s.pProcessorDetector->measureTSC( );
-	// Get application native library info, show string
-	printf( "done\r\nget library data..." );
-	char *dllProduct, *dllVersion, *dllVendor;
-	pFunctionsList->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
-	printf( "done\r\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
+	// Show title
+	AppConsole::setOutputOption( OUT_SCREEN );
+	snprintf( pTextAlloc, mText, "\r\n%s %s %s\r\n", stringTitle1, stringTitle2, stringTitle3 );
+	AppConsole::transmit( pTextAlloc );
+	
+	// Control and status variables
+	COMMAND_LINE_PARMS* pp = NULL;
+	BOOL opStatus;
+	DWORD osErrorCode;
+	LPCSTR statusString;
+	
 	// Get command line parameters
-	printf( "get command line parameters..." );
+	AppConsole::transmit( "get command line parameters..." );
 	pCommandLine = new CommandLine( );
 	pCommandLine->resetBeforeParse( );
 	osErrorCode = pCommandLine->parseCommandLine( argc, argv );
 	if ( osErrorCode )
 	{
-		printf( "FAILED\r\n" );
+		AppConsole::transmit( "FAILED\r\n" );
 		statusString = pCommandLine->getStatusString( );
-        printf( "\r\nERROR: %s\r\n\r\n", statusString );
+        snprintf( pTextAlloc, mText, "\r\nERROR: %s\r\n\r\n", statusString );
+        AppConsole::transmit( pTextAlloc );
         if ( osErrorCode > 0 )
         {
         	AppLib::printSystemError( osErrorCode );
+        	return 1;
     	}
 	}
 	else
 	{
-		printf( "done\r\n" );
+		AppConsole::transmit( "done\r\n" );
 		pCommandLine->correctAfterParse( );
 		pp = pCommandLine->getCommandLineParms( );
+		
+		// Support special file redirection mode
+		AppConsole::setOutputOption( pp->optionOut );
+		if ( pp->optionOut == OUT_FILE )
+		{
+			AppConsole::initializeOutput( );
+			AppConsole::transmit( pTextAlloc );  // copyright string to file
+		}
+
+		// Blank system classes pointers
+		s.pFunctionsLoader = NULL;
+		s.pProcessorDetector = NULL;
+		s.pTopologyDetector = NULL;
+		s.pMemoryDetector = NULL;
+		s.pPagingDetector = NULL;
+		s.pDomainsBuilder = NULL;
+		s.pThreadsBuilder = NULL;
+		// Create classes
+		AppConsole::transmit( "load API..." );
+		s.pFunctionsLoader = new FunctionsLoader( );
+		pFunctionsList = s.pFunctionsLoader->getFunctionsList( );
+		AppConsole::transmit( "done\r\ndetect processor features..." );
+		s.pProcessorDetector = new ProcessorDetector( pFunctionsList );
+		AppConsole::transmit( "done\r\ndetect SMP and cache levels..." );
+		s.pTopologyDetector = new TopologyDetector( pFunctionsList );
+		AppConsole::transmit( "done\r\ndetect memory..." );
+		s.pMemoryDetector = new MemoryDetector( pFunctionsList );
+		AppConsole::transmit( "done\r\ndetect paging..." );
+		s.pPagingDetector = new PagingDetector( pFunctionsList );
+		AppConsole::transmit( "done\r\ninitializing domains builder..." );
+		s.pDomainsBuilder = new DomainsBuilder( pFunctionsList );
+		AppConsole::transmit( "done\r\ninitializing threads builder..." );
+		s.pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
+		AppConsole::transmit( "done\r\nmeasure TSC clock..." );
+		s.pProcessorDetector->measureTSC( );
+		// Get application native library info, show string
+		AppConsole::transmit( "done\r\nget library data..." );
+		char *dllProduct, *dllVersion, *dllVendor;
+		pFunctionsList->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
+		snprintf( pTextAlloc, mText, "done\r\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
+		AppConsole::transmit( pTextAlloc );
+
 		// Select scenario
 		int opHelp = pp->optionHelp;
 		int opInfo = pp->optionInfo;
@@ -315,8 +342,7 @@ int main(int argc, char** argv)
 		// User help scenario
 		if ( opHelp != OPTION_NOT_SET )
 		{
-			printf( "run user help scenario.\r\n" );
-			// printf( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
+			AppConsole::transmit( "run user help scenario.\r\n" );
 			const OPTION_ENTRY* oplist = pCommandLine->getOptionsList( );
 			pUserHelp = new UserHelp( pTextAlloc, mText, opHelp, oplist );
 			pUserHelp->execute( );
@@ -324,7 +350,7 @@ int main(int argc, char** argv)
 		// System information scenario
 		if ( opInfo != OPTION_NOT_SET )
 		{
-			printf( "run system information scenario.\r\n" );
+			AppConsole::transmit( "run system information scenario.\r\n" );
 			pSysinfoScenario = new SysinfoScenario( pTextAlloc, mText, opInfo, &s );
 			pSysinfoScenario->execute( );
 		}
@@ -334,44 +360,44 @@ int main(int argc, char** argv)
 			// Benchmark scenario: memory
 			if ( opTest == TEST_MEMORY )
 			{
-				printf( "run memory benchmark scenario.\r\n" );
+				AppConsole::transmit( "run memory benchmark scenario.\r\n" );
 				pMemoryScenario = new MemoryScenario( pTextAlloc, mText, opTest, &s, pp );
 				pMemoryScenario->execute( );
 			}
 			// Benchmark scenario: mass storage
 			if ( opTest == TEST_STORAGE )
 			{
-				printf( "run mass storage benchmark scenario.\r\n" );
-				printf( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
+				AppConsole::transmit( "run mass storage benchmark scenario.\r\n" );
+				AppConsole::transmit( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
 			}
 		}
 		// Default scenario
 		if ( ( opHelp == OPTION_NOT_SET )&&( opInfo == OPTION_NOT_SET )&&( opTest == OPTION_NOT_SET ) )
 		{
-			printf( "run default scenario.\r\n" );
-			// printf( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
-			printf( "\r\nNO PARAMETERS, USE \"help=full\".\r\n\r\n" );
+			AppConsole::transmit( "run default scenario.\r\n" );
+			AppConsole::transmit( "\r\nNO PARAMETERS, USE \"help=full\".\r\n\r\n" );
 		}
 	}
 	// Scenario done, print message, release (delete) objects and exit
-	printf( "delete global objects..." );
-	// Release conditionally created objects
-	if ( pUserHelp != NULL )        delete pUserHelp;
+	AppConsole::transmit( "delete global objects..." );
+	// Delete scenario modules
+	if ( pUserHelp        != NULL ) delete pUserHelp;
 	if ( pSysinfoScenario != NULL ) delete pSysinfoScenario;
-	if ( pMemoryScenario != NULL )  delete pMemoryScenario;
+	if ( pMemoryScenario  != NULL ) delete pMemoryScenario;
 	if ( pStorageScenario != NULL ) delete pStorageScenario;
-	// Release unconditionally created objects
-	delete pCommandLine;
-	delete s.pThreadsBuilder;
-	delete s.pDomainsBuilder;
-	delete s.pPagingDetector;
-	delete s.pMemoryDetector;
-	delete s.pTopologyDetector;
-	delete s.pProcessorDetector;
-	delete s.pFunctionsLoader;
-	free( pTextAlloc );
+	// Delete classes
+	if ( s.pThreadsBuilder    != NULL ) delete s.pThreadsBuilder;
+	if ( s.pDomainsBuilder    != NULL ) delete s.pDomainsBuilder;
+	if ( s.pPagingDetector    != NULL ) delete s.pPagingDetector;
+	if ( s.pMemoryDetector    != NULL ) delete s.pMemoryDetector;
+	if ( s.pTopologyDetector  != NULL ) delete s.pTopologyDetector;
+	if ( s.pProcessorDetector != NULL ) delete s.pProcessorDetector;
+	if ( s.pFunctionsLoader   != NULL ) delete s.pFunctionsLoader;
+	if ( pCommandLine         != NULL ) delete pCommandLine;
+	// Release text buffer memory
+	if ( pTextAlloc != NULL ) free( pTextAlloc );
 	// Exit application with "done" message
-	printf( "done\r\n\r\n" );
+	AppConsole::transmit( "done\r\n\r\n" );
 	return 0;
 }
 

@@ -8,16 +8,20 @@
 
 // Build type strings definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.60.03 for Windows ia32."
+#define BUILD_STRING "v0.60.04 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.60.03 for Windows x64."
+#define BUILD_STRING "v0.60.04 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else
 #define BUILD_STRING "UNSUPPORTED PLATFORM."
 #endif
+
+// Input and output files default names
+#define INPUT_FILE_NAME  "input.txt"
+#define OUTPUT_FILE_NAME "output.txt"
 
 // Operational parameters
 #define MAXIMUM_THREADS           256
@@ -30,6 +34,7 @@
 #define DEFAULT_HELP_SCENARIO OPTION_NOT_SET
 #define DEFAULT_INFO_SCENARIO OPTION_NOT_SET
 #define DEFAULT_TEST_SCENARIO OPTION_NOT_SET
+#define DEFAULT_OUTPUT OUT_SCREEN
 
 #define DEFAULT_ASM_METHOD OPTION_NOT_SET
 #define DEFAULT_MEMORY_OBJECT OPTION_NOT_SET
@@ -57,6 +62,7 @@
 
 // Text report definitions
 #define TEXT_SIZE 100*1024
+#define TX_SIZE 4095
 
 // Enumerations for options settings
 // Also used for bitmaps generation for CPU and OS support
@@ -263,6 +269,10 @@ typedef enum {
 	TEST_MEMORY, TEST_STORAGE
 } TEST_KEYS;
 
+typedef enum {
+	OUT_SCREEN, OUT_FILE
+} OUT_KEYS;
+
 // Enumeration of target tested objects, argument for select block size and number of threads
 typedef enum {
 	CACHE_L1, CACHE_L2, CACHE_L3, CACHE_L4, DRAM
@@ -290,6 +300,8 @@ typedef struct {
 	DWORD optionHelp;
 	DWORD optionInfo;
 	DWORD optionTest;
+	// Output mode, screen or file
+	DWORD optionOut;
 	// Benchmark base option
     DWORD optionAsm;
     DWORD optionMemory;

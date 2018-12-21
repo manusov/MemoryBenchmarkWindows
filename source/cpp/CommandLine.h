@@ -22,6 +22,8 @@ class CommandLine
 		static const char* keysHelp[];
 		static const char* keysInfo[];
 		static const char* keysTest[];
+		// Output mode data, screen or file
+		static const char* keysOut[];
 		// Benchmark scenario data
 		static const char* keysAsm[];
 		static const char* keysMemory[];

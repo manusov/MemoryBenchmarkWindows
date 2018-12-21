@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=0000000100000000000001000
-UnitCount=29
+UnitCount=31
 
 [VersionInfo]
 Major=1
@@ -321,7 +321,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit30]
-FileName=SysinfoScenario.cpp
+FileName=AppConsole.h
 CompileCpp=1
 Folder=
 Compile=1
@@ -342,6 +342,16 @@ BuildCmd=
 
 [Unit20]
 FileName=CommandLine.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit31]
+FileName=AppConsole.cpp
 CompileCpp=1
 Folder=
 Compile=1

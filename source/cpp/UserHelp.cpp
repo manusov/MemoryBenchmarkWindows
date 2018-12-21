@@ -1,5 +1,3 @@
-// THIS MODULE IS RESERVED FOR FUTURE USE
-
 #include "UserHelp.h"
 
 char* UserHelp::saveDst;
@@ -33,69 +31,73 @@ void UserHelp::execute( )
 	const OPTION_ENTRY* p = optionsList;
 	const char** p1 = NULL;
 	// This unconditionally write
-	printf( "\r\noptions list:\r\n" );
+	AppConsole::transmit( "\r\noptions list:\r\n" );
 	while ( p->name != NULL )
 	{
-		printf( "%s", p->name );
+		snprintf( saveDst, saveMax, "%s", p->name );
+		AppConsole::transmit( saveDst );
 		p++;
 		if ( p->name != NULL )
 		{
-			printf( " " );
+			AppConsole::transmit( " " );
 		}
 	}
-	printf( "\r\n" );
+	AppConsole::transmit( "\r\n" );
 	// This write only if "help=full" mode
 	if ( enumOp == HELP_FULL )
 	{
-		printf( "\r\nvalues list:\r\n" );
+		AppConsole::transmit( "\r\nvalues list:\r\n" );
 		p = optionsList;
 		while ( p->name != NULL )
 		{
 			dst = saveDst;
 			max = saveMax;
 			AppLib::printCell( dst, p->name, max, MAX_OPTION_WIDTH );
-			printf( "%s= ", saveDst );
+			AppConsole::transmit( saveDst );
+			AppConsole::transmit( "= " );
 			switch ( p->routine )
 			{
 				case INTPARM:
-					printf( "< integer value >" );
+					AppConsole::transmit( "< integer value >" );
 					break;
 				case MEMPARM:
-					printf( "< value in memory size units, can use K/M/G, example \"4M\" >" );
+					AppConsole::transmit( "< value in memory size units, can use K/M/G, example \"4M\" >" );
 					break;
 				case SELPARM:
 					p1 = p->values;
 					k = 1;
 					while ( *p1 != NULL )
 					{
-						printf( "%s", *p1 );
+						snprintf( saveDst, saveMax, "%s", *p1 );
+						AppConsole::transmit( saveDst );
 						p1++;
 						if ( ( *p1 != NULL ) && ( ( k % 4 ) != 0 ) )
 						{
-							printf( " | " );
+							AppConsole::transmit( " | " );
 						}
 						if ( ( *p1 != NULL ) && ( ( k % 4 ) == 0 ) )
 						{
 							dst = saveDst;
 							max = saveMax;
 							AppLib::printCell( dst, " ", max, LEFT_INTERVAL );
-							printf( "\r\n%s", saveDst );
+							AppConsole::transmit( "\r\n" );
+							AppConsole::transmit( saveDst );
 						}
 					k++;
 					}
 					break;
 				case STRPARM:
-					printf( "< text string >" );
+					AppConsole::transmit( "< text string >" );
 					break;
 				default:
 					break;
 			}
 			p++;
-			printf( "\r\n" );
+			AppConsole::transmit( "\r\n" );
 		}
-		// printf( "\r\n" );
 	}
-	printf( "\r\n%s\r\n\r\n", exampleString );
+	snprintf( saveDst, saveMax, "\r\n%s\r\n\r\n", exampleString );
+	AppConsole::transmit( saveDst );
 }
 
 

@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o
-LINKOBJ  = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o
+OBJ      = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o AppConsole.o
+LINKOBJ  = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o AppConsole.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -m32 -s
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -65,3 +65,6 @@ StorageScenario.o: StorageScenario.cpp
 
 SysinfoScenario.o: SysinfoScenario.cpp
 	$(CPP) -c SysinfoScenario.cpp -o SysinfoScenario.o $(CXXFLAGS)
+
+AppConsole.o: AppConsole.cpp
+	$(CPP) -c AppConsole.cpp -o AppConsole.o $(CXXFLAGS)

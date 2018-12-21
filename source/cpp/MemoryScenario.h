@@ -6,6 +6,7 @@
 #include "maindefinitions.h"
 #include "maincontrolset.h"
 #include "AppLib.h"
+#include "AppConsole.h"
 
 class MemoryScenario
 {

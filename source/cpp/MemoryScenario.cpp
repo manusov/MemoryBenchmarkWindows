@@ -25,9 +25,6 @@ void MemoryScenario::execute( )
 {
 	char* dst = NULL;
 	size_t max = 0;
-/*
-	printf( "\r\n" );
-*/
 	// Setup variables not changed when executed benchmark scenario
 	// Mode options
 	int opAsm     = pCmd->optionAsm;
@@ -48,14 +45,6 @@ void MemoryScenario::execute( )
 	{
 		opRepeats1 = APPROXIMATION_REPEATS;      // opRepeats1 = always valid counter
 	}
-	// Block start, stop, size values selection
-/*	
-	DWORD64 blkAlloc = pCmd->optionBlockStop;
-	if ( blkAlloc < pCmd->optionBlockStart )
-	{
-		blkAlloc = pCmd->optionBlockStart;
-	}
-*/
 	// Select optimal read/write method = f( options, features )
 	SYSTEM_PROCESSOR_DATA* pCpu = controlSet->pProcessorDetector->getProcessorList( );
 	// Automatically detect read-write method if not set
@@ -70,8 +59,9 @@ void MemoryScenario::execute( )
 	// Check read-write method selection
 	if ( ( opAsm > MAXIMUM_ASM_METHOD ) || ( opAsm < 0 ) )
 	{
-		printf( "\r\nINTERNAL ERROR: wrong read-write method selector (%d).\r\n\r\n", opAsm );
-		return;
+		snprintf( saveDst, saveMax, "\r\nINTERNAL ERROR: wrong read-write method selector (%d).\r\n\r\n", opAsm );
+		AppConsole::transmit( saveDst );
+		;
 	}
 	// Check selected read-write method supported by CPUID features
 	DWORD a = opAsm;
@@ -84,59 +74,41 @@ void MemoryScenario::execute( )
 	mask = mask << a;
 	if ( ( pCpu->cpuBitmap & mask ) == 0 )
 	{
-		printf( "\r\nERROR: selected read-write method (%d) not supported by CPU instruction set.\r\n\r\n", opAsm );
-		return;
+		snprintf( saveDst, saveMax, "\r\nERROR: selected read-write method (%d) not supported by CPU instruction set.\r\n\r\n", opAsm );
+		AppConsole::transmit( saveDst );
+		;
 	}
 	// Check selected read-write method supported by OS context management features
 	if ( ( pCpu->cpuBitmap & mask ) == 0 )
 	{
-		printf( "\r\nERROR: selected read-write method (%d) not supported by OS context management.\r\n\r\n", opAsm );
-		return;
+		snprintf( saveDst, saveMax, "\r\nERROR: selected read-write method (%d) not supported by OS context management.\r\n\r\n", opAsm );
+		AppConsole::transmit( saveDst );
+		;
 	}
 	size_t bytesPerInstruction = controlSet->pProcessorDetector->getBytesPerInstruction( opAsm );
 	int bpi = bytesPerInstruction;
-	printf( "asm method ID=%d, bytes per instruction BPI=%d\r\n", opAsm, bpi );
-/*
-	// TSC clock frequency measurement, update variables
-	printf( "re-measure TSC clock for benchmarking..." );
-	BOOL b = controlSet->pProcessorDetector->measureTSC( );
-	if ( !b )
-	{
-		printf( "FAILED.\r\nTSC clock measurement error.\r\n\r\n" );
-		return;
-	}
-	if ( pCpu->deltaTsc == 0 )
-	{
-		printf( "FAILED.\r\nTSC clock zero frequency returned.\r\n\r\n" );
-		return;
-	}
-*/
+	snprintf( saveDst, saveMax, "asm method ID=%d, bytes per instruction BPI=%d\r\n", opAsm, bpi );
+	AppConsole::transmit( saveDst );
+
 	double frequencyHz = pCpu->deltaTsc;
 	double periodSeconds = 1.0 / pCpu->deltaTsc;
 	// Show frequency in MHz, and period in nanoseconds
 	double frequencyMHz = frequencyHz / 1000000.0;
 	double periodNs = periodSeconds * 1000000000.0;
-/*
-	printf( "done\r\nTSC frequency F=%.3f MHz, period T=%.3f ns\r\n", frequencyMHz, periodNs );
-*/
-	printf( "TSC frequency F=%.3f MHz, period T=%.3f ns\r\n", frequencyMHz, periodNs );
+
+	snprintf( saveDst, saveMax, "TSC frequency F=%.3f MHz, period T=%.3f ns\r\n", frequencyMHz, periodNs );
+	AppConsole::transmit( saveDst );
 	// Get cache memory configuration
 	SYSTEM_TOPOLOGY_DATA* pTopology = controlSet->pTopologyDetector->getTopologyList( );
-	
-	/*
-    printf( "cache points for data read/write:\r\nL1=%I64d KB, L2=%I64d KB, L3=%I64d KB, L4=%I64d KB\r\nCPU core count=%d, HyperThreading=%d\r\n",
-    		pTopology->pointL1 / 1024 , pTopology->pointL2 / 1024 , pTopology->pointL3 / 1024 , pTopology->pointL4 / 1024 ,
-    		pTopology->coresCount , pTopology->hyperThreadingFlag );
-    */
 	int kl1 = pTopology->pointL1 / 1024;
 	int kl2 = pTopology->pointL2 / 1024;
 	int kl3 = pTopology->pointL3 / 1024;
 	int kl4 = pTopology->pointL4 / 1024;
 	int kcc = pTopology->coresCount;
 	int kht = pTopology->hyperThreadingFlag;
-    printf( "cache points for data read/write:\r\nL1=%d KB, L2=%d KB, L3=%d KB, L4=%d KB\r\nCPU core count=%d, HyperThreading=%d\r\n",
+    snprintf( saveDst, saveMax, "cache points for data read/write:\r\nL1=%d KB, L2=%d KB, L3=%d KB, L4=%d KB\r\nCPU core count=%d, HyperThreading=%d\r\n",
     		kl1, kl2, kl3, kl4, kcc, kht );
-    //
+    AppConsole::transmit( saveDst );
 	
 	// Set memory regions and threads count by selected memory object
 	DWORD64 mSize = 0;
@@ -195,7 +167,7 @@ void MemoryScenario::execute( )
 	// Check Cache or DRAM detection status
 	if ( ( mSize == 0 ) && ( opMemory != OPTION_NOT_SET ) )
 	{
-		printf( "\r\nERROR: selected memory object not detected, use settings start/end/step.\r\n\r\n" );
+		AppConsole::transmit( "\r\nERROR: selected memory object not detected, use settings start/end/step.\r\n\r\n" );
 		return;
 	}
 	else if ( opMemory != OPTION_NOT_SET )
@@ -208,12 +180,12 @@ void MemoryScenario::execute( )
     SYSTEM_PAGING_DATA* pPaging = controlSet->pPagingDetector->getPagingList( );
 	if ( ( opLp == LP_USED ) && ( pPaging->largePage == 0 ) )
     {
-    	printf( "\r\nERROR: large pages not supported by platform.\r\n\r\n" );
+    	AppConsole::transmit( "\r\nERROR: large pages not supported by platform.\r\n\r\n" );
     	return;
 	}
 	if ( ( opLp == LP_USED ) && ( pPaging->pagingRights == 0 ) )
 	{
-    	printf( "\r\nERROR: no privileges for large pages.\r\n\r\n" );
+		AppConsole::transmit( "\r\nERROR: no privileges for large pages.\r\n\r\n" );
     	return;
 	}
 	// start build benchmark scenario
@@ -262,11 +234,12 @@ void MemoryScenario::execute( )
 	// opThreads = threads count, mt = threads list size in bytes, pt = pointer to threads list
 	if ( ( opThreads > MAXIMUM_THREADS ) || ( opThreads <= 0 ) )
 	{
-		printf( "\r\nERROR: wrong number of threads (%d), can be 1-%d\r\n\r\n", opThreads, MAXIMUM_THREADS );
-		return;
+		snprintf( saveDst, saveMax, "\r\nERROR: wrong number of threads (%d), can be 1-%d\r\n\r\n", opThreads, MAXIMUM_THREADS );
+		AppConsole::transmit( saveDst );
+		;
 	}
 	// start memory allocation
-	printf( "memory allocation..." );
+	AppConsole::transmit( "memory allocation..." );
 	// allocation control data
 	SYSTEM_NUMA_DATA* pNuma;
 	DWORD64 allThreadsSrcDstMemory = ic.maxSizeBytes * opThreads * 2;
@@ -291,47 +264,48 @@ void MemoryScenario::execute( )
 		controlSet->pDomainsBuilder->getSimpleText( dst, max );
 	}
 	*dst = 0;  // terminator must be char = 0
-	printf( "done\r\n%s", saveDst );
+	AppConsole::transmit( "done\r\n" );
+	AppConsole::transmit( saveDst );
 	if ( !opStatus )
 	{
-		printf( "\r\nmemory allocation error.\r\n\r\n" );
+		AppConsole::transmit( "\r\nmemory allocation error.\r\n\r\n" );
 		return;
 	}
 	// start threads allocation
-	printf( "\r\nthreads allocation..." );
+	AppConsole::transmit( "\r\nthreads allocation..." );
 	// text control data
 	dst = saveDst;
 	max = saveMax;
 	opStatus = controlSet->pThreadsBuilder->buildThreadsList( &ic, &iv, pNuma );
 	controlSet->pThreadsBuilder->getThreadsText( dst, max );
-	printf( "done\r\n%s", saveDst );
+	AppConsole::transmit( "done\r\n" );
+	AppConsole::transmit( saveDst );
 	if ( !opStatus )
 	{
-		printf( "\r\nthreads allocation error.\r\n\r\n" );
-		return;
+		AppConsole::transmit( "\r\nthreads allocation error.\r\n\r\n" );
+		;
 	}
 	// Benchmark scenario, run threads
-	printf( "\r\nrunning threads..." );
+	AppConsole::transmit( "\r\nrunning threads..." );
 	opStatus = controlSet->pThreadsBuilder->runThreads( &ov );
-	
-	/*
-	printf( "done\r\ndTSC=%016Xh\r\n", ov.resultDeltaTsc );
-	*/
 	dst = saveDst;
 	max = saveMax;
+	int cnt = 0;
+	cnt = snprintf( dst, max, "done ( dTSC=" );
+	dst += cnt;
+	max -=cnt;
 	AppLib::print64( dst, max, ov.resultDeltaTsc, TRUE );
+	cnt = snprintf( dst, max, " )\r\n" );
+	dst += cnt;
 	*dst = 0;
-	// printf( "done\r\ndTSC=%s\r\n", saveDst );
-	printf( "done ( dTSC=%s )\r\n", saveDst );
-	//
-	
+	AppConsole::transmit( saveDst );
 	if ( !opStatus )
 	{
-		printf( "\r\nrun threads error.\r\n\r\n" );
+		AppConsole::transmit( "\r\nrun threads error.\r\n\r\n" );
 		return;
 	}
 	// Benchmark process and calculation variables
-	printf( "allocate statistics arrays..." );
+	AppConsole::transmit( "allocate statistics arrays..." );
 	double megabytes = 0.0;
 	double seconds = 0.0;
 	double mbps = 0.0;
@@ -369,7 +343,7 @@ void MemoryScenario::execute( )
 	// Verify and show statistics arrays allocation	
 	if ( ( pMbps == NULL ) || ( pNs == NULL ) )
 	{
-		printf( "FAILED\r\nError at memory allocation for statistics arrays.\r\n\r\n" );
+		AppConsole::transmit( "FAILED\r\nError at memory allocation for statistics arrays.\r\n\r\n" );
 		return;
 	}
 	else
@@ -382,7 +356,7 @@ void MemoryScenario::execute( )
 	AppLib::printString( dst, max, "\r\nlatency statistics,   " );
 	AppLib::printBaseAndSize( dst, max, ( DWORD64 )pNs, ma );
 	*dst = 0;
-	printf( "%s", saveDst );
+	AppConsole::transmit( saveDst );
 	}
 	// Blank both statistics arrays
 	double* pMbps1 = pMbps;
@@ -394,32 +368,34 @@ void MemoryScenario::execute( )
 		pMbps1++; 
 		pNs1++;
 	}
+	
 	// Prepare for print input conditions
 	dst = saveDst;
 	max = saveMax;
-	AppLib::printCellMemorySize( dst, max, ic.pageSize, 1 );
-	*dst = 0;
+
 	if ( opRepeats3 == OPTION_NOT_SET )
-	{
-		// printf( "\r\nRUN: method=%d, threads=%d, repeats=%d\r\n     buffer=%016Xh, page mode=%d, page size=%s\r\n", 
-	    //    opAsm, opThreads, opRepeats1, ic.maxSizeBytes, ic.pagingMode, saveDst );
-		printf( "\r\nRUN: method=%d, threads=%d, repeats=%d\r\n     page mode=%d, page size=%s\r\n", 
-	    	opAsm, opThreads, opRepeats1, ic.pagingMode, saveDst );
-		// otherwise printf crush in the 32-bit mode
+	{	// note use 64-bit parameters for printf can crush in the 32-bit mode
+		cnt = snprintf( dst, max, "\r\nRUN: method=%d, threads=%d, repeats=%d\r\n     page mode=%d, ", 
+	    				opAsm, opThreads, opRepeats1, ic.pagingMode );
 	}
 	else
 	{
-		// printf( "\r\nRUN: method=%d, threads=%d, repeats=ADAPTIVE\r\n     buffer=%016Xh, page mode=%d, page size=%s\r\n", 
-	    //    opAsm, opThreads, ic.maxSizeBytes, ic.pagingMode, saveDst );
-		printf( "\r\nRUN: method=%d, threads=%d, repeats=ADAPTIVE\r\n     page mode=%d, page size=%s\r\n", 
-	        opAsm, opThreads, ic.pagingMode, saveDst );
-		// otherwise printf crush in the 32-bit mode
+		cnt = snprintf( dst, max, "\r\nRUN: method=%d, threads=%d, repeats=ADAPTIVE\r\n     page mode=%d, ", 
+	        			opAsm, opThreads, ic.pagingMode );
 	}
+	dst += cnt;
+	max -= cnt;
 	
-	/*
-	printf( "     start=%d, end=%d, delta=%d, bpi=%d\n", 
-	        ( int )ic.startSize, ( int )ic.endSize, ( int )ic.deltaSize, bytesPerInstruction );
-	*/
+	cnt = snprintf( dst, max, "page size=" );
+	dst += cnt;
+	max -= cnt;
+	AppLib::printCellMemorySize( dst, max, ic.pageSize, 1 );
+	cnt = snprintf( dst, max, "\r\n" );
+	dst += cnt;
+	*dst = 0;
+	AppConsole::transmit( saveDst );
+	
+	// Write start, end, delta, bpi
 	dst = saveDst;
 	max = saveMax;
 	AppLib::printString( dst, max, "     start=" );
@@ -431,13 +407,13 @@ void MemoryScenario::execute( )
 	AppLib::printString( dst, max, ", bpi=" );
 	AppLib::printCellMemorySize( dst, max, bytesPerInstruction, 1 );
 	*dst=0;
-	printf( "%s\r\n", saveDst );
-	//
+	AppConsole::transmit( saveDst );
+	AppConsole::transmit( "\r\n" );
 	
 	// Calibration
 	if ( ( opRepeats2 == OPTION_NOT_SET ) && ( opRepeats3 == OPTION_NOT_SET ) )
 	{
-		printf( "calibration..." );
+		AppConsole::transmit( "calibration..." );
 		iv.currentSizeInstructions = ic.maxSizeBytes / bytesPerInstruction;
 		controlSet->pThreadsBuilder->updateThreadsList( &iv );
 		opStatus = controlSet->pThreadsBuilder->restartThreads( &ov );
@@ -454,32 +430,33 @@ void MemoryScenario::execute( )
 		}
 		if ( !opStatus )
 		{
-			printf( "FAILED.\r\nerror returned.\r\n\r\n" );
+			AppConsole::transmit( "FAILED.\r\nthread build error.\r\n\r\n" );
 			return;
 		}
 		double cTime = ov.resultDeltaTsc * periodSeconds;
 		double cTarget = CALIBRATION_TARGET_TIME;
 		double cRepeats = opRepeats1 * ( cTarget / cTime );
 		opRepeats1 = cRepeats;
-		// printf( "done\r\ndelay=%.3f seconds, update repeats=%d. \n", cTime, opRepeats1 );
-		printf( "done ( delay=%.3f seconds, update repeats=%d )\r\n", cTime, opRepeats1 );
+		snprintf( saveDst, saveMax, "done ( delay=%.3f seconds, update repeats=%d )\r\n", cTime, opRepeats1 );
+		AppConsole::transmit( saveDst );
 		iv.currentMeasurementRepeats = opRepeats1;
 		controlSet->pThreadsBuilder->updateThreadsList( &iv );
 	}
 	// decode read-write method name
 	const char* iname = controlSet->pProcessorDetector->getInstructionString( opAsm );
-	printf( "\r\n[ %s ]\r\n", iname );
+	snprintf( saveDst, saveMax, "\r\n[ %s ]\r\n", iname );
+	AppConsole::transmit( saveDst );
 
 #define BENCHMARK_TABLE_WIDTH 55
 #define STATISTICS_TABLE_WIDTH 78
 
 	// Print parameters names and table up line
-	printf ( "\r\n   #        size   CPI     nsPI    MBPS\r\n" );
+	AppConsole::transmit( "\r\n   #        size   CPI     nsPI    MBPS\r\n" );
 	dst = saveDst;
 	max = saveMax;
 	AppLib::printLine( dst, max, BENCHMARK_TABLE_WIDTH );
 	*dst = 0;
-	printf( "%s", saveDst );
+	AppConsole::transmit( saveDst );
 	        
 	// Start measurements cycle for different block sizes, show table: speed = f(size)
 	pMbps1 = pMbps;
@@ -507,9 +484,6 @@ void MemoryScenario::execute( )
 		     ( ( iv.currentMethodId == CPU_FEATURE_LATENCY_LCM    ) || 
 		       ( iv.currentMethodId == CPU_FEATURE_LATENCY_RDRAND )  )  )
 		{
-			// pPerformer->routineUpdate( &scenario, CPU_FEATURE_LATENCY_WALK );
-			// osErrorCode = pPerformer->threadsRestart( &scenario, deltaTsc );
-			// pPerformer->routineUpdate( &scenario, scenario.methodId );
 			int a = iv.currentMethodId;
 			iv.currentMethodId = CPU_FEATURE_LATENCY_WALK;
 			controlSet->pThreadsBuilder->updateThreadsList( &iv );  // ADD 1
@@ -520,10 +494,7 @@ void MemoryScenario::execute( )
 		
 		if ( !opStatus )
 		{
-			// statusString = pPerformer->getStatusString( );
-        	// printf( "\nBenchmark error at %s\n", statusString );
-        	// printSystemError( osErrorCode );
-        	printf( "\r\nbenchmark error\r\n\r\n" );
+        	AppConsole::transmit( "\r\nbenchmark error\r\n\r\n" );
 			return;
 		}
 		
@@ -539,7 +510,8 @@ void MemoryScenario::execute( )
 		seconds = ov.resultDeltaTsc * periodSeconds;
 		mbps = megabytes / seconds;
 		
-		printf ( "%4d%12d%8.3f%8.3f   %-10.3f\r\n", blockCount+1, blockSize, cpi, nspi, mbps );
+		snprintf ( saveDst, saveMax, "%4d%12d%8.3f%8.3f   %-10.3f\r\n", blockCount+1, blockSize, cpi, nspi, mbps );
+		AppConsole::transmit( saveDst );
 		
 		*pMbps1++ = mbps;
 		*pNs1++ = nspi;
@@ -551,7 +523,7 @@ void MemoryScenario::execute( )
 	max = saveMax;
 	AppLib::printLine( dst, max, BENCHMARK_TABLE_WIDTH );
 	*dst = 0;
-	printf( "%s", saveDst );
+	AppConsole::transmit( saveDst );
 	
 	// Statistics calculate and show, select branches for bandwidth or latency
 	const char* statisticsName = NULL;
@@ -567,6 +539,7 @@ void MemoryScenario::execute( )
 		statisticsName = "Latency ( nanoseconds )";
 		statisticsPointer = pNs;
 	}
+
 	// Statistics calculate and show, f(selected method)
 	AppLib::calculateStatistics( blockMax+1, statisticsPointer, 
 								 &resultMin, &resultMax, &resultAverage, &resultMedian );
@@ -583,10 +556,10 @@ void MemoryScenario::execute( )
 	max -= nchars;
 	AppLib::printLine( dst, max, STATISTICS_TABLE_WIDTH );
 	*dst = 0;
-	printf( "%s", saveDst );
+	AppConsole::transmit( saveDst );
 	
 	// Delete created objects and termination
-	printf( "\r\ndelete local objects..." );
+	AppConsole::transmit( "\r\ndelete local objects..." );
 	free ( pMbps );
 	free ( pNs );
 	controlSet->pThreadsBuilder->releaseThreadsList( );
@@ -598,7 +571,7 @@ void MemoryScenario::execute( )
 	{
 		controlSet->pDomainsBuilder->freeSimpleList( );
 	}
-	printf( "done\r\n" );
-		
+	AppConsole::transmit( "done\r\n" );
 
 }
+
