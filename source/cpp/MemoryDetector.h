@@ -1,3 +1,8 @@
+/*
+         MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for Memory Information Windows API class.
+*/
+
 #ifndef MEMORYDETECTOR_H
 #define MEMORYDETECTOR_H
 

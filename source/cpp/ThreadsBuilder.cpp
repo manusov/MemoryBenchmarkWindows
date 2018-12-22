@@ -1,3 +1,8 @@
+/*
+    MEMORY PERFORMANCE ENGINE FRAMEWORK.
+          Threads Builder class.
+*/
+
 #include "ThreadsBuilder.h"
 
 // Pointer to global control set of functions 

@@ -1,3 +1,8 @@
+/*
+      MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    CPU and OS paging features detector class.
+*/
+
 #include "PagingDetector.h"
 
 // Pointer to global control set of functions 

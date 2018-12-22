@@ -1,3 +1,8 @@
+/*
+       MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    CPU features and frequency detector class.
+*/
+
 #include "ProcessorDetector.h"
 
 // Pointer to global control set of functions 
@@ -317,48 +322,6 @@ DWORD ProcessorDetector::findMaxMethodTemporal( DWORD64 bitmapCpu, DWORD64 bitma
     select = CPU_FEATURE_READ_IA32_X64;
     if ( mapCheck ( bitmap, select ) ) return select;
     return OPTION_NOT_SET;
-
-/*
-    DWORD64 bitmap = bitmapCpu & bitmapOs;
-    DWORD mask = 0;
-    DWORD select = 0;
-    // Try AVX512 read memory method
-    select = CPU_FEATURE_READ_AVX512;
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_AVX256;
-    }
-    // Try AVX256 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_SSE128;
-    }
-    
-	// start of changed at v0.60.03
-	// Try SSE128 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_MMX64;   // CPU_FEATURE_READ_IA32_X64;
-    }
-    // Try MMX64 read memory method
-	mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_IA32_X64;
-    }
-	// end of changed at v0.60.03
-	 
-    // Try common x86 or x86-64 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = OPTION_NOT_SET;
-    }
-    return select;
-*/
 }
 
 // This method used for auto select method, for non-temporal mode (uncacheable)
@@ -377,47 +340,6 @@ DWORD ProcessorDetector::findMaxMethodNonTemporal( DWORD64 bitmapCpu, DWORD64 bi
     if ( mapCheck ( bitmap, select ) ) return select;
     return OPTION_NOT_SET;
 
-/*
-    DWORD64 bitmap = bitmapCpu & bitmapOs;
-    DWORD mask = 0;
-    DWORD select = 0;
-    // Try AVX512 read memory method
-    select = CPU_FEATURE_NTRW_READ_AVX512,
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_NTPRW_READ_AVX256;
-    }
-    // Try AVX256 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_NTPRW_READ_SSE128;
-    }
-    
-    // start of changed at v0.60.03
-    // Try SSE128 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_MMX64;   // CPU_FEATURE_READ_IA32_X64;
-    }
-    // Try MMX64 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = CPU_FEATURE_READ_IA32_X64;
-    }
-	// end of changed at v0.60.03
-	
-	// Try common x86 or x86-64 read memory method
-    mask = ( ( DWORDLONG )1 ) << select;
-    if ( ! ( mask & bitmap ) )
-    {
-        select = OPTION_NOT_SET;
-    }
-    return select;
-*/
 }
 
 // Helper method for test 64-bit map, prevent overflow of 32-bit operations

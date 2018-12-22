@@ -1,3 +1,9 @@
+/*
+                MEMORY PERFORMANCE ENGINE FRAMEWORK.
+        Windows SMP/Cache topology detection API interface class.
+    This method can be functional even if cache not detected by CPUID.
+*/
+
 #include "TopologyDetector.h"
 
 // Pointer to global control set of functions 

@@ -1,3 +1,8 @@
+/*
+     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+         Console input-output class.
+*/
+
 #include "AppConsole.h"
 
 const char* AppConsole::inputName = INPUT_FILE_NAME;

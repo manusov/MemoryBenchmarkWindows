@@ -1,3 +1,8 @@
+/*
+         MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Classes directory for functinality interconnect.
+*/
+
 #ifndef MAINCONTROLSET_H
 #define MAINCONTROLSET_H
 

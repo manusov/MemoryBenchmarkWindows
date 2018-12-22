@@ -1,3 +1,8 @@
+/*
+                MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for command line parser and parameters extractor class.
+*/
+
 #ifndef COMMANDLINE_H
 #define COMMANDLINE_H
 
@@ -37,3 +42,4 @@ class CommandLine
 };
 
 #endif  // COMMANDLINE_H
+

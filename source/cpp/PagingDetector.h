@@ -1,3 +1,8 @@
+/*
+           MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for CPU and OS paging features detector class.
+*/
+
 #ifndef PAGINGDETECTOR_H
 #define PAGINGDETECTOR_H
 

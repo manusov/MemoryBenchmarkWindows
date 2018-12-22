@@ -1,3 +1,9 @@
+/*
+                  MEMORY PERFORMANCE ENGINE FRAMEWORK.
+              Header for System Information Scenario class.
+    This class make sequence of different components detectors routines.
+*/
+
 #ifndef SYSINFOSCENARIO_H
 #define SYSINFOSCENARIO_H
 

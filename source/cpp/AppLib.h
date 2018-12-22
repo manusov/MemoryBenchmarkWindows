@@ -1,3 +1,8 @@
+/*
+           MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for common library, text strings builder class.
+*/
+
 #ifndef APPLIB_H
 #define APPLIB_H
 

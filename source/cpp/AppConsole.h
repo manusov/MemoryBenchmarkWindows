@@ -1,3 +1,8 @@
+/*
+     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for console input-output class.
+*/
+
 #ifndef APPCONSOLE_H
 #define APPCONSOLE_H
 

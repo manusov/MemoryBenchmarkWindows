@@ -1,3 +1,9 @@
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                      Header for functions loader class.
+    This class make dynamical import for Windows API and this application DLL.
+*/
+
 #ifndef FUNCTIONSLOADER_H
 #define FUNCTIONSLOADER_H
 

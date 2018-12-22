@@ -1,3 +1,8 @@
+/*
+           MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Command line parser and parameters extractor class.
+*/
+
 #include "CommandLine.h"
 
 // Command line parameters parse control

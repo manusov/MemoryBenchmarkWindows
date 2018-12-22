@@ -1,3 +1,9 @@
+/*
+                 MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Header for Windows SMP/Cache topology detection API interface class.
+     This method can be functional even if cache not detected by CPUID.
+*/
+
 #ifndef TOPOLOGYDETECTOR_H
 #define TOPOLOGYDETECTOR_H
 
@@ -44,3 +50,4 @@ class TopologyDetector
 };
 
 #endif  // TOPOLOGYDETECTOR_H
+

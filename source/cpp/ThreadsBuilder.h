@@ -1,3 +1,8 @@
+/*
+    MEMORY PERFORMANCE ENGINE FRAMEWORK.
+     Header for Threads Builder class.
+*/
+
 #ifndef THREADSBUILDER_H
 #define THREADSBUILDER_H
 
@@ -31,3 +36,4 @@ class ThreadsBuilder
 };
 
 #endif  // THREADSBUILDER_H
+

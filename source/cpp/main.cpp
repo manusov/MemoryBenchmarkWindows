@@ -1,7 +1,6 @@
 /*
-
-     MEMORY PERFORMANCE ENGINE FRAMEWORK DEBUG MODULE.
-     
+    MEMORY PERFORMANCE ENGINE FRAMEWORK.
+               MAIN MODULE.
 */
 
 /*
@@ -27,14 +26,14 @@ TODO:
 10) + Asm method id must be decoded as routine name, otherwise user view unknown method, numeric id only.
 11) + Remove "GUI" option from DLLs. Recompile for 32/64.
 12) + Bug with select max temporal and max non temporal methods, shifts and comparing 32 instead 64.
-
-13) File report modes.
-	 - base functionality.
-     - refactor saveDst vs txp operations, sometimes can remove txp.
+13) + File report modes.
+	 + base functionality.
+     + refactor saveDst vs txp operations, sometimes can remove txp.
 		use saveDst, saveMax for AppConsole::transmit, REMOVE txp and MAX_TRANSIT.
-	 - report copyright when out=file.
-	 - number of spaces when exit on different scenarios.
+	 + report copyright when out=file.
+	 + number of spaces when exit on different scenarios.
 
+---
 14) Bug return from memory test scenario when objects not released, if errors detected, by error handling branch.
 15) Variables (some of): blockMax, blockSize, blockCount, blockDelta make 64-bit, prevent overflows. Plus other width regularity.
 16) Detalize WinAPI errors codes. Function printSystemError, replace printf to snprintf at this routine.
@@ -46,7 +45,6 @@ TODO:
 
 22) 64-bit verify all options. Include AVX512, NUMA, Processor Groups. Required platform.
 23) 32-bit verify all options. Include AVX512, NUMA, Processor Groups. Required platform.
-
 
 */
 
@@ -87,170 +85,6 @@ char* pTextWrite = NULL;
 // Application entry point
 int main(int argc, char** argv) 
 {
-
-/*
-	DEBUG
-*/
-
-/*
-	BOOL status = FALSE;
-	// Allocate memory for text buffer
-	int mText = sizeof( char ) * TEXT_SIZE;
-	pTextAlloc = ( char* )malloc( mText+1 );
-	if ( pTextAlloc == NULL )
-	{
-		printf( "\nError at memory allocation for text report buffer.\n" );
-		return 1;
-	}
-	// Create classes
-	pFunctionsLoader = new FunctionsLoader( );
-	pFunctionsList = pFunctionsLoader->getFunctionsList( );
-	pProcessorDetector = new ProcessorDetector( pFunctionsList );
-	pTopologyDetector = new TopologyDetector( pFunctionsList );
-	pMemoryDetector = new MemoryDetector( pFunctionsList );
-	pPagingDetector = new PagingDetector( pFunctionsList );
-	pDomainsBuilder = new DomainsBuilder( pFunctionsList );
-	pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
-	pCommandLine = new CommandLine( );
-*/
-
-/*	
-	// Initializing get text report
-	pTextWrite = pTextAlloc;
-	size_t max = TEXT_SIZE;
-	// Special step for measure CPU TSC clock
-	printf( "\nMeasure TSC clock..." );
-	status = pProcessorDetector->measureTSC( );
-	if ( status )
-	{
-		printf( "OK.\n\n" );
-	}
-	else
-	{
-		printf( pProcessorDetector->getStatusString( ) );
-	}
-	// Report about loaded functions: WinAPI and this application DLL
-	pFunctionsLoader->getFunctionsText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about processor features and frequency
-	pProcessorDetector->getProcessorText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about system topology, standard version
-	pTopologyDetector->getTopologyText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about system topology, extended version
-	pTopologyDetector->getTopologyTextEx( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about system memory
-	pMemoryDetector->getMemoryText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about paging options
-	pPagingDetector->getPagingText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about NUMA domains
-	pDomainsBuilder->getNumaText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Report about execution threads
-	pThreadsBuilder->getThreadsText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	// Done reports
-	*pTextWrite = 0;  // Terminator must be char = 0
-	pTextWrite++;
-	// Show text report
-	printf( "\n[    DEBUG STRINGS: SYSTEM INFORMATION    ]\n\n%s\n", pTextAlloc );
-*/
-
-/*	
-	#define TEST_BLOCK 1024*1024
-	pTextWrite = pTextAlloc;
-	max = TEXT_SIZE;
-	pDomainsBuilder->allocateNodesList( TEST_BLOCK, 0, 4096, FALSE );
-	pDomainsBuilder->getNumaText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	pDomainsBuilder->freeNodesList();
-	pDomainsBuilder->getNumaText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	*pTextWrite = 0;  // Terminator must be char = 0
-	pTextWrite++;
-	printf( "\n[   DEBUG STRINGS: NUMA-AWARE MEMORY ALLOCATION   ]\n\n%s\n", pTextAlloc );
-*/
-
-/*
-	#define TEST_BLOCK 1024*1024
-	pTextWrite = pTextAlloc;
-	max = TEXT_SIZE;
-	pDomainsBuilder->allocateSimpleList( TEST_BLOCK, 0, 4096 );
-	pDomainsBuilder->getSimpleText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	pDomainsBuilder->freeSimpleList();
-	pDomainsBuilder->getSimpleText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	*pTextWrite = 0;  // Terminator must be char = 0
-	pTextWrite++;
-	printf( "\n[   DEBUG STRINGS: NUMA-UNAWARE MEMORY ALLOCATION   ]\n\n%s\n", pTextAlloc );
-*/
-
-/*
-	#define TEST_THREADS 4
-	#define TEST_BLOCK_PER_THREAD  1024*1024
-	#define TEST_BLOCK_ALL_THREADS TEST_BLOCK_PER_THREAD * TEST_THREADS
-	#define TEST_SIZE_INSTRUCTIONS 4096
-	#define TEST_REPEATS 100000
-	#define TEST_LARGE_PAGE 0
-	#define TEST_METHOD_ID 0
-	
-	INPUT_CONSTANTS ic;
-	INPUT_VARIABLES iv;
-	OUTPUT_VARIABLES ov;
-	ic.threadCount = TEST_THREADS;
-	ic.maxSizeBytes = TEST_BLOCK_PER_THREAD;
-	iv.currentSizeInstructions = TEST_SIZE_INSTRUCTIONS;
-	iv.currentMeasurementRepeats = TEST_REPEATS;
-	ic.pagingMode = TEST_LARGE_PAGE;
-	iv.currentMethodId = TEST_METHOD_ID;
-	ic.htMode = HT_NOT_USED;
-	
-	pTextWrite = pTextAlloc;
-	max = TEXT_SIZE;
-	
-	pDomainsBuilder->allocateSimpleList( TEST_BLOCK_ALL_THREADS, 0, 4096 );
-	pDomainsBuilder->getSimpleText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	SYSTEM_NUMA_DATA* pn = pDomainsBuilder->getSimpleList();
-	
-	pThreadsBuilder->buildThreadsList( &ic, &iv, pn );
-	pThreadsBuilder->getThreadsText( pTextWrite, max );
-	AppLib::printCrLf( pTextWrite, max );
-	*pTextWrite = 0;  // Terminator must be char = 0
-	pTextWrite++;
-	printf( "\n[   DEBUG STRINGS: NODES AND THREADS ALLOCATION   ]\n\n%s\n", pTextAlloc );
-	
-	printf( "start thread..." );
-	pThreadsBuilder->runThreads( &ov );
-	printf( " done.\n" );
-	printf( "re-start thread..." );
-	pThreadsBuilder->restartThreads( &ov );
-	printf( " done.\n\n" );
-*/
-
-/*
-	// Release objects and exit
-	delete pCommandLine;
-	delete pThreadsBuilder;
-	delete pDomainsBuilder;
-	delete pPagingDetector;
-	delete pMemoryDetector;
-	delete pTopologyDetector;
-	delete pProcessorDetector;
-	delete pFunctionsLoader;
-	free( pTextAlloc );
-	return 0;
-*/
-
-/*
-	END OF DEBUG
-*/
-
 	// Allocate memory for text buffer
 	int mText = sizeof( char ) * TEXT_SIZE;
 	pTextAlloc = ( char* )malloc( mText+1 );
@@ -314,68 +148,77 @@ int main(int argc, char** argv)
 		AppConsole::transmit( "load API..." );
 		s.pFunctionsLoader = new FunctionsLoader( );
 		pFunctionsList = s.pFunctionsLoader->getFunctionsList( );
-		AppConsole::transmit( "done\r\ndetect processor features..." );
-		s.pProcessorDetector = new ProcessorDetector( pFunctionsList );
-		AppConsole::transmit( "done\r\ndetect SMP and cache levels..." );
-		s.pTopologyDetector = new TopologyDetector( pFunctionsList );
-		AppConsole::transmit( "done\r\ndetect memory..." );
-		s.pMemoryDetector = new MemoryDetector( pFunctionsList );
-		AppConsole::transmit( "done\r\ndetect paging..." );
-		s.pPagingDetector = new PagingDetector( pFunctionsList );
-		AppConsole::transmit( "done\r\ninitializing domains builder..." );
-		s.pDomainsBuilder = new DomainsBuilder( pFunctionsList );
-		AppConsole::transmit( "done\r\ninitializing threads builder..." );
-		s.pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
-		AppConsole::transmit( "done\r\nmeasure TSC clock..." );
-		s.pProcessorDetector->measureTSC( );
-		// Get application native library info, show string
-		AppConsole::transmit( "done\r\nget library data..." );
-		char *dllProduct, *dllVersion, *dllVendor;
-		pFunctionsList->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
-		snprintf( pTextAlloc, mText, "done\r\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
-		AppConsole::transmit( pTextAlloc );
+		
+		// Check application DLL load
+		if ( pFunctionsList->loadStatus == 0 )
+		{
+			AppConsole::transmit( "done\r\ndetect processor features..." );
+			s.pProcessorDetector = new ProcessorDetector( pFunctionsList );
+			AppConsole::transmit( "done\r\ndetect SMP and cache levels..." );
+			s.pTopologyDetector = new TopologyDetector( pFunctionsList );
+			AppConsole::transmit( "done\r\ndetect memory..." );
+			s.pMemoryDetector = new MemoryDetector( pFunctionsList );
+			AppConsole::transmit( "done\r\ndetect paging..." );
+			s.pPagingDetector = new PagingDetector( pFunctionsList );
+			AppConsole::transmit( "done\r\ninitializing domains builder..." );
+			s.pDomainsBuilder = new DomainsBuilder( pFunctionsList );
+			AppConsole::transmit( "done\r\ninitializing threads builder..." );
+			s.pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
+			AppConsole::transmit( "done\r\nmeasure TSC clock..." );
+			s.pProcessorDetector->measureTSC( );
+			// Get application native library info, show string
+			AppConsole::transmit( "done\r\nget library data..." );
+			char *dllProduct, *dllVersion, *dllVendor;
+			pFunctionsList->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
+			snprintf( pTextAlloc, mText, "done\r\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
+			AppConsole::transmit( pTextAlloc );
 
-		// Select scenario
-		int opHelp = pp->optionHelp;
-		int opInfo = pp->optionInfo;
-		int opTest = pp->optionTest;
-		// User help scenario
-		if ( opHelp != OPTION_NOT_SET )
-		{
-			AppConsole::transmit( "run user help scenario.\r\n" );
-			const OPTION_ENTRY* oplist = pCommandLine->getOptionsList( );
-			pUserHelp = new UserHelp( pTextAlloc, mText, opHelp, oplist );
-			pUserHelp->execute( );
-		}
-		// System information scenario
-		if ( opInfo != OPTION_NOT_SET )
-		{
-			AppConsole::transmit( "run system information scenario.\r\n" );
-			pSysinfoScenario = new SysinfoScenario( pTextAlloc, mText, opInfo, &s );
-			pSysinfoScenario->execute( );
-		}
-		// Benchmark scenario
-		if ( opTest != OPTION_NOT_SET )
-		{
-			// Benchmark scenario: memory
-			if ( opTest == TEST_MEMORY )
+			// Select scenario
+			int opHelp = pp->optionHelp;
+			int opInfo = pp->optionInfo;
+			int opTest = pp->optionTest;
+			// User help scenario
+			if ( opHelp != OPTION_NOT_SET )
 			{
-				AppConsole::transmit( "run memory benchmark scenario.\r\n" );
-				pMemoryScenario = new MemoryScenario( pTextAlloc, mText, opTest, &s, pp );
-				pMemoryScenario->execute( );
+				AppConsole::transmit( "run user help scenario.\r\n" );
+				const OPTION_ENTRY* oplist = pCommandLine->getOptionsList( );
+				pUserHelp = new UserHelp( pTextAlloc, mText, opHelp, oplist );
+				pUserHelp->execute( );
 			}
-			// Benchmark scenario: mass storage
-			if ( opTest == TEST_STORAGE )
+			// System information scenario
+			if ( opInfo != OPTION_NOT_SET )
 			{
-				AppConsole::transmit( "run mass storage benchmark scenario.\r\n" );
-				AppConsole::transmit( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
+				AppConsole::transmit( "run system information scenario.\r\n" );
+				pSysinfoScenario = new SysinfoScenario( pTextAlloc, mText, opInfo, &s );
+				pSysinfoScenario->execute( );
+			}
+			// Benchmark scenario
+			if ( opTest != OPTION_NOT_SET )
+			{
+				// Benchmark scenario: memory
+				if ( opTest == TEST_MEMORY )
+				{
+					AppConsole::transmit( "run memory benchmark scenario.\r\n" );
+					pMemoryScenario = new MemoryScenario( pTextAlloc, mText, opTest, &s, pp );
+					pMemoryScenario->execute( );
+				}
+				// Benchmark scenario: mass storage
+				if ( opTest == TEST_STORAGE )
+				{
+					AppConsole::transmit( "run mass storage benchmark scenario.\r\n" );
+					AppConsole::transmit( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
+				}
+			}
+			// Default scenario
+			if ( ( opHelp == OPTION_NOT_SET )&&( opInfo == OPTION_NOT_SET )&&( opTest == OPTION_NOT_SET ) )
+			{
+				AppConsole::transmit( "run default scenario.\r\n" );
+				AppConsole::transmit( "\r\nNO PARAMETERS, USE \"help=full\".\r\n\r\n" );
 			}
 		}
-		// Default scenario
-		if ( ( opHelp == OPTION_NOT_SET )&&( opInfo == OPTION_NOT_SET )&&( opTest == OPTION_NOT_SET ) )
+		else
 		{
-			AppConsole::transmit( "run default scenario.\r\n" );
-			AppConsole::transmit( "\r\nNO PARAMETERS, USE \"help=full\".\r\n\r\n" );
+			AppConsole::transmit( "\r\nError loading DLL.\r\n" );
 		}
 	}
 	// Scenario done, print message, release (delete) objects and exit

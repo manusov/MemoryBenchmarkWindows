@@ -1,3 +1,9 @@
+/*
+                       MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                      Header for NUMA domains detector class.
+    For platforms without NUMA API builds one virtual domain, for regular methods.
+*/
+
 #ifndef DOMAINSBUILDER_H
 #define DOMAINSBUILDER_H
 

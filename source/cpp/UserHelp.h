@@ -1,4 +1,7 @@
-// THIS MODULE IS RESERVED FOR FUTURE USE
+/*
+    MEMORY PERFORMANCE ENGINE FRAMEWORK.
+        Header for User Help class.
+*/
 
 #ifndef USERHELP_H
 #define USERHELP_H

@@ -1,4 +1,10 @@
-// THIS MODULE IS RESERVED FOR FUTURE USE
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                  Header for Storage Benchmark Scenario class.
+    This class make sequence of different initialization end measurement routines.
+
+                   THIS MODULE IS RESERVED FOR FUTURE USE
+*/
 
 #ifndef STORAGESCENARIO_H
 #define STORAGESCENARIO_H

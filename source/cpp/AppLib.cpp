@@ -1,3 +1,8 @@
+/*
+      MEMORY PERFORMANCE ENGINE FRAMEWORK.
+    Common library, text strings builder class.
+*/
+
 #include "AppLib.h"
 
 // Print string

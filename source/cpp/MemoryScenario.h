@@ -1,3 +1,9 @@
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                  Header for Memory Benchmark Scenario class.
+    This class make sequence of different initialization end measurement routines.
+*/
+
 #ifndef MEMORYSCENARIO_H
 #define MEMORYSCENARIO_H
 

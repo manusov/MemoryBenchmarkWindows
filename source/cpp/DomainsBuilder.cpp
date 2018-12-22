@@ -1,3 +1,9 @@
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                          Functions loader class.
+    This class make dynamical import for Windows API and this application DLL.
+*/
+
 #include "DomainsBuilder.h"
 
 // Pointer to global control set of functions 

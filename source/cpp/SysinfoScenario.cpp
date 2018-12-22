@@ -1,3 +1,9 @@
+/*
+                  MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                   System Information Scenario class.
+    This class make sequence of different components detectors routines.
+*/
+
 #include "SysinfoScenario.h"
 
 char* SysinfoScenario::saveDst;

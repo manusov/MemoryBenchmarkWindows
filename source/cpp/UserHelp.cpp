@@ -1,3 +1,8 @@
+/*
+    MEMORY PERFORMANCE ENGINE FRAMEWORK.
+             User Help class.
+*/
+
 #include "UserHelp.h"
 
 char* UserHelp::saveDst;

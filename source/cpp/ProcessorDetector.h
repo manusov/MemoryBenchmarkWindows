@@ -1,3 +1,8 @@
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+             Header for CPU features and frequency detector class.
+*/
+
 #ifndef PROCESSORDETECTOR_H
 #define PROCESSORDETECTOR_H
 

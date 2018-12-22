@@ -1,3 +1,9 @@
+/*
+                     MEMORY PERFORMANCE ENGINE FRAMEWORK.
+                       Memory Benchmark Scenario class.
+    This class make sequence of different initialization end measurement routines.
+*/
+
 #include "MemoryScenario.h"
 
 char* MemoryScenario::saveDst;
