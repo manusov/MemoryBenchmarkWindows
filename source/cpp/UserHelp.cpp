@@ -36,7 +36,7 @@ void UserHelp::execute( )
 	const OPTION_ENTRY* p = optionsList;
 	const char** p1 = NULL;
 	// This unconditionally write
-	AppConsole::transmit( "\r\noptions list:\r\n" );
+	AppConsole::transmit( "\noptions list:\n" );
 	while ( p->name != NULL )
 	{
 		snprintf( saveDst, saveMax, "%s", p->name );
@@ -47,11 +47,11 @@ void UserHelp::execute( )
 			AppConsole::transmit( " " );
 		}
 	}
-	AppConsole::transmit( "\r\n" );
+	AppConsole::transmit( "\n" );
 	// This write only if "help=full" mode
 	if ( enumOp == HELP_FULL )
 	{
-		AppConsole::transmit( "\r\nvalues list:\r\n" );
+		AppConsole::transmit( "\nvalues list:\n" );
 		p = optionsList;
 		while ( p->name != NULL )
 		{
@@ -85,7 +85,7 @@ void UserHelp::execute( )
 							dst = saveDst;
 							max = saveMax;
 							AppLib::printCell( dst, " ", max, LEFT_INTERVAL );
-							AppConsole::transmit( "\r\n" );
+							AppConsole::transmit( "\n" );
 							AppConsole::transmit( saveDst );
 						}
 					k++;
@@ -98,10 +98,10 @@ void UserHelp::execute( )
 					break;
 			}
 			p++;
-			AppConsole::transmit( "\r\n" );
+			AppConsole::transmit( "\n" );
 		}
 	}
-	snprintf( saveDst, saveMax, "\r\n%s\r\n\r\n", exampleString );
+	snprintf( saveDst, saveMax, "\n%s\n\n", exampleString );
 	AppConsole::transmit( saveDst );
 }
 

@@ -15,7 +15,7 @@ char ThreadsBuilder::s[NS];
 // Width and up string for threads list table
 #define TABLE_WIDTH_THREADS 79
 const char* ThreadsBuilder::tableUpThreads =
-	" ID  (values hex)\r\n";
+	" ID  (values hex)\n";
 	
 // Threads control constant
 #define THREAD_TIMEOUT 60000
@@ -101,31 +101,31 @@ void ThreadsBuilder::getThreadsText( LPSTR &dst, size_t &max )
 			AppLib::printString( dst, max, " txevent=" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->txEventHandle ), FALSE );
 			// Line 2
-			AppLib::printString( dst, max, "\r\n     base1 =" );
+			AppLib::printString( dst, max, "\n     base1 =" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->base1 ), FALSE );
 			AppLib::printString( dst, max, " base2  =" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->base2 ), FALSE );
 			AppLib::printString( dst, max, " sizeins=" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->sizeInstructions ), FALSE );
 			// Line 3
-			AppLib::printString( dst, max, "\r\n     repeat=" );
+			AppLib::printString( dst, max, "\n     repeat=" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->measurementRepeats ), FALSE );
 			AppLib::printString( dst, max, " large page mode =" );
 			AppLib::print16( dst, max, pT->largePagesMode, FALSE );
 			AppLib::printString( dst, max, "    method id =" );
 			AppLib::print16( dst, max, pT->methodId, FALSE );
 			// Line 4
-			AppLib::printString( dst, max, "\r\n     optimal affinity group\\mask  = " );
+			AppLib::printString( dst, max, "\n     optimal affinity group\\mask  = " );
 			AppLib::print16( dst, max, pT->optimalGaff.Group, FALSE );
 			AppLib::printString( dst, max, "\\" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->optimalGaff.Mask ), FALSE );
 			// Line 5
-			AppLib::printString( dst, max, "\r\n     original affinity group\\mask = " );
+			AppLib::printString( dst, max, "\n     original affinity group\\mask = " );
 			AppLib::print16( dst, max, pT->originalGaff.Group, FALSE );
 			AppLib::printString( dst, max, "\\" );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->originalGaff.Mask ), FALSE );
 			// Line 6
-			AppLib::printString( dst, max, "\r\n     control set pointer          = " );
+			AppLib::printString( dst, max, "\n     control set pointer          = " );
 			AppLib::print64( dst, max, ( DWORD64 )( pT->pRoutines ), FALSE );
 			// Done thread entry
 			AppLib::printCrLf( dst, max );

@@ -1,75 +1,79 @@
-
-Memory Performance Engine. v0.60.00 for Windows x64. (C)2018 IC Book Labs.
-load API...done
-detect processor features...done
-detect SMP and cache levels...done
-detect memory...done
-detect paging...done
-initializing domains builder...done
-initializing threads builder...done
-measure TSC clock...done
-get library data...done
-MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
-get command line parameters...done
-run memory benchmark scenario.
-asm method ID=9, bytes per instruction BPI=32
-TSC frequency F=2400.080 MHz, period T=0.417 ns
-cache points for data read/write:
-L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
-CPU core count=4, HyperThreading=1
-memory allocation...done
-NUMA-unaware mode, list allocated at base = 0000000000445640h
-
- ID  allocated base   allocated size   original (all hex)
----------------------------------------------------------
- 0   0000000000E50000 0000000001800000 0000000000E50000 
----------------------------------------------------------
-
-threads allocation...done
-threads entries created = 1 , list allocated at base = 0000000000E46F00h
-
- ID  (values hex)
--------------------------------------------------------------------------------
- 0   thread=0000000000000088 rxevent=00000000000000CC txevent=00000000000000D0
-     base1 =0000000000E50000 base2  =0000000001A50000 sizeins=0000000000006000
-     repeat=0000000000002710 large page mode =0001    method id =0009
-     optimal affinity group\mask  = 0000\0000000000000000
-     original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000000000445100
-
--------------------------------------------------------------------------------
-
-running threads...done
-dTSC=000000001B0486A3h
-allocate statistics array...done
-statistics array allocated: BASE=000000000066A7D0h, SIZE=0000000000000080h
-
-RUN: method=9, threads=1, repeats=ADAPTIVE
-     page mode=1, page size=4.00 KB
-     start=786432, end=12582912, delta=786432, bpi=32
-
-   #        size   CPI     nsPI    MBPS
--------------------------------------------------------
-   1      786432   1.806   0.753   42521.401 
-   2     1572864   1.804   0.752   42579.292 
-   3     2359296   1.801   0.751   42635.655 
-   4     3145728   1.801   0.751   42636.488 
-   5     3932160   1.822   0.759   42157.653 
-   6     4718592   1.915   0.798   40105.792 
-   7     5505024   2.197   0.916   34953.381 
-   8     6291456   2.398   0.999   32030.838 
-   9     7077888   2.751   1.146   27913.958 
-  10     7864320   3.040   1.267   25260.895 
-  11     8650752   3.260   1.358   23557.962 
-  12     9437184   3.570   1.487   21513.834 
-  13    10223616   3.668   1.528   20937.993 
-  14    11010048   3.801   1.584   20207.733 
-  15    11796480   3.914   1.631   19623.564 
-  16    12582912   4.011   1.671   19147.428 
--------------------------------------------------------
 
- | max=42636.488  | min=19147.428  | average=31111.492  | median=29972.398  |
-
-delete local objects...done
-delete global objects...done
-
+Memory Performance Engine. v0.60.06 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.22.00 for Windows x64. (C)2018 IC Book Labs.
+run memory benchmark scenario.
+asm method ID=12, bytes per instruction BPI=32
+TSC frequency F=2410.928 MHz, period T=0.415 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000000D00000 0000000001800000 0000000000D00000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 1 , list allocated at base = 00000000007B6F20h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=00000000000000CC rxevent=00000000000000D0 txevent=00000000000000D4
+     base1 =0000000000D00000 base2  =0000000001900000 sizeins=0000000000006000
+     repeat=0000000000002710 large page mode =0001    method id =000C
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done ( dTSC=000000001AD62532h )
+allocate statistics arrays...done
+bandwidth statistics, BASE=000000000066A7B0h, SIZE=0000000000000080h
+latency statistics,   BASE=000000000066A840h, SIZE=0000000000000080h
+RUN: method=12, threads=1, repeats=ADAPTIVE
+     page mode=1, page size=4.00 KB
+     start=768.00 KB, end=12.00 MB, delta=768.00 KB, bpi=32 bytes
+
+[ read 256-bit AVX VMOVAPD ]
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1      786432   1.811   0.751   42609.183 
+   2     1572864   1.816   0.753   42474.053 
+   3     2359296   1.808   0.750   42673.823 
+   4     3145728   1.808   0.750   42660.366 
+   5     3932160   1.817   0.754   42462.564 
+   6     4718592   1.845   0.765   41821.187 
+   7     5505024   2.019   0.838   38207.517 
+   8     6291456   2.332   0.967   33084.211 
+   9     7077888   2.697   1.119   28603.809 
+  10     7864320   3.104   1.288   24853.871 
+  11     8650752   3.353   1.391   23006.262 
+  12     9437184   3.579   1.484   21558.256 
+  13    10223616   3.840   1.593   20088.612 
+  14    11010048   3.919   1.625   19687.775 
+  15    11796480   4.017   1.666   19205.137 
+  16    12582912   4.094   1.698   18842.908 
+-------------------------------------------------------
+
+ Bandwidth ( megabytes per second )
+------------------------------------------------------------------------------
+ | max=42673.823  | min=18842.908  | average=31364.971  | median=30844.010  |
+------------------------------------------------------------------------------
+
+delete local objects...done
+delete global objects...done
+

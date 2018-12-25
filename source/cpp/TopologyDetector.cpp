@@ -22,24 +22,24 @@ SYSTEM_TOPOLOGY_DATA TopologyDetector::topologyData;
 SYSTEM_TOPOLOGY_DATA TopologyDetector::topologyDataEx;
 // Tables up strings, standard version of system information
 const char* TopologyDetector::tableUpCores =
-	" core  affinity mask (hex)   ht flag   logical processors\r\n";
+	" core  affinity mask (hex)   ht flag   logical processors\n";
 const char* TopologyDetector::tableUpCaches =
-	" cache  type          size (KB)    associativity   line     logical processors\r\n";
+	" cache  type          size (KB)    associativity   line     logical processors\n";
 const char* TopologyDetector::tableUpDomains =
-	" domain   affinity mask (hex)   logical processors\r\n";
+	" domain   affinity mask (hex)   logical processors\n";
 const char* TopologyDetector::tableUpPackages =
-	" package   affinity mask (hex)   logical processors\r\n";
+	" package   affinity mask (hex)   logical processors\n";
 // Tables up strings, extended version of system information
 const char* TopologyDetector::tableUpCoresEx =
-	" core   ht   efficiency   group and affinity mask (hex)\r\n";
+	" core   ht   efficiency   group and affinity mask (hex)\n";
 const char* TopologyDetector::tableUpCachesEx =
-	" cache  type          size (KB)          group and affinity mask (hex)\r\n";
+	" cache  type          size (KB)          group and affinity mask (hex)\n";
 const char* TopologyDetector::tableUpDomainsEx =
-	" domain   group and affinity mask (hex)\r\n";
+	" domain   group and affinity mask (hex)\n";
 //const char* TopologyDetector::tableUpPackagesEx =
-//	" package   group and affinity mask (hex)\r\n";
+//	" package   group and affinity mask (hex)\n";
 const char* TopologyDetector::tableUpGroupsEx =
-	" group   maximum   active   maximum   active   affinity mask (hex)\r\n";
+	" group   maximum   active   maximum   active   affinity mask (hex)\n";
 
 // Cache types names strings
 const char* TopologyDetector::cacheTypes[] =

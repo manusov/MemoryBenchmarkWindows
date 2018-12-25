@@ -43,7 +43,7 @@ void AppLib::printLine( LPSTR &dst, size_t &max, size_t cnt )
 			max -= count;
 		}
 	}
-	count = snprintf( dst, max, "\r\n" );
+	count = snprintf( dst, max, "\n" );
 	dst += count;
 	max -= count;
 	return;
@@ -51,7 +51,7 @@ void AppLib::printLine( LPSTR &dst, size_t &max, size_t cnt )
 // Print CR, LF, next string
 void AppLib::printCrLf( LPSTR &dst, size_t &max )
 {
-	int count = snprintf( dst, max, "\r\n" );
+	int count = snprintf( dst, max, "\n" );
 	dst += count;
 	max -= count;
 }

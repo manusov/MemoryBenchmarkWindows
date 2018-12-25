@@ -28,94 +28,94 @@ void SysinfoScenario::execute( )
 {
 	char* dst = NULL;
 	size_t max = 0;
-	AppConsole::transmit( "\r\n" );
+	AppConsole::transmit( "\n" );
 	// support key: "info=cpu"
 	if ( ( enumOp == INFO_CPU ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- PROCESSOR INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- PROCESSOR INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pProcessorDetector->getProcessorText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=topology"
 	if ( ( enumOp == INFO_TOPOLOGY ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- MP TOPOLOGY AND CACHE INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- MP TOPOLOGY AND CACHE INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pTopologyDetector->getTopologyText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=topologyex"
 	if ( ( enumOp == INFO_TOPOLOGY_EX ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- MP TOPOLOGY AND CACHE EXTENDED INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- MP TOPOLOGY AND CACHE EXTENDED INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pTopologyDetector->getTopologyTextEx( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=memory"
 	if ( ( enumOp == INFO_MEMORY ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- MEMORY INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- MEMORY INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pMemoryDetector->getMemoryText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=paging"
 	if ( ( enumOp == INFO_PAGING ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- PAGING INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- PAGING INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pPagingDetector->getPagingText( dst, max );
 		*dst = 0;  // terminator must be char = 0		
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=api"
 	if ( ( enumOp == INFO_API ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- WINAPI AND APPLICATION LIBRARY INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- WINAPI AND APPLICATION LIBRARY INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pFunctionsLoader->getFunctionsText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=domains"
 	if ( ( enumOp == INFO_DOMAINS ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- NUMA DOMAINS INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- NUMA DOMAINS INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pDomainsBuilder->getNumaText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 	// support key: "info=threads"
 	if ( ( enumOp == INFO_THREADS ) || ( enumOp == INFO_ALL ) )
 	{
-		AppConsole::transmit( "[ --- THREADS INFORMATION --- ]\r\n\r\n" );
+		AppConsole::transmit( "[ --- THREADS INFORMATION --- ]\n\n" );
 		dst = saveDst;
 		max = saveMax;
 		controlSet->pThreadsBuilder->getThreadsText( dst, max );
 		*dst = 0;  // terminator must be char = 0
 		AppConsole::transmit( saveDst );
-		AppConsole::transmit( "\r\n" );
+		AppConsole::transmit( "\n" );
 	}
 }
 

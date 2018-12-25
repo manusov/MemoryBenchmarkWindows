@@ -19,11 +19,11 @@ char DomainsBuilder::s[NS];
 // Width and up string for nodes list table, for NUMA-aware version
 #define TABLE_WIDTH_NUMA 79
 const char* DomainsBuilder::tableUpNuma =
-	" ID affinity group\\mask   allocated base   allocated size   original (all hex)\r\n";
+	" ID affinity group\\mask   allocated base   allocated size   original (all hex)\n";
 // Width and up string for nodes list table, for NUMA-unaware version
 #define TABLE_WIDTH_SIMPLE 57
 const char* DomainsBuilder::tableUpSimple =
-	" ID  allocated base   allocated size   original (all hex)\r\n";
+	" ID  allocated base   allocated size   original (all hex)\n";
 // Class constructor, 
 // allocate memory for lists, initialize pointers, get NUMA topology data
 DomainsBuilder::DomainsBuilder( FUNCTIONS_LIST* functions )

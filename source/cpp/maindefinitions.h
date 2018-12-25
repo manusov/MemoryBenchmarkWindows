@@ -13,11 +13,11 @@
 
 // Build type strings definition
 #if __i386__ & _WIN32
-#define BUILD_STRING "v0.60.05 for Windows ia32."
+#define BUILD_STRING "v0.60.06 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "mpe_w_32.dll"
 #define NATIVE_WIDTH 32
 #elif __x86_64__ & _WIN64
-#define BUILD_STRING "v0.60.05 for Windows x64."
+#define BUILD_STRING "v0.60.06 for Windows x64."
 #define NATIVE_LIBRARY_NAME "mpe_w_64.dll"
 #define NATIVE_WIDTH 64
 #else

@@ -41,7 +41,7 @@ const char* FunctionsLoader::dllFunctions[] =
 };
 // Table up for loaded functions list.
 const char* FunctionsLoader::tableUp =
-	" module           function                            pointer (hex)\r\n";
+	" module           function                            pointer (hex)\n";
 // Control array for print list of loaded functions with libraries names
 const PRINT_LOADED_FUNCTION FunctionsLoader::printLoaded[] =
 {

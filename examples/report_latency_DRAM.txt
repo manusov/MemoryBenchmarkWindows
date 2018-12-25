@@ -1,75 +1,79 @@
-
-Memory Performance Engine. v0.60.00 for Windows x64. (C)2018 IC Book Labs.
-load API...done
-detect processor features...done
-detect SMP and cache levels...done
-detect memory...done
-detect paging...done
-initializing domains builder...done
-initializing threads builder...done
-measure TSC clock...done
-get library data...done
-MPE native library. v0.21.00 for Windows x64. (C)2018 IC Book Labs.
-get command line parameters...done
-run memory benchmark scenario.
-asm method ID=33, bytes per instruction BPI=8
-TSC frequency F=2402.275 MHz, period T=0.416 ns
-cache points for data read/write:
-L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
-CPU core count=4, HyperThreading=1
-memory allocation...done
-NUMA-unaware mode, list allocated at base = 0000000000445640h
-
- ID  allocated base   allocated size   original (all hex)
----------------------------------------------------------
- 0   0000000000EF0000 0000000008000000 0000000000EF0000 
----------------------------------------------------------
-
-threads allocation...done
-threads entries created = 1 , list allocated at base = 0000000000EE6F40h
-
- ID  (values hex)
--------------------------------------------------------------------------------
- 0   thread=00000000000000CC rxevent=00000000000000D0 txevent=00000000000000D4
-     base1 =0000000000EF0000 base2  =0000000004EF0000 sizeins=0000000000080000
-     repeat=000000000000000A large page mode =0001    method id =0021
-     optimal affinity group\mask  = 0000\0000000000000000
-     original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000000000445100
-
--------------------------------------------------------------------------------
-
-running threads...done
-dTSC=0000000014F7271Ch
-allocate statistics array...done
-statistics array allocated: BASE=0000000000D7A7D0h, SIZE=0000000000000080h
-
-RUN: method=33, threads=1, repeats=ADAPTIVE
-     page mode=1, page size=4.00 KB
-     start=4194304, end=67108864, delta=4194304, bpi=8
-
-   #        size   CPI     nsPI    MBPS
--------------------------------------------------------
-   1     4194304  31.918  13.287   602.103   
-   2     8388608  92.087  38.333   208.697   
-   3    12582912 123.399  51.368   155.740   
-   4    16777216 149.251  62.129   128.764   
-   5    20971520 154.555  64.337   124.345   
-   6    25165824 163.212  67.941   117.750   
-   7    29360128 172.789  71.927   111.224   
-   8    33554432 175.503  73.057   109.503   
-   9    37748736 181.147  75.406   106.092   
-  10    41943040 179.425  74.690   107.110   
-  11    46137344 183.091  76.216   104.965   
-  12    50331648 185.564  77.245   103.566   
-  13    54525952 187.002  77.844   102.770   
-  14    58720256 187.229  77.938   102.645   
-  15    62914560 190.823  79.434   100.712   
-  16    67108864 192.353  80.071   99.911    
--------------------------------------------------------
 
- | max=602.103    | min=99.911     | average=149.119    | median=108.307    |
-
-delete local objects...done
-delete global objects...done
-
+Memory Performance Engine. v0.60.06 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.22.00 for Windows x64. (C)2018 IC Book Labs.
+run memory benchmark scenario.
+asm method ID=36, bytes per instruction BPI=8
+TSC frequency F=2412.014 MHz, period T=0.415 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000000D40000 0000000008000000 0000000000D40000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 1 , list allocated at base = 0000000000C36F60h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=0000000000000088 rxevent=00000000000000CC txevent=00000000000000D0
+     base1 =0000000000D40000 base2  =0000000004D40000 sizeins=0000000000080000
+     repeat=000000000000000A large page mode =0001    method id =0024
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done ( dTSC=00000000138CA133h )
+allocate statistics arrays...done
+bandwidth statistics, BASE=0000000000C5A7B0h, SIZE=0000000000000080h
+latency statistics,   BASE=0000000000C5A840h, SIZE=0000000000000080h
+RUN: method=36, threads=1, repeats=ADAPTIVE
+     page mode=1, page size=4.00 KB
+     start=4.00 MB, end=64.00 MB, delta=4.00 MB, bpi=8 bytes
+
+[ prepare walk list for latency measure by RDRAND ]
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1     4194304  32.673  13.546   590.591   
+   2     8388608  95.749  39.697   201.528   
+   3    12582912 131.169  54.382   147.108   
+   4    16777216 145.365  60.267   132.743   
+   5    20971520 158.016  65.512   122.115   
+   6    25165824 170.226  70.574   113.356   
+   7    29360128 177.522  73.599   108.697   
+   8    33554432 184.836  76.631   104.396   
+   9    37748736 178.954  74.193   107.827   
+  10    41943040 181.778  75.363   106.152   
+  11    46137344 186.800  77.446   103.298   
+  12    50331648 187.685  77.812   102.811   
+  13    54525952 190.539  78.996   101.271   
+  14    58720256 188.950  78.337   102.123   
+  15    62914560 193.395  80.180   99.775    
+  16    67108864 193.743  80.324   99.596    
+-------------------------------------------------------
+
+ Latency ( nanoseconds )
+------------------------------------------------------------------------------
+ | max=80.324     | min=13.546     | average=67.304     | median=74.778     |
+------------------------------------------------------------------------------
+
+delete local objects...done
+delete global objects...done
+

@@ -140,7 +140,7 @@ const XGETBV_CONDITION ProcessorDetector::y[] = {
 
 // Table up for CPU functionality list
 const char* ProcessorDetector::tableUpFunctionality =
-	" #    CPU  OS   cpu functionality and instructions\r\n";
+	" #    CPU  OS   cpu functionality and instructions\n";
 
 // String results of CPUID
 #define VENDOR_SIZE 12+1
@@ -196,7 +196,7 @@ void ProcessorDetector::getProcessorText( LPSTR &dst, size_t &max )
 {
 	int count = 0;
 	// Processor vendor and model
-	count = snprintf( dst, max, "processor vendor = %s\r\nprocessor model  = %s\r\n", 
+	count = snprintf( dst, max, "processor vendor = %s\nprocessor model  = %s\n", 
 					  cpuVendorString, cpuModelString );
 	dst += count;
 	max -= count;
@@ -204,14 +204,14 @@ void ProcessorDetector::getProcessorText( LPSTR &dst, size_t &max )
 	DWORD64 hz = processorData.deltaTsc;
 	if ( hz == 0 )
 	{
-		count = snprintf( dst, max, "time stamp counter (TSC) frequency measurement error\r\n");
+		count = snprintf( dst, max, "time stamp counter (TSC) frequency measurement error\n");
 	}
 	else
 	{
 		double mhz = hz / 1000000.0;
 		double ns = 1000000000.0 / hz;
 		count = snprintf( dst, max, 
-						  "time stamp counter (TSC) frequency = %.1f MHz, period = %.3f ns\r\n",
+						  "time stamp counter (TSC) frequency = %.1f MHz, period = %.3f ns\n",
 						  mhz, ns );
 	}
 	dst += count;

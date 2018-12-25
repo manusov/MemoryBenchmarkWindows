@@ -42,7 +42,7 @@ void AppConsole::transmit( LPCSTR s )
 	}
 	else
 	{
-		printf( "\r\nOUTPUT OPTION ERROR.\r\n" );
+		printf( "\nOUTPUT OPTION ERROR.\n" );
 	}
 }
 

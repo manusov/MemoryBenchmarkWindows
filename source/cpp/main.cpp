@@ -91,12 +91,12 @@ int main(int argc, char** argv)
 	if ( pTextAlloc == NULL )
 	{
 		// Yet simple printf, because buffer not allocated
-		printf( "\r\nError at memory allocation for text report buffer.\r\n" );
+		printf( "\nError at memory allocation for text report buffer.\n" );
 		return 1;
 	}
 	// Show title
 	AppConsole::setOutputOption( OUT_SCREEN );
-	snprintf( pTextAlloc, mText, "\r\n%s %s %s\r\n", stringTitle1, stringTitle2, stringTitle3 );
+	snprintf( pTextAlloc, mText, "\n%s %s %s\n", stringTitle1, stringTitle2, stringTitle3 );
 	AppConsole::transmit( pTextAlloc );
 	
 	// Control and status variables
@@ -112,9 +112,9 @@ int main(int argc, char** argv)
 	osErrorCode = pCommandLine->parseCommandLine( argc, argv );
 	if ( osErrorCode )
 	{
-		AppConsole::transmit( "FAILED\r\n" );
+		AppConsole::transmit( "FAILED\n" );
 		statusString = pCommandLine->getStatusString( );
-        snprintf( pTextAlloc, mText, "\r\nERROR: %s\r\n\r\n", statusString );
+        snprintf( pTextAlloc, mText, "\nERROR: %s\n\n", statusString );
         AppConsole::transmit( pTextAlloc );
         if ( osErrorCode > 0 )
         {
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		AppConsole::transmit( "done\r\n" );
+		AppConsole::transmit( "done\n" );
 		pCommandLine->correctAfterParse( );
 		pp = pCommandLine->getCommandLineParms( );
 		
@@ -133,7 +133,9 @@ int main(int argc, char** argv)
 		if ( pp->optionOut == OUT_FILE )
 		{
 			AppConsole::initializeOutput( );
-			AppConsole::transmit( pTextAlloc );  // copyright string to file
+			// copyright string to file
+			snprintf( pTextAlloc, mText, "%s %s %s\n", stringTitle1, stringTitle2, stringTitle3 );
+			AppConsole::transmit( pTextAlloc );
 		}
 
 		// Blank system classes pointers
@@ -152,25 +154,25 @@ int main(int argc, char** argv)
 		// Check application DLL load
 		if ( pFunctionsList->loadStatus == 0 )
 		{
-			AppConsole::transmit( "done\r\ndetect processor features..." );
+			AppConsole::transmit( "done\ndetect processor features..." );
 			s.pProcessorDetector = new ProcessorDetector( pFunctionsList );
-			AppConsole::transmit( "done\r\ndetect SMP and cache levels..." );
+			AppConsole::transmit( "done\ndetect SMP and cache levels..." );
 			s.pTopologyDetector = new TopologyDetector( pFunctionsList );
-			AppConsole::transmit( "done\r\ndetect memory..." );
+			AppConsole::transmit( "done\ndetect memory..." );
 			s.pMemoryDetector = new MemoryDetector( pFunctionsList );
-			AppConsole::transmit( "done\r\ndetect paging..." );
+			AppConsole::transmit( "done\ndetect paging..." );
 			s.pPagingDetector = new PagingDetector( pFunctionsList );
-			AppConsole::transmit( "done\r\ninitializing domains builder..." );
+			AppConsole::transmit( "done\ninitializing domains builder..." );
 			s.pDomainsBuilder = new DomainsBuilder( pFunctionsList );
-			AppConsole::transmit( "done\r\ninitializing threads builder..." );
+			AppConsole::transmit( "done\ninitializing threads builder..." );
 			s.pThreadsBuilder = new ThreadsBuilder( pFunctionsList );
-			AppConsole::transmit( "done\r\nmeasure TSC clock..." );
+			AppConsole::transmit( "done\nmeasure TSC clock..." );
 			s.pProcessorDetector->measureTSC( );
 			// Get application native library info, show string
-			AppConsole::transmit( "done\r\nget library data..." );
+			AppConsole::transmit( "done\nget library data..." );
 			char *dllProduct, *dllVersion, *dllVendor;
 			pFunctionsList->DLL_GetDllStrings( &dllProduct, &dllVersion, &dllVendor );
-			snprintf( pTextAlloc, mText, "done\r\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
+			snprintf( pTextAlloc, mText, "done\n%s %s %s\n", dllProduct, dllVersion, dllVendor );
 			AppConsole::transmit( pTextAlloc );
 
 			// Select scenario
@@ -180,7 +182,7 @@ int main(int argc, char** argv)
 			// User help scenario
 			if ( opHelp != OPTION_NOT_SET )
 			{
-				AppConsole::transmit( "run user help scenario.\r\n" );
+				AppConsole::transmit( "run user help scenario.\n" );
 				const OPTION_ENTRY* oplist = pCommandLine->getOptionsList( );
 				pUserHelp = new UserHelp( pTextAlloc, mText, opHelp, oplist );
 				pUserHelp->execute( );
@@ -188,7 +190,7 @@ int main(int argc, char** argv)
 			// System information scenario
 			if ( opInfo != OPTION_NOT_SET )
 			{
-				AppConsole::transmit( "run system information scenario.\r\n" );
+				AppConsole::transmit( "run system information scenario.\n" );
 				pSysinfoScenario = new SysinfoScenario( pTextAlloc, mText, opInfo, &s );
 				pSysinfoScenario->execute( );
 			}
@@ -198,27 +200,27 @@ int main(int argc, char** argv)
 				// Benchmark scenario: memory
 				if ( opTest == TEST_MEMORY )
 				{
-					AppConsole::transmit( "run memory benchmark scenario.\r\n" );
+					AppConsole::transmit( "run memory benchmark scenario.\n" );
 					pMemoryScenario = new MemoryScenario( pTextAlloc, mText, opTest, &s, pp );
 					pMemoryScenario->execute( );
 				}
 				// Benchmark scenario: mass storage
 				if ( opTest == TEST_STORAGE )
 				{
-					AppConsole::transmit( "run mass storage benchmark scenario.\r\n" );
-					AppConsole::transmit( "\r\nTHIS BRANCH IS UNDER CONSTRUCTION.\r\n\r\n" );
+					AppConsole::transmit( "run mass storage benchmark scenario.\n" );
+					AppConsole::transmit( "\nTHIS BRANCH IS UNDER CONSTRUCTION.\n\n" );
 				}
 			}
 			// Default scenario
 			if ( ( opHelp == OPTION_NOT_SET )&&( opInfo == OPTION_NOT_SET )&&( opTest == OPTION_NOT_SET ) )
 			{
-				AppConsole::transmit( "run default scenario.\r\n" );
-				AppConsole::transmit( "\r\nNO PARAMETERS, USE \"help=full\".\r\n\r\n" );
+				AppConsole::transmit( "run default scenario.\n" );
+				AppConsole::transmit( "\nNO PARAMETERS, USE \"help=full\".\n\n" );
 			}
 		}
 		else
 		{
-			AppConsole::transmit( "\r\nError loading DLL.\r\n" );
+			AppConsole::transmit( "\nError loading DLL.\n" );
 		}
 	}
 	// Scenario done, print message, release (delete) objects and exit
@@ -240,7 +242,7 @@ int main(int argc, char** argv)
 	// Release text buffer memory
 	if ( pTextAlloc != NULL ) free( pTextAlloc );
 	// Exit application with "done" message
-	AppConsole::transmit( "done\r\n\r\n" );
+	AppConsole::transmit( "done\n\n" );
 	return 0;
 }
 

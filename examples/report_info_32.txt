@@ -1,184 +1,187 @@
-
-Memory Performance Engine. v0.60.00 for Windows ia32. (C)2018 IC Book Labs.
-load API...done
-detect processor features...done
-detect SMP and cache levels...done
-detect memory...done
-detect paging...done
-initializing domains builder...done
-initializing threads builder...done
-measure TSC clock...done
-get library data...done
-MPE native library. v0.21.00 for Windows ia32. (C)2018 IC Book Labs.
-get command line parameters...done
-run system information scenario.
-
-[ --- PROCESSOR INFORMATION --- ]
-
-processor vendor = GenuineIntel
-processor model  = Intel(R) Core(TM) i7-4700HQ CPU @ 2.40GHz
-time stamp counter (TSC) frequency = 2395.7 MHz, period = 0.417 ns
-cpuid bitmap = 00000007E79E8FFFh , xgetbv bitmap = 00000007E79E8FFFh
-
- #    CPU  OS   cpu functionality and instructions
-----------------------------------------------------------------------
- 0    1    1    read 32-bit MOV                                   
- 1    1    1    write 32-bit MOV                                  
- 2    1    1    copy 32-bit MOV                                   
- 3    1    1    modify 32-bit NOT                                 
- 4    1    1    write 32-bit REP STOSD                            
- 5    1    1    copy 32-bit REP MOVSD                             
- 6    1    1    read 128-bit SSE MOVAPS                           
- 7    1    1    write 128-bit SSE MOVAPS                          
- 8    1    1    copy 128-bit SSE MOVAPS                           
- 9    1    1    read 256-bit AVX VMOVAPD                          
- 10   1    1    write 256-bit AVX VMOVAPD                         
- 11   1    1    copy 256-bit AVX VMOVAPD                          
- 12   0    0    read 512-bit AVX VMOVAPD                          
- 13   0    0    write 512-bit AVX VMOVAPD                         
- 14   0    0    copy 512-bit AVX VMOVAPD                          
- 15   1    1    dot product 256-bit FMA VFMADD231PD               
- 16   0    0    dot product 512-bit FMA VFMADD231PD               
- 17   1    1    non-temporal write 128-bit SSE MOVNTPS            
- 18   1    1    non-temporal copy 128-bit SSE MOVAPS+MOVNTPS      
- 19   1    1    non-temporal write 256-bit AVX VMOVNTPD           
- 20   1    1    non-temporal copy 256-bit AVX VMOVAPD+VMOVNTPD    
- 21   0    0    non-temporal write 512-bit AVX VMOVNTPD           
- 22   0    0    non-temporal copy 512-bit AVX VMOVAPD+VMOVNTPD    
- 23   1    1    non-temporal read 128-bit SSE MOVNTDQA            
- 24   1    1    non-temporal copy 128-bit SSE MOVNTDQA+MOVNTPD    
- 25   1    1    non-temporal read 256-bit AVX VMOVNTDQA           
- 26   1    1    non-temporal copy 256-bit AVX VMOVNTDQA+VMOVNTPD  
- 27   0    0    non-temporal read 512-bit AVX VMOVNTDQA           
- 28   0    0    non-temporal copy 512-bit AVX VMOVNTDQA+VMOVNTPD  
- 29   1    1    non-temporal read 128-bit SSE PREFETCHNTA+MOVAPS  
- 30   1    1    reserved                                          
- 31   1    1    non-temporal read 256-bit AVX PREFETCHNTA+VMOVAPD 
- 32   1    1    prepare walk list for latency measure by LCM      
- 33   1    1    prepare walk list for latency measure by RDRAND   
- 34   1    1    latency measure by walk list                      
-----------------------------------------------------------------------
-
-[ --- MP TOPOLOGY AND CACHE INFORMATION --- ]
-
- core  affinity mask (hex)   ht flag   logical processors
-----------------------------------------------------------
- 0     0000000000000003      1         0-1
- 1     000000000000000C      1         2-3
- 2     0000000000000030      1         4-5
- 3     00000000000000C0      1         6-7
-----------------------------------------------------------
-
- cache  type          size (KB)    associativity   line     logical processors
--------------------------------------------------------------------------------
- L1     data          32           8               64       0-1
- L1     instruction   32           8               64       0-1
- L2     unified       256          8               64       0-1
- L1     data          32           8               64       2-3
- L1     instruction   32           8               64       2-3
- L2     unified       256          8               64       2-3
- L1     data          32           8               64       4-5
- L1     instruction   32           8               64       4-5
- L2     unified       256          8               64       4-5
- L1     data          32           8               64       6-7
- L1     instruction   32           8               64       6-7
- L2     unified       256          8               64       6-7
- L3     unified       6144         12              64       0-7
--------------------------------------------------------------------------------
-
- domain   affinity mask (hex)   logical processors
----------------------------------------------------
- 0        00000000000000FF      0-7
----------------------------------------------------
-
- package   affinity mask (hex)   logical processors
-----------------------------------------------------
- 0         00000000000000FF      0-7
-----------------------------------------------------
-
-[ --- MP TOPOLOGY AND CACHE EXTENDED INFORMATION --- ]
-
- core   ht   efficiency   group and affinity mask (hex)
----------------------------------------------------------
- 0      1    0            0000 \ 0000000000000003
- 1      1    0            0000 \ 000000000000000C
- 2      1    0            0000 \ 0000000000000030
- 3      1    0            0000 \ 00000000000000C0
----------------------------------------------------------
-
- cache  type          size (KB)          group and affinity mask (hex)
------------------------------------------------------------------------
- L1     data          32                 0000 \ 0000000000000003
- L1     instruction   32                 0000 \ 0000000000000003
- L2     unified       256                0000 \ 0000000000000003
- L3     unified       6144               0000 \ 00000000000000FF
- L1     data          32                 0000 \ 000000000000000C
- L1     instruction   32                 0000 \ 000000000000000C
- L2     unified       256                0000 \ 000000000000000C
- L1     data          32                 0000 \ 0000000000000030
- L1     instruction   32                 0000 \ 0000000000000030
- L2     unified       256                0000 \ 0000000000000030
- L1     data          32                 0000 \ 00000000000000C0
- L1     instruction   32                 0000 \ 00000000000000C0
- L2     unified       256                0000 \ 00000000000000C0
------------------------------------------------------------------------
-
- domain   group and affinity mask (hex)
-----------------------------------------
- 0        0000 \ 00000000000000FF
-----------------------------------------
-
- group   maximum   active   maximum   active   affinity mask (hex)
--------------------------------------------------------------------
- 0       1        1         8        8         00000000000000FF
--------------------------------------------------------------------
-
-[ --- MEMORY INFORMATION --- ]
-
-installed memory = 16657448 KB, free = 12845944 KB
-
-[ --- PAGING INFORMATION --- ]
-
-default page = 4 KB, large page = 2048 KB, privileges = 0
-
-[ --- WINAPI AND APPLICATION LIBRARY INFORMATION --- ]
-
- module           function                            pointer (hex)
------------------------------------------------------------------------
- kernel32         GetLogicalProcessorInformation      75526EE0
- kernel32         GetLogicalProcessorInformationEx    74928B70
- kernel32         GlobalMemoryStatusEx                755254A0
- kernel32         GetActiveProcessorCount             75563F00
- kernel32         GetActiveProcessorGroupCount        75563E80
- kernel32         GetNumaHighestNodeNumber            75527310
- kernel32         GetNumaNodeProcessorMask            75564E90
- kernel32         GetNumaNodeProcessorMaskEx          75527330
- kernel32         VirtualAllocExNuma                  755266E0
- kernel32         SetThreadAffinityMask               75567F50
- kernel32         SetThreadGroupAffinity              75527390
- kernel32         GetLargePageMinimum                 75524AB0
- kernel32         GetSystemFirmwareTable              75521E20
- mpe_w_32.dll     GetDllStrings                       67261006
- mpe_w_32.dll     CheckCpuid                          67261033
- mpe_w_32.dll     ExecuteCpuid                        67261058
- mpe_w_32.dll     ExecuteRdtsc                        67261081
- mpe_w_32.dll     ExecuteXgetbv                       6726108F
- mpe_w_32.dll     MeasureTsc                          672610A2
- mpe_w_32.dll     PerformanceGate                     67261103
------------------------------------------------------------------------
-
-[ --- NUMA DOMAINS INFORMATION --- ]
-
-NUMA nodes detected = 1 , list allocated at base = 00DF9458h
-
- ID affinity group\mask   allocated base   allocated size   original (all hex)
--------------------------------------------------------------------------------
- 0  0000\00000000000000FF 0000000000000000 0000000000000000 0000000000000000 
--------------------------------------------------------------------------------
-
-[ --- THREADS INFORMATION --- ]
-
-threads entries created = 0 , list allocated at base = 00FB6DA8h
-
-delete global objects...done
-
+
+Memory Performance Engine. v0.60.06 for Windows ia32. (C)2018 IC Book Labs.
+get command line parameters...done
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.22.00 for Windows ia32. (C)2018 IC Book Labs.
+run system information scenario.
+
+[ --- PROCESSOR INFORMATION --- ]
+
+processor vendor = GenuineIntel
+processor model  = Intel(R) Core(TM) i7-4700HQ CPU @ 2.40GHz
+time stamp counter (TSC) frequency = 2410.8 MHz, period = 0.415 ns
+cpuid bitmap = 0000003F3CF47FFFh , xgetbv bitmap = 0000003F3CF47FFFh
+
+ #    CPU  OS   cpu functionality and instructions
+----------------------------------------------------------------------
+ 0    1    1    read 32-bit MOV                                   
+ 1    1    1    write 32-bit MOV                                  
+ 2    1    1    copy 32-bit MOV                                   
+ 3    1    1    modify 32-bit NOT                                 
+ 4    1    1    write 32-bit REP STOSD                            
+ 5    1    1    copy 32-bit REP MOVSD                             
+ 6    1    1    read 64-bit MMX MOVQ                              
+ 7    1    1    write 64-bit MMX MOVQ                             
+ 8    1    1    copy 64-bit MMX MOVQ                              
+ 9    1    1    read 128-bit SSE MOVAPS                           
+ 10   1    1    write 128-bit SSE MOVAPS                          
+ 11   1    1    copy 128-bit SSE MOVAPS                           
+ 12   1    1    read 256-bit AVX VMOVAPD                          
+ 13   1    1    write 256-bit AVX VMOVAPD                         
+ 14   1    1    copy 256-bit AVX VMOVAPD                          
+ 15   0    0    read 512-bit AVX VMOVAPD                          
+ 16   0    0    write 512-bit AVX VMOVAPD                         
+ 17   0    0    copy 512-bit AVX VMOVAPD                          
+ 18   1    1    dot product 256-bit FMA VFMADD231PD               
+ 19   0    0    dot product 512-bit FMA VFMADD231PD               
+ 20   1    1    non-temporal write 128-bit SSE MOVNTPS            
+ 21   1    1    non-temporal copy 128-bit SSE MOVAPS+MOVNTPS      
+ 22   1    1    non-temporal write 256-bit AVX VMOVNTPD           
+ 23   1    1    non-temporal copy 256-bit AVX VMOVAPD+VMOVNTPD    
+ 24   0    0    non-temporal write 512-bit AVX VMOVNTPD           
+ 25   0    0    non-temporal copy 512-bit AVX VMOVAPD+VMOVNTPD    
+ 26   1    1    non-temporal read 128-bit SSE MOVNTDQA            
+ 27   1    1    non-temporal copy 128-bit SSE MOVNTDQA+MOVNTPD    
+ 28   1    1    non-temporal read 256-bit AVX VMOVNTDQA           
+ 29   1    1    non-temporal copy 256-bit AVX VMOVNTDQA+VMOVNTPD  
+ 30   0    0    non-temporal read 512-bit AVX VMOVNTDQA           
+ 31   0    0    non-temporal copy 512-bit AVX VMOVNTDQA+VMOVNTPD  
+ 32   1    1    non-temporal read 128-bit SSE PREFETCHNTA+MOVAPS  
+ 33   1    1    reserved                                          
+ 34   1    1    non-temporal read 256-bit AVX PREFETCHNTA+VMOVAPD 
+ 35   1    1    prepare walk list for latency measure by LCM      
+ 36   1    1    prepare walk list for latency measure by RDRAND   
+ 37   1    1    latency measure by walk list                      
+----------------------------------------------------------------------
+
+[ --- MP TOPOLOGY AND CACHE INFORMATION --- ]
+
+ core  affinity mask (hex)   ht flag   logical processors
+----------------------------------------------------------
+ 0     0000000000000003      1         0-1
+ 1     000000000000000C      1         2-3
+ 2     0000000000000030      1         4-5
+ 3     00000000000000C0      1         6-7
+----------------------------------------------------------
+
+ cache  type          size (KB)    associativity   line     logical processors
+-------------------------------------------------------------------------------
+ L1     data          32           8               64       0-1
+ L1     instruction   32           8               64       0-1
+ L2     unified       256          8               64       0-1
+ L1     data          32           8               64       2-3
+ L1     instruction   32           8               64       2-3
+ L2     unified       256          8               64       2-3
+ L1     data          32           8               64       4-5
+ L1     instruction   32           8               64       4-5
+ L2     unified       256          8               64       4-5
+ L1     data          32           8               64       6-7
+ L1     instruction   32           8               64       6-7
+ L2     unified       256          8               64       6-7
+ L3     unified       6144         12              64       0-7
+-------------------------------------------------------------------------------
+
+ domain   affinity mask (hex)   logical processors
+---------------------------------------------------
+ 0        00000000000000FF      0-7
+---------------------------------------------------
+
+ package   affinity mask (hex)   logical processors
+----------------------------------------------------
+ 0         00000000000000FF      0-7
+----------------------------------------------------
+
+[ --- MP TOPOLOGY AND CACHE EXTENDED INFORMATION --- ]
+
+ core   ht   efficiency   group and affinity mask (hex)
+---------------------------------------------------------
+ 0      1    0            0000 \ 0000000000000003
+ 1      1    0            0000 \ 000000000000000C
+ 2      1    0            0000 \ 0000000000000030
+ 3      1    0            0000 \ 00000000000000C0
+---------------------------------------------------------
+
+ cache  type          size (KB)          group and affinity mask (hex)
+-----------------------------------------------------------------------
+ L1     data          32                 0000 \ 0000000000000003
+ L1     instruction   32                 0000 \ 0000000000000003
+ L2     unified       256                0000 \ 0000000000000003
+ L3     unified       6144               0000 \ 00000000000000FF
+ L1     data          32                 0000 \ 000000000000000C
+ L1     instruction   32                 0000 \ 000000000000000C
+ L2     unified       256                0000 \ 000000000000000C
+ L1     data          32                 0000 \ 0000000000000030
+ L1     instruction   32                 0000 \ 0000000000000030
+ L2     unified       256                0000 \ 0000000000000030
+ L1     data          32                 0000 \ 00000000000000C0
+ L1     instruction   32                 0000 \ 00000000000000C0
+ L2     unified       256                0000 \ 00000000000000C0
+-----------------------------------------------------------------------
+
+ domain   group and affinity mask (hex)
+----------------------------------------
+ 0        0000 \ 00000000000000FF
+----------------------------------------
+
+ group   maximum   active   maximum   active   affinity mask (hex)
+-------------------------------------------------------------------
+ 0       1        1         8        8         00000000000000FF
+-------------------------------------------------------------------
+
+[ --- MEMORY INFORMATION --- ]
+
+installed memory = 15.89 GB, free = 12.59 GB
+
+[ --- PAGING INFORMATION --- ]
+
+default page = 4 KB, large page = 2048 KB, privileges = 0
+
+[ --- WINAPI AND APPLICATION LIBRARY INFORMATION --- ]
+
+ module           function                            pointer (hex)
+-----------------------------------------------------------------------
+ kernel32         GetLogicalProcessorInformation      77926EE0
+ kernel32         GetLogicalProcessorInformationEx    75C88B70
+ kernel32         GlobalMemoryStatusEx                779254A0
+ kernel32         GetActiveProcessorCount             77963F00
+ kernel32         GetActiveProcessorGroupCount        77963E80
+ kernel32         GetNumaHighestNodeNumber            77927310
+ kernel32         GetNumaNodeProcessorMask            77964E90
+ kernel32         GetNumaNodeProcessorMaskEx          77927330
+ kernel32         VirtualAllocExNuma                  779266E0
+ kernel32         SetThreadAffinityMask               77967F50
+ kernel32         SetThreadGroupAffinity              77927390
+ kernel32         GetLargePageMinimum                 77924AB0
+ kernel32         GetSystemFirmwareTable              77921E20
+ mpe_w_32.dll     GetDllStrings                       68FF1006
+ mpe_w_32.dll     CheckCpuid                          68FF1033
+ mpe_w_32.dll     ExecuteCpuid                        68FF1058
+ mpe_w_32.dll     ExecuteRdtsc                        68FF1081
+ mpe_w_32.dll     ExecuteXgetbv                       68FF108F
+ mpe_w_32.dll     MeasureTsc                          68FF10A2
+ mpe_w_32.dll     PerformanceGate                     68FF1103
+-----------------------------------------------------------------------
+
+[ --- NUMA DOMAINS INFORMATION --- ]
+
+NUMA nodes detected = 1 , list allocated at base = 006D9458h
+
+ ID affinity group\mask   allocated base   allocated size   original (all hex)
+-------------------------------------------------------------------------------
+ 0  0000\00000000000000FF 0000000000000000 0000000000000000 0000000000000000 
+-------------------------------------------------------------------------------
+
+[ --- THREADS INFORMATION --- ]
+
+threads entries created = 0 , list allocated at base = 01236DA8h
+
+delete global objects...done
+
