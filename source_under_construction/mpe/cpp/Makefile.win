@@ -1,0 +1,70 @@
+# Project: Debug1
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o AppConsole.o
+LINKOBJ  = main.o FunctionsLoader.o AppLib.o TopologyDetector.o MemoryDetector.o PagingDetector.o ProcessorDetector.o DomainsBuilder.o ThreadsBuilder.o CommandLine.o UserHelp.o MemoryScenario.o StorageScenario.o SysinfoScenario.o AppConsole.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -m32 -s
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = Debug1.exe
+CXXFLAGS = $(CXXINCS) -m32
+CFLAGS   = $(INCS) -m32
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+FunctionsLoader.o: FunctionsLoader.cpp
+	$(CPP) -c FunctionsLoader.cpp -o FunctionsLoader.o $(CXXFLAGS)
+
+AppLib.o: AppLib.cpp
+	$(CPP) -c AppLib.cpp -o AppLib.o $(CXXFLAGS)
+
+TopologyDetector.o: TopologyDetector.cpp
+	$(CPP) -c TopologyDetector.cpp -o TopologyDetector.o $(CXXFLAGS)
+
+MemoryDetector.o: MemoryDetector.cpp
+	$(CPP) -c MemoryDetector.cpp -o MemoryDetector.o $(CXXFLAGS)
+
+PagingDetector.o: PagingDetector.cpp
+	$(CPP) -c PagingDetector.cpp -o PagingDetector.o $(CXXFLAGS)
+
+ProcessorDetector.o: ProcessorDetector.cpp
+	$(CPP) -c ProcessorDetector.cpp -o ProcessorDetector.o $(CXXFLAGS)
+
+DomainsBuilder.o: DomainsBuilder.cpp
+	$(CPP) -c DomainsBuilder.cpp -o DomainsBuilder.o $(CXXFLAGS)
+
+ThreadsBuilder.o: ThreadsBuilder.cpp
+	$(CPP) -c ThreadsBuilder.cpp -o ThreadsBuilder.o $(CXXFLAGS)
+
+CommandLine.o: CommandLine.cpp
+	$(CPP) -c CommandLine.cpp -o CommandLine.o $(CXXFLAGS)
+
+UserHelp.o: UserHelp.cpp
+	$(CPP) -c UserHelp.cpp -o UserHelp.o $(CXXFLAGS)
+
+MemoryScenario.o: MemoryScenario.cpp
+	$(CPP) -c MemoryScenario.cpp -o MemoryScenario.o $(CXXFLAGS)
+
+StorageScenario.o: StorageScenario.cpp
+	$(CPP) -c StorageScenario.cpp -o StorageScenario.o $(CXXFLAGS)
+
+SysinfoScenario.o: SysinfoScenario.cpp
+	$(CPP) -c SysinfoScenario.cpp -o SysinfoScenario.o $(CXXFLAGS)
+
+AppConsole.o: AppConsole.cpp
+	$(CPP) -c AppConsole.cpp -o AppConsole.o $(CXXFLAGS)
