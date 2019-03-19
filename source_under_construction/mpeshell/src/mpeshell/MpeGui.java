@@ -26,7 +26,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.DefaultCaret;
 import mpeshell.opendraw.ActionDraw;
@@ -307,6 +306,8 @@ public void runBenchmarkGui()
     }
 
 // handler for close session when exit by System.exit(n);
+// this software emulation required because JVM calls windowClosing
+// handler one when window closing.
 public void invokeCloseSession()
     {
     csl.windowClosing( null );
@@ -317,7 +318,7 @@ private class CloseSessionListener extends WindowAdapter
     {
     @Override public void windowClosing( WindowEvent e )
         {
-        OpStatus ops = taskShell.closeSession();
+        OpStatus ops = taskShell.closeSession();  // delete unpacked binaries
         if ( ! ops.getStatusFlag() )
             {
             JOptionPane.showMessageDialog

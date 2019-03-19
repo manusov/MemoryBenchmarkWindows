@@ -1,3 +1,11 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Support report text parsing for extract events and parameters,
+ * used for this java application monitoring native application output.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.math.BigDecimal;
@@ -9,6 +17,7 @@ private final static String[]
 private final static String 
         PATTERN_TABLE_BOUND = "-";
 
+// detect string with measurement results table up with parameters names
 public boolean detectBenchmarkTableUp( String[] words )
     {
     boolean b = false;
@@ -28,12 +37,14 @@ public boolean detectBenchmarkTableUp( String[] words )
     return b;
     }
 
+// detect string with table bound line "---...---"
 public boolean detectTableBoundLine( String[] words )
     {
     return ( words.length > 0 ) && ( words[0].length() > 0 ) &&
            ( words[0].subSequence( 0, 1 ).equals( PATTERN_TABLE_BOUND ) ); 
     }
 
+// extract numeric values from result table line
 public NumericEntry detectTableEntry( String[] words )
     {
     int n = words.length;

@@ -2,6 +2,7 @@
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
  * Static class with statistic library: min, max, median, average for arrays.
+ * Plus strings builder for statistics info in the tables.
  * Note some yet unused methods disabled.
  * Note array ordering software method don't replaced to java.util.Arrays.sort
  * because service array with elements indexes required.
@@ -252,6 +253,9 @@ public static EntryDetail getStatistic( double[] array, int n )
     return statisticEntry;
     }
 
+// method accept parameters for ReportListener and builds detail statistics
+// info (include text strings) for tables:
+// 1) table in the main window, 2) table in the openable statistics window.
 public static EntryStatistics buildStatisticsTable
         ( CopyOnWriteArrayList<NumericEntry> dataArray )
     {
@@ -292,6 +296,5 @@ public static EntryStatistics buildStatisticsTable
     estat.statTable[3][3] = String.format( "%.3f"   , mbps.max );
     return estat;
     }
-
 
 }

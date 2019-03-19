@@ -34,7 +34,8 @@ public int[] getKeys() { return null; }   // get keyb. keys for click this
 // this method for simplify visualization and encodings values
 // parent class provides dummy handler, for example if items is
 // text strings, not a numeric values
-public int[] getNumericValues()   { return null;  }  // get selections values
+public int[] getIntValues()       { return null;  }  // get selections values
+public long[] getLongValues()     { return null;  }
 public int getDefaultSelection()  { return -1;    }  // get default item, -1=no
 public boolean getDefaultEnable() { return true;  }  // get default state, e/d
 
@@ -101,6 +102,17 @@ String printRoundSize( long x, boolean b )
     // otherwise return string="?" for big sizes at this method context
     // terabytes not supported yet
     return s;    
+    }
+
+final long[] buildRoundNumbersArray( long x, int n )
+    {
+    long[] array = new long[n];
+    for( int i=0; i<n; i++ )
+        {
+        array[i] = x;
+        x = x << 1;
+        }
+    return array;
     }
 
 String[] printRoundSizesArray( long x, int n, boolean b )

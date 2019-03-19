@@ -1,3 +1,11 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Representation for benchmarks measurement session result.
+ * Some functionality of this class YET RESERVED.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 public class OpResult extends OpStatus

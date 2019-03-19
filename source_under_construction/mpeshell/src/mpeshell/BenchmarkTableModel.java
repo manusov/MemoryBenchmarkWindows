@@ -52,35 +52,7 @@ public void setRowsValues( String[][] s )  { rowsValues = s;       }
 @Override public boolean isCellEditable( int row, int column )
     { return false; }
 
-/*
-public void arrayNotify
-    ( double[] sz, double[] cp, double[] ns, double[] mb )
-    {
-    int n = sz.length;
-    EntryDetail size = StatisticUtil.getStatistic( sz );
-    EntryDetail cpi  = StatisticUtil.getStatistic( cp );
-    EntryDetail nspi = StatisticUtil.getStatistic( ns );
-    EntryDetail mbps = StatisticUtil.getStatistic( mb );
-    setValueAt( String.format( "%.1f K" , size.median / 1024.0 )  , 0, 1 );
-    setValueAt( String.format( "%.3f"   , cpi.median )            , 1, 1 );
-    setValueAt( String.format( "%.3f"   , nspi.median )           , 2, 1 );
-    setValueAt( String.format( "%.3f"   , mbps.median )           , 3, 1 );
-    setValueAt( String.format( "%.1f K" , size.average / 1024.0 ) , 0, 2 );
-    setValueAt( String.format( "%.3f"   , cpi.average )           , 1, 2 );
-    setValueAt( String.format( "%.3f"   , nspi.average )          , 2, 2 );
-    setValueAt( String.format( "%.3f"   , mbps.average )          , 3, 2 );
-    setValueAt( String.format( "%.1f K" , size.min / 1024.0 )     , 0, 3 );
-    setValueAt( String.format( "%.3f"   , cpi.min )               , 1, 3 );
-    setValueAt( String.format( "%.3f"   , nspi.min )              , 2, 3 );
-    setValueAt( String.format( "%.3f"   , mbps.min )              , 3, 3 );
-    setValueAt( String.format( "%.1f K" , size.max / 1024.0 )     , 0, 4 );
-    setValueAt( String.format( "%.3f"   , cpi.max )               , 1, 4 );
-    setValueAt( String.format( "%.3f"   , nspi.max )              , 2, 4 );
-    setValueAt( String.format( "%.3f"   , mbps.max )              , 3, 4 );
-    fireTableRowsUpdated( 0, 3 );
-    }
-*/
-
+// update table for each measured value from Report Monitor.
 public void measurementNotify( EntryStatistics ests )
     {
     for( int i=0; i<4; i++ )

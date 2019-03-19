@@ -1,3 +1,13 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * OS type detector, required for
+ * Task Monitor run child native application.
+ * Note Linux mode not supported yet because
+ * required native binary is under construction.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.util.Properties;
@@ -16,16 +26,25 @@ private final static String REPORT_NAME = "output.txt";
 public enum PlatformTypes { WIN32, WIN64, LINUX32, LINUX64, UNKNOWN }
 private PlatformTypes selector = PlatformTypes.UNKNOWN;
 
+// get current OS type selection
+// method  detector()  or  setSelector() 
+// must be called before this method for valid selection
 public PlatformTypes getSelector()
     {
     return selector; 
     }
 
+// set current OS type selection, can override auto-detect result,
+// for example (1) x64 application can run at x64 platform/OS with JRE32,
+// for example (2) ia32 application can run at x64 platform/OS.
 public void setSelector( PlatformTypes n ) 
     {
     selector = n;
     }
 
+// get [exename][libname][extension] of binary for selected native mode
+// method  detector()  or  setSelector() 
+// must be called before this method for valid selection
 public String[] getNameExt()
     {
     String[] s = null;
@@ -37,16 +56,22 @@ public String[] getNameExt()
     return s;
     }
 
+// get array of [exename][libname][extension] entres of binaries for
+// all supported native modes
 public String[][] getAllNameExt()
     {
     return NATIVE_APPLICATIONS;
     }
 
+// get name.extension of report file, used by report monitoring interceptor
 public String getReportName()
     {
     return REPORT_NAME;
     }
 
+// detect platform OS type,
+// this method required pre-called before getSelector(), getNameExt()
+// for valid selector.
 public void detect()
     {
     // initializing variables, xO = OS index, xC = CPU index

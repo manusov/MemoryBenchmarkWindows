@@ -1,3 +1,10 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * 
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.io.File;
@@ -23,30 +30,41 @@ private File lib64 = null;
 private File txt   = null;
 private Process process = null;
 
+// initializing background process status
 private OpResult opresult = null;
 public void initOpResult()
     {
     opresult = new OpResult( false, null, null );
     }
 
+// get background process status
+public OpResult getTaskMonitorResults()
+    {
+    return opresult;
+    }
+
+// set command line options string for native application run
 private String cmdParms = null;
 public void setCmdParms( String s )
     {
     cmdParms = s;
     }
 
+// set platform/OS type for select native application to run
 private PlatformTypes platform = null;
 public void setPlatform( PlatformTypes p )
     {
     platform = p;
     }
 
+// get directory path after create temporary directory and unpack binaries
 private String reportDir = null;
 public String getReportDir()
     {
     return reportDir;
     }
 
+// unpack native binaries, called ONCE when RUN Java application session
 public OpStatus unpackBinaries( String[][] binlist, String reportname )
     {
     estr = "";
@@ -87,6 +105,7 @@ public OpStatus unpackBinaries( String[][] binlist, String reportname )
         return new OpStatus( true, "OK" );
     }
 
+// helper for unpack file
 private File unpackFileHelper( String tmppath, String name, String ext )
     {
     estr = "";
@@ -117,6 +136,7 @@ private File unpackFileHelper( String tmppath, String name, String ext )
     return file;
     }
 
+// delete unpacked binaries, called ONCE when CLOSE Java application session
 public OpStatus deleteBinaries()
     {
     boolean b = false;    
@@ -148,6 +168,7 @@ public OpStatus deleteBinaries()
     return new OpStatus( b, s );
     }
 
+// delete text report
 public OpStatus deleteReport()
     {
     boolean b = true;
@@ -158,6 +179,7 @@ public OpStatus deleteReport()
     return new OpStatus( b, s );
     }
 
+// execute child task: native benchmark application with dynamical libraries.
 public OpStatus executeTask()
     {
     File exe;
@@ -218,7 +240,7 @@ public OpStatus executeTask()
     double dt = ( t2 - t1 ) / 1_000_000_000.0;
     
     try {
-        Thread.sleep(100);
+        Thread.sleep( 100 );
         }
     catch ( InterruptedException e )
         {
@@ -233,11 +255,6 @@ public OpStatus executeTask()
     opresult.setStatusString( stime );
     opresult.setDoneExe( true );
     return new OpStatus( true, stime );
-    }
-
-public OpResult getTaskMonitorResults()
-    {
-    return opresult;
     }
 
 }

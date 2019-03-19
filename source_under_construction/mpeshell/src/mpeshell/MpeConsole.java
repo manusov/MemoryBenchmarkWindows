@@ -1,7 +1,7 @@
 /*
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
- * Scenario for Console mode. Yet RESERVED.
+ * Scenario for Console mode.
  *
  */
 

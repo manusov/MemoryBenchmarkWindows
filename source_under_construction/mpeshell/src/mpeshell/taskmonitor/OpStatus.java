@@ -1,3 +1,11 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Representation of operation results for 
+ * TaskMonitor and DirectoryMonitor procedures.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 public class OpStatus 

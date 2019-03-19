@@ -55,7 +55,7 @@ private class FunctionDrawPanel extends JPanel
         g.fillRect( r.x , r.y ,  r.width , r.height );
 
         g.setColor( axisColor );
-        int xleft   = r.x + 45;
+        int xleft   = r.x + 60;        // v0.00.02 old=45;
         int xright  = r.width - 40;
         int ybottom = r.height - 40;
         int ytop    = 40;

@@ -1,9 +1,21 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Scenario for benchmark session:
+ * run native application, intercept text report file updates.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
+import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
 import mpeshell.MpeGuiList;
 import mpeshell.opendraw.DrawController;
 import mpeshell.opendraw.DrawModelInterface;
 import mpeshell.opendraw.DrawViewInterface;
+import mpeshell.openlog.ActionTextLog;
 import mpeshell.taskmonitor.PlatformDetector.PlatformTypes;
 
 public class ActionRun 
@@ -51,12 +63,22 @@ public OpStatus closeSession()
     return ops;
     }
 
+private final int PROGRESS_1 = 5;
+private final int PROGRESS_2 = 95;
+public int getProgress1() { return PROGRESS_1; }
+public int getProgress2() { return PROGRESS_2; }
 
 // entry point for run benchmark scenario, get option by mglst,
 // note executable binaries (EXE, DLL) must be unpacked
 public void runBenchmark()
     {
-    // open session for drawings window
+    // Initializing progress indicator, update it for 0 percents
+    JProgressBar progressBar = mglst.getMpeGui().getProgressBar();
+    DefaultBoundedRangeModel progressModel = ( DefaultBoundedRangeModel )
+        progressBar.getModel();
+    progressUpdate( progressModel, progressBar, 0 );
+
+    // Open session for drawings window and logging
     DrawController drawController = 
         mglst.getMpeGui().getChildDraw().getController();
     DrawModelInterface drawModel = drawController.getModel();
@@ -64,6 +86,8 @@ public void runBenchmark()
     drawController.reset();
     drawModel.rescaleXmax( 80 );    // TODO. Parametrize, debug constant 80.
     drawModel.startModel();
+    JTextArea log1 = mglst.getMpeGui().getTextArea();
+    ActionTextLog log2 = mglst.getMpeGui().getChildTextLog();
         
     // Select 32/64-bit native application mode
     PlatformTypes pt;
@@ -83,7 +107,23 @@ public void runBenchmark()
     taskMonitor.setPlatform( pt );
 
     // Get command line parameters
-    taskMonitor.setCmdParms( mglst.getOptionString() );
+    String cmdParms = mglst.getOptionString();
+    taskMonitor.setCmdParms( cmdParms );
+    
+    // Write to log: Platform, tempDir, Options.
+    String logRunning = 
+        "\r\n\r\nRunning binary executable with parameters:";
+    String logPlatform = "\r\n Platform : " + pt;
+    String logTempDir  = "\r\n TempDir  : " + tempDir;
+    String logOptions  = "\r\n Options  : " + cmdParms + "\r\n";
+    log1.append( logRunning );
+    log2.write( logRunning );
+    log1.append( logPlatform );
+    log2.write( logPlatform );
+    log1.append( logTempDir );
+    log2.write( logTempDir );
+    log1.append( logOptions );
+    log2.write( logOptions );
 
     // Connect report listener for file monitoring and GUI update
     String[] reps = reportName.split( "\\." );
@@ -101,16 +141,22 @@ public void runBenchmark()
     ReportFileListener fileListener = 
         new ReportFileListener( tempDir, repName, repExt );
     ReportToGuiListener dataListener = 
-        new ReportToGuiListener( mglst.getMpeGui() );
+        new ReportToGuiListener( mglst );
     directoryMonitor.addReportFileListener( fileListener );
     directoryMonitor.addReportDataListener( dataListener );
 
     // Start directory monitor at background
     OpStatus startDirMonStatus = directoryMonitor.monitorStartBackground();
+    
+    // Update progress indicator: 5 percents
+    progressUpdate( progressModel, progressBar, PROGRESS_1 );  // start work
 
     // Start native application by start task monitor
     taskMonitor.initOpResult();
-    OpStatus taskStatus = taskMonitor.executeTask();
+    OpStatus taskStatus = taskMonitor.executeTask();  // this is execution time
+    
+    // Update progress indicator: 95 percents
+    progressUpdate( progressModel, progressBar, PROGRESS_2 );  // end work
 
     // Remove report listeners for file monitoring and GUI update
     directoryMonitor.removeReportFileListener( fileListener );
@@ -119,9 +165,18 @@ public void runBenchmark()
     // Stop directory monitor
     OpStatus stopDirMonStatus = directoryMonitor.monitorStop();
 
-    // close session for drawings window
+    // Close session for drawings window
     drawModel.stopModel();
     
+    // Done, update progress indicator: 100 percents
+    progressUpdate( progressModel, progressBar, 100 );
     }
-    
+
+public void progressUpdate( DefaultBoundedRangeModel model, JProgressBar bar, 
+                             int percentage )
+    {
+    model.setValue( percentage );
+    bar.setString( model.getValue() + "%" );
+    }
+
 }

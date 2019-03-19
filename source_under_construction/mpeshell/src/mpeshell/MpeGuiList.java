@@ -1,3 +1,13 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Descriptors of GUI objects, edit logic implementation,
+ * also provides command line builder for native application run.
+ * This class used by MpeGui,
+ * scenario for GUI mode, with global variables interconnect.
+ *
+ */
+
 package mpeshell;
 
 import java.awt.Dimension;
@@ -14,13 +24,15 @@ import mpeshell.service.ActionReport;
 public class MpeGuiList 
 {
 private final MpeGui mg;
-public MpeGui getMpeGui() { return mg; }
+public MpeGui getMpeGui() { return mg; }  // provides MpeGui for scenarios
         
 public MpeGuiList( MpeGui x )
     {
     mg = x;
     }
 
+// this method implements combo boxes logic, some boxes depends on other.
+// id = combo box number, e = combo box click event
 public void changesMonitor( int id, ActionEvent e )
     {
     JComboBox[] c = mg.getCombos();
@@ -133,13 +145,47 @@ private void updateHelper( JComboBox c, DescriptCombo dc, boolean b )
     updateHelper( c, dc );
     }
 
+// Support progress indicator = f( native mode step count)
+private final static int DEFAULT_PROGRESS_COUNT = 16;
+public int getProgressCount()
+    {
+    long start = stepsHelper( 11 );
+    long stop = stepsHelper( 12 );
+    long step = stepsHelper( 13 );
+    if ( ( start > 0 )&&( stop > 0 )&&( step > 0 ) )
+        {
+        long x = ( stop - start ) / step;
+        if ( ( x > 0 )&& ( x < Integer.MAX_VALUE ) )
+            return (int)x;
+        else
+            return DEFAULT_PROGRESS_COUNT;
+        }
+    else
+        return DEFAULT_PROGRESS_COUNT;
+    }
+
+private long stepsHelper( int id )
+    {
+    JComboBox cb = mg.getCombos()[id];
+    DescriptCombo dc = getDescriptCombos()[id];
+    int index = cb.getSelectedIndex();
+    if ( index <= 0 )
+        return -1;
+    index--;
+    return dc.getLongValues()[index];
+    }
+
+
+// Fields for extracts parameters for native application run
 private final static String PREFIX = "out=file";
 private int optionWidth;
 private String optionString; 
 
-public int getOptionWidth()     { return optionWidth;  }
-public String getOptionString() { return optionString; }
+public int getOptionWidth()     { return optionWidth;  }  // get mode 32/64
+public String getOptionString() { return optionString; }  // get options
 
+// extracts parameters for native application run,
+// this parameters = f ( GUI editable components state ).
 public void extractParmsFromGui()
     {
     optionWidth = 0;
@@ -191,6 +237,8 @@ private String helperOption( JComboBox[] c, DescriptCombo[] dc, int n )
     return s;
     }
 
+// lists of groups of main window GUI elements
+
 public DescriptButton[] getDescriptButtons() { return LIST_BUTTONS; }
 private final DescriptButton[] LIST_BUTTONS = new DescriptButton[]
     { new ButtonOpenLog( this ),
@@ -238,7 +286,6 @@ private final DescriptCombo[] LIST_COMBOS = new DescriptCombo[]
       new ComboStart( this ),           // #11
       new ComboEnd( this ),             // #12
       new ComboStep( this ) };          // #13 
-    
 }
 
 // buttons descriptors
@@ -828,7 +875,7 @@ public ComboThreads( MpeGuiList x )
 private final static String THREADS = "threads";
 private int[] numericValues = { 1, 2, 4, 8, 64 };
 private String[] textValues;
-@Override public int[] getNumericValues() { return numericValues; }
+@Override public int[] getIntValues() { return numericValues; }
 public void setNumericValues( int[] x )   
     {
     numericValues = x;
@@ -896,7 +943,7 @@ public ComboRepeats( MpeGuiList x )
 private final static String REPEATS = "repeats";
 private int[] numericValues = { 2000000, 500000, 10000, 1000, 200, 20 };
 private String[] textValues;
-@Override public int[] getNumericValues() { return numericValues; }
+@Override public int[] getIntValues() { return numericValues; }
 public void setNumericValues( int[] x )    
     {
     numericValues = x;    
@@ -956,11 +1003,15 @@ public ComboStart( MpeGuiList x )
     super( x, 11 ); 
     textValuesCombo = buildSizesOptions( 512, 22 );
     textValuesCmd = buildSizesOptions( 512, 22, false );
+    longValues = buildRoundNumbersArray( 512, 22 );
     }
 private final static String START = "start";
 private final String[] textValuesCombo;
 private final String[] textValuesCmd;
-// public void setTextValues( String[] s ) { textValues = s;    }
+
+private final long[] longValues;
+@Override public long[] getLongValues() { return longValues; }
+
 @Override public String[] getValues()   
     { return getAvailable() ? textValuesCombo : NA; }
 @Override public String getText()      
@@ -981,10 +1032,15 @@ public ComboEnd( MpeGuiList x )
     super( x, 12 ); 
     textValuesCombo  = buildSizesOptions( 512, 22 );
     textValuesCmd = buildSizesOptions( 512, 22, false );
+    longValues = buildRoundNumbersArray( 512, 22 );
     }
 private final static String END = "end";
 private final String[] textValuesCombo;
 private final String[] textValuesCmd;
+
+private final long[] longValues;
+@Override public long[] getLongValues() { return longValues; }
+
 @Override public String[] getValues()
     { return getAvailable() ? textValuesCombo : NA; }
 @Override public String getText()      
@@ -1005,10 +1061,15 @@ public ComboStep( MpeGuiList x )
     super( x, 13 ); 
     textValuesCombo = buildSizesOptions( 512, 22 );
     textValuesCmd = buildSizesOptions( 512, 22, false );
+    longValues = buildRoundNumbersArray( 512, 22 );
     }
 private final static String STEP = "step";
 private final String[] textValuesCombo;
 private final String[] textValuesCmd;
+
+private final long[] longValues;
+@Override public long[] getLongValues() { return longValues; }
+
 @Override public String[] getValues()
     { return getAvailable() ? textValuesCombo : NA; }
 @Override public String getText()      

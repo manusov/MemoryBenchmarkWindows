@@ -1,3 +1,13 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Listener for report file updates, provides array of strings:
+ * file to array of strings.
+ * This java application receives measurement data from
+ * native application by report listeners.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.io.BufferedReader;

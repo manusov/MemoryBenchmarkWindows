@@ -1,6 +1,6 @@
 /*
  *
-  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
  * Class for return detail info about array median value.
  * Note. Lower, higher and center median elements required for
  * marking in the text report table.

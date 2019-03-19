@@ -1,3 +1,11 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Monitor for intercept text report file changes.
+ * Monitoring object is directory.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.io.IOException;
@@ -20,6 +28,9 @@ public DirectoryMonitor( String d )
     dir = d;
     }
 
+// start report file (directory) monitor,
+// this method waits session termination,
+// see also background mode by method: monitorStartBackground()
 public OpStatus monitorStart()
     {
     alive = true;
@@ -81,6 +92,7 @@ public OpStatus monitorStart()
     return new OpStatus( true, "OK" );
     }
 
+// stop report file (directory) monitor
 public OpStatus monitorStop()
     {
     // wait extra
@@ -116,6 +128,7 @@ public OpStatus monitorStop()
         return new OpStatus( false, "Termination timeout." );
     }
 
+// start report file (directory) monitor as background task
 public OpStatus monitorStartBackground()
     {
     Runnable r = () -> 
@@ -128,6 +141,7 @@ public OpStatus monitorStartBackground()
     return new OpStatus( true, "OK" );
     }
 
+// get status from parallel runned operation
 public OpStatus getMonitorStatus()
     {   
     if ( monitorStatus != null )
@@ -136,21 +150,25 @@ public OpStatus getMonitorStatus()
         return new OpStatus( false, "N/A" );
     }
 
+// add listener for file update, this listener extract strings list
 public void addReportFileListener( WatchFileListener wfl )
     {
     flst.add( wfl );
     }
 
+// remove listener for file update, this listener extract strings list
 public void removeReportFileListener( WatchFileListener wfl )
     {
     flst.remove( wfl );
     }
 
+// add listener for benchmarks result extraction
 public void addReportDataListener( WatchDataListener wdl )
     {
     dlst.add( wdl );
     }
 
+// remove listener for benchmarks result extraction
 public void removeReportDataListener( WatchDataListener wdl )
     {
     dlst.remove( wdl );

@@ -80,9 +80,11 @@ public void saveReportDialogue()
             // add product and copyright information to report
             data.append( About.getLongName() );
             data.append( "\r\n" );
+            data.append( About.getVendorName() );
+            data.append( "\r\n" );
             data.append( About.getWebSite() );
             data.append( "\r\n" );
-            data.append( "report file." );
+            data.append( "Report file." );
             data.append( "\r\n\r\n" );
 
             // brief report, text same as openable full report

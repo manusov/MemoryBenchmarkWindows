@@ -2,7 +2,7 @@
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
  * Handler for open statistics table window with benchmark results as
- * Speed = F ( Block Size) , Latency = F ( Block Size ).
+ * Speed = F ( Block Size) or Latency = F ( Block Size ).
  *
  */
 
@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.math.BigDecimal;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -64,17 +63,6 @@ public void blankTable( int n )
             table.getColumnModel().getColumn(i).setCellRenderer( tr );
         }
     }
-
-// method for add measurement result or statistics entry
-/*
-public void writeTable( BigDecimal[] value )
-    {
-    if ( stm != null )
-        {
-        stm.write( value );
-        }
-    }
-*/
 
 // method gets table model, used for text report
 public StatisticsTableModel getTableModel()

@@ -1,10 +1,10 @@
 /*
  *
  * Memory Performance Engine (MPE) GUI Shell. (C)2019 IC Book Labs.
- *                     Main module.
- *      Start point for Console and GUI scenarios.
+ *                   Main module (main class).
+ *           Start point for Console and GUI scenarios.
  *
- *      UNDER CONSTRUCTION. PROJECT FOR LEARN JAVA.
+ *           UNDER CONSTRUCTION. PROJECT FOR LEARN JAVA.
  *
  */
 

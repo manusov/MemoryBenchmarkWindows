@@ -1,3 +1,11 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Converts monitored data from report to application output,
+ * this class used at CONSOLE mode scenario.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.util.concurrent.CopyOnWriteArrayList;

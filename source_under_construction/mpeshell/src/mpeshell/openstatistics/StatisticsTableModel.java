@@ -16,14 +16,10 @@ public StatisticsTableModel()
     {
     rowsValues = initValues;
     }
-// application-specific fields and methods
-private int maxIndex = 1;
-private int currentIndex = 0;
 
+// clear table for next measurement session, n = measurement entries count
 public void blank( int n ) 
     { 
-    maxIndex = n;
-    currentIndex = 0;
     rowsValues = new String[ n + 5 ][ getColumnCount() ];
     int i;
     for( i=0; i<n; i++ )
@@ -45,28 +41,6 @@ public void blank( int n )
         }
     fireTableStructureChanged();
     }
-
-/*
-public void write( BigDecimal[] value )
-    {  // +4 because Median/Average/Minimum/Maximum
-    if ( currentIndex < ( maxIndex + 4 ) )
-        {
-        int n = rowsValues[currentIndex].length;
-        for( int i=0; i<n; i++ )
-            {
-            if ( i < value.length )
-                {
-                if ( currentIndex < maxIndex )
-                    rowsValues[currentIndex][i] = value[i].toPlainString();
-                else if ( ( i + 1 ) < n )
-                    rowsValues[currentIndex+1][i+1] = value[i].toPlainString();
-                }
-            }
-        currentIndex++;
-        }
-    fireTableRowsUpdated( 0, maxIndex + 4 );
-    }
-*/
 
 // table model class fields
 private final String[] COLUMNS_NAMES = 
@@ -114,33 +88,7 @@ public void setRowsValues( String[][] s )  { rowsValues = s;       }
 @Override public boolean isCellEditable( int row, int column )
     { return false; }
 
-/*
-public void arrayNotify
-    ( double[] block, double[] cpi, double[] nspi, double[] mbps )
-    {
-    
-    }
-*/
-
-/*
-public void arrayNotify( EntryStatistics ests )
-    {
-    // write new data string
-    // ...
-    // write statistics, last 4 strings
-    int offset = getRowCount() - 4;
-    for( int i=0; i<4; i++ )
-        {
-        for ( int j=0; j<4; j++ )
-            {
-            setValueAt( ests.statTable[j][i], i+offset, j+1 );
-            }
-        }
-    // notify changes
-    fireTableDataChanged();
-    }
-*/
-
+// update table for each measured value from Report Monitor.
 public void measurementNotify( EntryStatistics ests )
     {
     // write new data string
@@ -159,8 +107,8 @@ public void measurementNotify( EntryStatistics ests )
             ( "%.3f" , ests.dataArray.get( i ).doubles[3] );
         }
     // write empty string
-    for( int i=0; i<blankValues.length; i++ )
-        rowsValues[count][i] = blankValues[i];
+    System.arraycopy
+        ( blankValues, 0, rowsValues[count], 0, blankValues.length );
     // write statistics, last 4 strings
     for( int i=0; i<4; i++ )
         {

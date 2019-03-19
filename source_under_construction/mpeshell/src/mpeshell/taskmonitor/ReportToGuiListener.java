@@ -1,11 +1,21 @@
+/*
+ *
+ * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
+ * Converts monitored data from report to application output,
+ * this class used at GUI mode scenario.
+ * 
+ */
+
 package mpeshell.taskmonitor;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import mpeshell.BenchmarkTableModel;
 import mpeshell.MpeGui;
+import mpeshell.MpeGuiList;
 import mpeshell.opendraw.ActionDraw;
 import mpeshell.opendraw.DrawModelInterface;
 import mpeshell.opendraw.DrawViewInterface;
@@ -17,7 +27,9 @@ import mpeshell.openstatistics.StatisticsTableModel;
 
 public class ReportToGuiListener implements WatchDataListener
 {
+private final MpeGuiList mglst;
 private final MpeGui mg;
+
 private final ReportParseKeys rpk;
 private boolean detectedUp = false;
 private boolean detectedBound = false;
@@ -28,28 +40,43 @@ private final CopyOnWriteArrayList<NumericEntry>
 private final JTextArea mainText;
 private final BenchmarkTableModel mainTable;
 private final JProgressBar mainProgress;
+private final DefaultBoundedRangeModel mainProgressModel;
 private final ActionDraw openableDraw;
 private final ActionStatistics openableStatistics;
 private final ActionTextLog openableText;
 private final StatisticsTableModel openableTable;
 private final DrawModelInterface drawModel;
 private final DrawViewInterface drawView;
+private final ActionRun taskShell;
+
+private double progressValue = 0.0;
+private double progressDelta = 0.0;
 
 private int previous = 0;
 
-public ReportToGuiListener( MpeGui x )
+public ReportToGuiListener( MpeGuiList x )
     {
-    mg = x;
+    // initializing GUI elements
+    mglst = x;
+    mg = mglst.getMpeGui();
     rpk = new ReportParseKeys();
     mainText = mg.getTextArea();
     mainTable = mg.getTableModel();
     mainProgress = mg.getProgressBar();
+    mainProgressModel = ( DefaultBoundedRangeModel ) mainProgress.getModel();
     openableDraw = mg.getChildDraw();
     openableStatistics = mg.getChildStatistics();
     openableText = mg.getChildTextLog();
     openableTable = openableStatistics.getTableModel();
     drawModel = openableDraw.getController().getModel();
     drawView =  openableDraw.getController().getView();
+    taskShell = mg.getTaskShell();
+    // initializing progress indicator
+    int p1 = taskShell.getProgress1();
+    int p2 = taskShell.getProgress2();
+    double pCount = mglst.getProgressCount();
+    progressValue = p1;
+    progressDelta = ( p2 - p1 - 3 ) / pCount; 
     }
     
 @Override public void dataHandler
@@ -73,13 +100,13 @@ public ReportToGuiListener( MpeGui x )
                     {
                     if ( rpk.detectBenchmarkTableUp( words ) )
                         {
-                        detectedUp = true;
+                        detectedUp = true;  // mark begin of results table
                         }
                     else if ( detectedUp && 
                             ( rpk.detectTableBoundLine( words ) ) )
                         {
                         if ( ! ( detectedBound = ! detectedBound ) )
-                            detectedUp = false;
+                            detectedUp = false;  // mark end of results table
                         }
                     else if ( detectedUp )
                         {
@@ -97,6 +124,7 @@ public ReportToGuiListener( MpeGui x )
                             
                             // update statistic table at main window
                             mainTable.measurementNotify( ests );
+                            
                             // update statistic table, openable window
                             openableTable.measurementNotify( ests );
                             
@@ -108,6 +136,12 @@ public ReportToGuiListener( MpeGui x )
                             drawModel.updateValue( point );
                             drawModel.rescaleYmax();
                             drawView.getPanel().repaint();
+                            
+                            // update progress indicator
+                            progressValue += progressDelta;
+                            taskShell.progressUpdate
+                                ( mainProgressModel, mainProgress, 
+                                 (int)progressValue );
                             }
                         }
                     }
