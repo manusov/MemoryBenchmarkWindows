@@ -23,9 +23,9 @@ private String[][] rowsValues =
         { "MBPS"       , "-" , "-" , "-" , "-" }
     };
 // table model this application-specific public methods
-public String[] getColumnsNames()          { return COLUMNS_NAMES; }
-public String[][] getRowsValues()          { return rowsValues;    }
-public void setRowsValues( String[][] s )  { rowsValues = s;       }
+protected String[] getColumnsNames()          { return COLUMNS_NAMES; }
+protected String[][] getRowsValues()          { return rowsValues;    }
+protected void setRowsValues( String[][] s )  { rowsValues = s;       }
 // table model standard required public methods
 @Override public int getColumnCount()    { return COLUMNS_NAMES.length; }
 @Override public int getRowCount()       { return rowsValues.length;    }

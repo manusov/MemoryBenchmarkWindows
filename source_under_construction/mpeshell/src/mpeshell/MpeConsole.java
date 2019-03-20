@@ -2,6 +2,7 @@
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
  * Scenario for Console mode.
+ * Example console mode run: " java -jar mpeshell.jar console 32 test=memory ".
  *
  */
 
@@ -22,9 +23,6 @@ private final String[] cmd;
 private final static String KEY_32 = "32";
 private final static String KEY_64 = "64";
 private final static String KEY_OUT = "out=file";
-private final static String REPORT_NAME = "output";
-private final static String REPORT_EXT = "txt";
-
     
 public MpeConsole( String[] s )
     {
@@ -75,13 +73,18 @@ public void runBenchmarkConsole()
     System.out.printf( "Initializing task monitor... " );
     TaskMonitor taskMonitor = new TaskMonitor();
     OpStatus unpackStatus = taskMonitor.unpackBinaries
-        ( platformDetector.getAllNameExt(), platformDetector.getReportName() );
+        ( platformDetector.getAllNameExt(), 
+          platformDetector.getReportNameExtSingle() );
     System.out.println( unpackStatus.getStatusString() );
     if ( ! unpackStatus.getStatusFlag() )
         return;
     
-    platformDetector.setSelector( userSelection );
-    taskMonitor.setPlatform( userSelection );
+    PlatformTypes resultSelection = userSelection;
+    if ( resultSelection == PlatformTypes.UNKNOWN )
+        resultSelection = systemSelection;
+    
+    platformDetector.setSelector( resultSelection );
+    taskMonitor.setPlatform( resultSelection );
     taskMonitor.setCmdParms( options.toString() );
     
     // Initializing and start directory monitor
@@ -91,8 +94,9 @@ public void runBenchmarkConsole()
                         reportDir );
     
     // Create and connect report listeners
+    String[] srep = platformDetector.getReportNameExtSeparate();
     ReportFileListener fileListener = 
-        new ReportFileListener( reportDir, REPORT_NAME, REPORT_EXT );
+        new ReportFileListener( reportDir, srep[0], srep[1] );
     ReportToConsoleListener dataListener = new ReportToConsoleListener();
     directoryMonitor.addReportFileListener( fileListener );
     directoryMonitor.addReportDataListener( dataListener );

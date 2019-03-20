@@ -21,7 +21,9 @@ private final static String[] WIN_32_APP    = { "mpe32" , "exe" , "dll" };
 private final static String[] WIN_64_APP    = { "mpe64" , "exe" , "dll" };
 private final static String[][] NATIVE_APPLICATIONS =
     { WIN_32_APP, WIN_64_APP };
-private final static String REPORT_NAME = "output.txt";
+
+private final static String REPORT_NAME = "output";
+private final static String REPORT_EXT = "txt";
 
 public enum PlatformTypes { WIN32, WIN64, LINUX32, LINUX64, UNKNOWN }
 private PlatformTypes selector = PlatformTypes.UNKNOWN;
@@ -64,10 +66,16 @@ public String[][] getAllNameExt()
     }
 
 // get name.extension of report file, used by report monitoring interceptor
-public String getReportName()
+public String getReportNameExtSingle()
     {
-    return REPORT_NAME;
+    return REPORT_NAME + "." + REPORT_EXT;
     }
+
+public String[] getReportNameExtSeparate()
+    {
+    return new String[] { REPORT_NAME , REPORT_EXT };
+    }
+
 
 // detect platform OS type,
 // this method required pre-called before getSelector(), getNameExt()

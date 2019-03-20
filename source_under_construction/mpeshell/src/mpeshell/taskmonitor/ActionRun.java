@@ -36,7 +36,7 @@ public ActionRun( MpeGuiList x )
     platformDetector = new PlatformDetector();
     platformDetector.detect();
     taskMonitor = new TaskMonitor();
-    reportName = platformDetector.getReportName();
+    reportName = platformDetector.getReportNameExtSingle();
     binariesList = platformDetector.getAllNameExt();
     // unpack all binaries for all session
     initStatus = taskMonitor.unpackBinaries( binariesList, reportName );
@@ -65,8 +65,8 @@ public OpStatus closeSession()
 
 private final int PROGRESS_1 = 5;
 private final int PROGRESS_2 = 95;
-public int getProgress1() { return PROGRESS_1; }
-public int getProgress2() { return PROGRESS_2; }
+protected int getProgress1() { return PROGRESS_1; }
+protected int getProgress2() { return PROGRESS_2; }
 
 // entry point for run benchmark scenario, get option by mglst,
 // note executable binaries (EXE, DLL) must be unpacked
@@ -126,20 +126,9 @@ public void runBenchmark()
     log2.write( logOptions );
 
     // Connect report listener for file monitoring and GUI update
-    String[] reps = reportName.split( "\\." );
-    String repName, repExt;
-    if ( reps.length > 1 )
-        {
-        repName = reps[0];
-        repExt = reps[1];
-        }
-    else
-        {
-        repName = reps[0];
-        repExt = null;
-        }
+    String[] reps = platformDetector.getReportNameExtSeparate();
     ReportFileListener fileListener = 
-        new ReportFileListener( tempDir, repName, repExt );
+        new ReportFileListener( tempDir, reps[0], reps[1] );
     ReportToGuiListener dataListener = 
         new ReportToGuiListener( mglst );
     directoryMonitor.addReportFileListener( fileListener );
@@ -173,7 +162,7 @@ public void runBenchmark()
     }
 
 public void progressUpdate( DefaultBoundedRangeModel model, JProgressBar bar, 
-                             int percentage )
+                               int percentage )
     {
     model.setValue( percentage );
     bar.setString( model.getValue() + "%" );

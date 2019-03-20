@@ -29,6 +29,7 @@ public void saveReportDialogue()
     {
     // get window context
     JFrame parentWin = mg.getFrame();
+    // get objects for save
     String logText = mg.getTextArea().getText();
     AbstractTableModel briefTable = 
         mg.getTableModel();
@@ -37,7 +38,7 @@ public void saveReportDialogue()
     // initializing file operations context
     final String DEFAULT_FILE_NAME = "report.txt";
     JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle( "Report - select directory" );
+    chooser.setDialogTitle( "Save report - select directory" );
     FileNameExtensionFilter filter = 
         new FileNameExtensionFilter ( "Text files" , "txt" );
     chooser.setFileFilter( filter );

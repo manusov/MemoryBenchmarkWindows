@@ -18,7 +18,7 @@ private final static String
         PATTERN_TABLE_BOUND = "-";
 
 // detect string with measurement results table up with parameters names
-public boolean detectBenchmarkTableUp( String[] words )
+protected boolean detectBenchmarkTableUp( String[] words )
     {
     boolean b = false;
     int n = words.length;
@@ -38,14 +38,14 @@ public boolean detectBenchmarkTableUp( String[] words )
     }
 
 // detect string with table bound line "---...---"
-public boolean detectTableBoundLine( String[] words )
+protected boolean detectTableBoundLine( String[] words )
     {
     return ( words.length > 0 ) && ( words[0].length() > 0 ) &&
            ( words[0].subSequence( 0, 1 ).equals( PATTERN_TABLE_BOUND ) ); 
     }
 
 // extract numeric values from result table line
-public NumericEntry detectTableEntry( String[] words )
+protected NumericEntry detectTableEntry( String[] words )
     {
     int n = words.length;
     if ( n > 1 )

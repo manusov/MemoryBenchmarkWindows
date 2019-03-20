@@ -12,14 +12,18 @@ package mpeshell;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 import javax.swing.table.AbstractTableModel;
 import mpeshell.service.About;
 import mpeshell.service.ActionAbout;
 import mpeshell.service.ActionGraph;
+import mpeshell.service.ActionLoad;
 import mpeshell.service.ActionReport;
+import mpeshell.taskmonitor.ActionRun;
 
 public class MpeGuiList 
 {
@@ -33,7 +37,7 @@ public MpeGuiList( MpeGui x )
 
 // this method implements combo boxes logic, some boxes depends on other.
 // id = combo box number, e = combo box click event
-public void changesMonitor( int id, ActionEvent e )
+protected void changesMonitor( int id, ActionEvent e )
     {
     JComboBox[] c = mg.getCombos();
     DescriptCombo[] dc = getDescriptCombos();
@@ -292,7 +296,7 @@ private final DescriptCombo[] LIST_COMBOS = new DescriptCombo[]
 
 class ButtonOpenLog extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonOpenLog( MpeGuiList x )  { mglst = x; }
+protected ButtonOpenLog( MpeGuiList x )  { mglst = x; }
 @Override public String getName() { return "Log >"; }
 @Override public String getText() { return "open log text window"; }
 @Override public Dimension getSize() { return new Dimension( 102, 25 ); }
@@ -302,7 +306,7 @@ public ButtonOpenLog( MpeGuiList x )  { mglst = x; }
 
 class ButtonOpenStatistics extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonOpenStatistics( MpeGuiList x ) { mglst = x; }
+protected ButtonOpenStatistics( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Statistics >"; }
 @Override public String getText() { return "open statistics table window"; }
 @Override public Dimension getSize() { return new Dimension( 102, 25 ); }
@@ -312,7 +316,7 @@ public ButtonOpenStatistics( MpeGuiList x ) { mglst = x; }
 
 class ButtonOpenDraw extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonOpenDraw( MpeGuiList x ) { mglst = x; }
+protected ButtonOpenDraw( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Draw >"; }
 @Override public String getText() { return "open draw window"; }
 @Override public Dimension getSize() { return new Dimension( 102, 25 ); }
@@ -322,7 +326,7 @@ public ButtonOpenDraw( MpeGuiList x ) { mglst = x; }
 
 class ButtonRun extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonRun( MpeGuiList x ) { mglst = x; }
+protected ButtonRun( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Run"; }
 @Override public String getText() { return "run benchmarks"; }
 @Override public Dimension getSize() { return new Dimension( 78, 24 ); }
@@ -345,7 +349,7 @@ private class BenchmarkAction implements Runnable
 
 class ButtonAbout extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonAbout( MpeGuiList x ) { mglst = x; }
+protected ButtonAbout( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "About"; }
 @Override public String getText() { return "information about application"; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
@@ -363,19 +367,20 @@ public ButtonAbout( MpeGuiList x ) { mglst = x; }
 
 class ButtonLoad extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonLoad( MpeGuiList x ) { mglst = x; }
+protected ButtonLoad( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Load"; }
 @Override public String getText() { return "load previous results"; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
 @Override public void actionPerformed( ActionEvent e )
     {
-    
+    final ActionLoad a = new ActionLoad( mglst );
+    a.loadReportDialogue();
     }
 }
 
 class ButtonGraph extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonGraph( MpeGuiList x ) { mglst = x; }
+protected ButtonGraph( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Graph"; }
 @Override public String getText() { return "save graphics image"; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
@@ -388,7 +393,7 @@ public ButtonGraph( MpeGuiList x ) { mglst = x; }
 
 class ButtonReport extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonReport( MpeGuiList x ) { mglst = x; }
+protected ButtonReport( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Report"; }
 @Override public String getText() { return "save text report"; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
@@ -401,7 +406,7 @@ public ButtonReport( MpeGuiList x ) { mglst = x; }
 
 class ButtonDefaults extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonDefaults( MpeGuiList x ) { mglst = x; }
+protected ButtonDefaults( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Defaults"; }
 @Override public String getText() { return "restore options defaults"; }
 @Override public Dimension getSize() { return new Dimension( 83, 24 ); }
@@ -423,7 +428,7 @@ public ButtonDefaults( MpeGuiList x ) { mglst = x; }
 
 class ButtonClear extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonClear( MpeGuiList x ) { mglst = x; }
+protected ButtonClear( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Clear"; }
 @Override public String getText() { return "clear logs and statistics"; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
@@ -445,12 +450,18 @@ public ButtonClear( MpeGuiList x ) { mglst = x; }
     atm.fireTableDataChanged();
     mglst.getMpeGui().getChildStatistics().blankTable( 0 );
     mglst.getMpeGui().getChildDraw().getController().reset();
+    // set progress indicator to 0 percents
+    JProgressBar progressBar = mglst.getMpeGui().getProgressBar();
+    DefaultBoundedRangeModel progressModel = ( DefaultBoundedRangeModel )
+        progressBar.getModel();
+    ActionRun ar = mglst.getMpeGui().getTaskShell();
+    ar.progressUpdate( progressModel, progressBar, 0 );
     }
 }
 
 class ButtonCancel extends DescriptButton {
 private final MpeGuiList mglst;
-public ButtonCancel( MpeGuiList x ) { mglst = x; }
+protected ButtonCancel( MpeGuiList x ) { mglst = x; }
 @Override public String getName() { return "Cancel"; }
 @Override public String getText() { return "exit application"; }
 @Override public Dimension getSize() { return new Dimension( 81, 24 ); }
@@ -566,7 +577,7 @@ class LabelStep extends DescriptLabelConst {
 // combo descriptor for select native application. This selection must make
 // additional updates: assembler option, operations different OP32/OP64
 class ComboApplication extends DescriptCombo {
-public ComboApplication( MpeGuiList x ) { super( x, 0 ); }
+protected ComboApplication( MpeGuiList x ) { super( x, 0 ); }
 @Override public String[] getValues()
     { 
     return new String[] 
@@ -590,7 +601,7 @@ public ComboApplication( MpeGuiList x ) { super( x, 0 ); }
 class ComboAction extends DescriptCombo {
 private final static String[] MODES =
     { "help=full", "info=all", "test=memory" };  // as irregular cases
-public ComboAction( MpeGuiList x ) { super( x, 1 ); }
+protected ComboAction( MpeGuiList x ) { super( x, 1 ); }
 @Override public String[] getValues()
     { 
     return new String[] 
@@ -610,7 +621,7 @@ public ComboAction( MpeGuiList x ) { super( x, 1 ); }
 // combo descriptor for select tested storage object: memory or mass storage.
 // This selection is under construction. Yet "memory" only.
 class ComboTest extends DescriptCombo {
-public ComboTest( MpeGuiList x ) { super( x, 2 ); }
+protected ComboTest( MpeGuiList x ) { super( x, 2 ); }
 @Override public String[] getValues()
     { return getAvailable() ? new String[] { "Memory", "Storage" } : NA; }
 @Override public String getText()      
@@ -630,12 +641,12 @@ public ComboTest( MpeGuiList x ) { super( x, 2 ); }
 // count options.
 class ComboMemory extends DescriptCombo {
 private boolean itemsAvailable = true;
-public boolean getItemsAvailable()          { return itemsAvailable;    }
-public void setItemsAvailable( boolean b )  { itemsAvailable = b;       }
+protected boolean getItemsAvailable()          { return itemsAvailable;    }
+protected void setItemsAvailable( boolean b )  { itemsAvailable = b;       }
 private final static String MEMORY = "memory";
 private final static String[] MEMTYPES = 
     { "l1", "l2", "l3", "l4", "dram", "custom"  };
-public ComboMemory( MpeGuiList x ) { super( x, 3 ); }
+protected ComboMemory( MpeGuiList x ) { super( x, 3 ); }
 @Override public String[] getValues()
     { 
     return getAvailable() ? 
@@ -658,7 +669,7 @@ public ComboMemory( MpeGuiList x ) { super( x, 3 ); }
 // combo descriptor for select assembler method. This selection without
 // additional updates.
 class ComboAsm extends DescriptCombo {
-public ComboAsm( MpeGuiList x ) { super( x, 4 ); }
+protected ComboAsm( MpeGuiList x ) { super( x, 4 ); }
 private static final String[] ASM_NAMES_32 =
     { 
     "auto",
@@ -777,10 +788,10 @@ private final static String[] ASM_64 =
 
 private boolean mode64 = true;
 private long bitmapAsm = -1;
-public boolean getMode64()         { return mode64;    }
-public void setMode64( boolean b ) { mode64 = b;       }
-public long getBitmapAsm()         { return bitmapAsm; }
-public void setBitmapAsm( long x ) { bitmapAsm = x;    }
+protected boolean getMode64()         { return mode64;    }
+protected void setMode64( boolean b ) { mode64 = b;       }
+protected long getBitmapAsm()         { return bitmapAsm; }
+protected void setBitmapAsm( long x ) { bitmapAsm = x;    }
 @Override public String[] getValues()
     { 
     String[] s;
@@ -807,12 +818,12 @@ public void setBitmapAsm( long x ) { bitmapAsm = x;    }
 
 // combo descriptor for select NUMA optimization mode.
 class ComboNuma extends DescriptCombo {
-public ComboNuma( MpeGuiList x ) { super( x, 5 ); }
+protected ComboNuma( MpeGuiList x ) { super( x, 5 ); }
 private final static String NUMA = "numa";
 private final static String[] NUMA_NAMES = { "unaware", "local", "remote" };
 private int bitmapNuma = -1;
-public long getBitmapNuma()        { return bitmapNuma; }
-public void setBitmapNuma( int x ) { bitmapNuma = x;    }
+protected long getBitmapNuma()        { return bitmapNuma; }
+protected void setBitmapNuma( int x ) { bitmapNuma = x;    }
 @Override public String[] getValues()
     { 
     String[] s = NUMA_NAMES;
@@ -837,12 +848,12 @@ public void setBitmapNuma( int x ) { bitmapNuma = x;    }
 
 // combo descriptor for select memory page size at memory allocation OS API.
 class ComboPage extends DescriptCombo {
-public ComboPage( MpeGuiList x ) { super( x, 6 ); }
+protected ComboPage( MpeGuiList x ) { super( x, 6 ); }
 private final static String PAGE = "page";
 private final static String[] PAGE_NAMES = { "default", "large" };
 private int bitmapPage = -1;
-public long getBitmapPage()        { return bitmapPage; }
-public void setBitmapPage( int x ) { bitmapPage = x;    }
+protected long getBitmapPage()        { return bitmapPage; }
+protected void setBitmapPage( int x ) { bitmapPage = x;    }
 @Override public String[] getValues()
     {
     String[] s = PAGE_NAMES;
@@ -867,7 +878,7 @@ public void setBitmapPage( int x ) { bitmapPage = x;    }
 
 // combo descriptor for select number of threads.
 class ComboThreads extends DescriptCombo {
-public ComboThreads( MpeGuiList x ) 
+protected ComboThreads( MpeGuiList x ) 
     {
     super( x, 7 ); 
     textValues = buildNumbersOptions( numericValues );
@@ -876,7 +887,7 @@ private final static String THREADS = "threads";
 private int[] numericValues = { 1, 2, 4, 8, 64 };
 private String[] textValues;
 @Override public int[] getIntValues() { return numericValues; }
-public void setNumericValues( int[] x )   
+protected void setNumericValues( int[] x )   
     {
     numericValues = x;
     textValues = buildNumbersOptions( numericValues );
@@ -902,15 +913,15 @@ public void setNumericValues( int[] x )
 
 // combo descriptor for select Hyper-Threading or SMT option
 class ComboHt extends DescriptCombo {
-public ComboHt( MpeGuiList x ) { super( x, 8 ); }
+protected ComboHt( MpeGuiList x ) { super( x, 8 ); }
 private final static String HT = "ht";
 private final static String[] HT_NAMES = 
     { "no control", "disabled", "enabled" };
 private final static String[] HT_CMDS  = 
     { null, "off", "on" };
 private int bitmapHt = -1;
-public long getBitmapHt()        { return bitmapHt; }
-public void setBitmapHt( int x ) { bitmapHt = x;    }
+protected long getBitmapHt()        { return bitmapHt; }
+protected void setBitmapHt( int x ) { bitmapHt = x;    }
 @Override public String[] getValues()
     {
     String[] s = HT_NAMES;
@@ -935,7 +946,7 @@ public void setBitmapHt( int x ) { bitmapHt = x;    }
 
 // combo descriptor for select measurement repeats count at non-adaptive mode.
 class ComboRepeats extends DescriptCombo {
-public ComboRepeats( MpeGuiList x ) 
+protected ComboRepeats( MpeGuiList x ) 
     {
     super( x, 9 ); 
     textValues = buildNumbersOptions( numericValues );
@@ -944,7 +955,7 @@ private final static String REPEATS = "repeats";
 private int[] numericValues = { 2000000, 500000, 10000, 1000, 200, 20 };
 private String[] textValues;
 @Override public int[] getIntValues() { return numericValues; }
-public void setNumericValues( int[] x )    
+protected void setNumericValues( int[] x )    
     {
     numericValues = x;    
     textValues = buildNumbersOptions( numericValues );
@@ -972,10 +983,10 @@ public void setNumericValues( int[] x )
 // formula: 
 // total size = ( one measurement iteration size ) * ( iterations count )
 class ComboAdaptive extends DescriptCombo {
-public ComboAdaptive( MpeGuiList x ) { super( x, 10 ); }
+protected ComboAdaptive( MpeGuiList x ) { super( x, 10 ); }
 private final static String ADAPTIVE = "adaptive";
 private String[] textValues = { "no control", "512M", "256M", "64M" };
-public void setTextValues( String[] s ) { textValues = s;    }
+protected void setTextValues( String[] s ) { textValues = s;    }
 @Override public String[] getValues()   
     { return getAvailable() ? textValues : NA; }
 @Override public String getText()      
@@ -998,7 +1009,7 @@ public void setTextValues( String[] s ) { textValues = s;    }
 // combo descriptor for select block size START value at 
 // function speed = f( block size ).
 class ComboStart extends DescriptCombo {
-public ComboStart( MpeGuiList x ) 
+protected ComboStart( MpeGuiList x ) 
     { 
     super( x, 11 ); 
     textValuesCombo = buildSizesOptions( 512, 22 );
@@ -1027,7 +1038,7 @@ private final long[] longValues;
 // combo descriptor for select block size END value at 
 // function speed = f( block size ).
 class ComboEnd extends DescriptCombo {
-public ComboEnd( MpeGuiList x ) 
+protected ComboEnd( MpeGuiList x ) 
     {
     super( x, 12 ); 
     textValuesCombo  = buildSizesOptions( 512, 22 );
@@ -1056,7 +1067,7 @@ private final long[] longValues;
 // combo descriptor for select block size STEP value at 
 // function speed = f( block size ).
 class ComboStep extends DescriptCombo {
-public ComboStep( MpeGuiList x ) 
+protected ComboStep( MpeGuiList x ) 
     {
     super( x, 13 ); 
     textValuesCombo = buildSizesOptions( 512, 22 );

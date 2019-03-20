@@ -308,7 +308,7 @@ public void runBenchmarkGui()
 // handler for close session when exit by System.exit(n);
 // this software emulation required because JVM calls windowClosing
 // handler one when window closing.
-public void invokeCloseSession()
+protected void invokeCloseSession()
     {
     csl.windowClosing( null );
     }

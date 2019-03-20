@@ -32,6 +32,7 @@ public void saveGraphicsDialogue()
     {
     // get window context
     JFrame parentWin = mg.getFrame();
+    // get objects for save
     JPanel displayWin = 
         mg.getChildDraw().getController().getView().getPanel();
     // generate graphics image from drawings GUI panel
@@ -52,7 +53,7 @@ public void saveGraphicsDialogue()
     // initializing file operations context
     final String DEFAULT_FILE_NAME = "picture.png";
     JFileChooser chooser = new JFileChooser();
-    chooser.setDialogTitle( "Pictire - select directory" );
+    chooser.setDialogTitle( "Save graphics - select directory" );
     FileNameExtensionFilter filter = 
         new FileNameExtensionFilter ( "Picture files" , "png" );
     chooser.setFileFilter( filter );

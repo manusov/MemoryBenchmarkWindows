@@ -19,13 +19,13 @@ public class StatisticUtil
 {
 
 // find minimum value of array
-public static double findMin( double[] array )
+protected static double findMin( double[] array )
     {
     return findMin( array, array.length );
     }
     
 // method returns minimum of input array, selected part n elements
-public static double findMin( double[] array, int n )
+protected static double findMin( double[] array, int n )
     {
     double min = Double.NaN;
     if ( ( array != null ) && ( n > 0 ) && ( n <= array.length ) )
@@ -40,13 +40,13 @@ public static double findMin( double[] array, int n )
     }
 
 // find maximum value of array
-public static double findMax( double[] array )
+protected static double findMax( double[] array )
     {
     return findMax( array, array.length );
     }
 
 // method returns maximum of input array, selected part n elements
-public static double findMax( double[] array, int n )
+protected static double findMax( double[] array, int n )
     {
     double max = Double.NaN;
     if ( ( array != null ) && ( n > 0 ) && ( n <= array.length ) )
@@ -63,13 +63,13 @@ public static double findMax( double[] array, int n )
 // find average value of array
 
 // method returns average of input array
-public static double findAverage( double[] array )
+protected static double findAverage( double[] array )
     {
     return findAverage( array, array.length );
     }
 
 // method returns average of input array, selected part n elements
-public static double findAverage( double[] array, int n )
+protected static double findAverage( double[] array, int n )
     {
     double average = Double.NaN;
     if ( ( array != null ) && ( n > 0 ) && ( n <= array.length ) )
@@ -85,12 +85,12 @@ public static double findAverage( double[] array, int n )
     }
 
 // find median value of array
-public static double findMedian( double[] array )
+protected static double findMedian( double[] array )
     {
     return findMedian( array, array.length );
     }
 
-public static double findMedian( double[] array, int n )
+protected static double findMedian( double[] array, int n )
     {
     double median = Double.NaN;
     if ( ( array != null ) && ( n == 1 ) && ( n <= array.length ) )
@@ -132,13 +132,13 @@ public static double findMedian( double[] array, int n )
 // find median value of array, additionally return indexes
 
 // method returns median representation of input array
-public static EntryMedian findMedianIndex( double[] array )
+protected static EntryMedian findMedianIndex( double[] array )
     {
     return findMedianIndex( array, array.length );
     }
 
 // method returns median representation of input array, selected part n elem.
-public static EntryMedian findMedianIndex( double[] arrayIn, int n )
+protected static EntryMedian findMedianIndex( double[] arrayIn, int n )
     {
     // this copy required because input array modified (sorted) by method
     int m = arrayIn.length;
@@ -228,14 +228,14 @@ public static EntryMedian findMedianIndex( double[] arrayIn, int n )
 
 
 // method returns statistics representation of input array
-public static EntryDetail getStatistic( double[] array )
+protected static EntryDetail getStatistic( double[] array )
     {
     return getStatistic( array, array.length );
     }
 
 // method returns statistics representation of input array, 
 // selected part n elements
-public static EntryDetail getStatistic( double[] array, int n )
+protected static EntryDetail getStatistic( double[] array, int n )
     {
     EntryMedian medianEntry = findMedianIndex( array, n );
     double average = findAverage( array, n );
