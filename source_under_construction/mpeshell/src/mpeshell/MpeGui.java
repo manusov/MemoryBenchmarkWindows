@@ -26,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.DefaultCaret;
 import mpeshell.opendraw.ActionDraw;
@@ -52,13 +53,13 @@ public ActionTextLog getChildTextLog()       { return childTextLog;    }
 public ActionRun getTaskShell()              { return taskShell;       }
 
 private JTable table = null;
-private BenchmarkTableModel tableModel = null;
+private SysBenchmarkTableModel tableModel = null;
 private JTextArea textArea = null;
 private DefaultBoundedRangeModel progressModel = null;
 private JProgressBar pb = null;
 
 public JTable getTable()                    { return table;      }
-public BenchmarkTableModel getTableModel()  { return tableModel; }
+public SysBenchmarkTableModel getTableModel()  { return tableModel; }
 public JTextArea getTextArea()              { return textArea;   }
 public DefaultBoundedRangeModel
         getProgressModel() { return progressModel; }
@@ -88,7 +89,7 @@ public void runBenchmarkGui()
     p = new JPanel( sl );                        // panel with layout
 
     // table
-    tableModel = new BenchmarkTableModel();
+    tableModel = new SysBenchmarkTableModel();
     table = new JTable( tableModel );
     JScrollPane tbs = new JScrollPane( table );
     DefaultTableCellRenderer tr = new DefaultTableCellRenderer();
@@ -305,6 +306,52 @@ public void runBenchmarkGui()
     frame.setVisible( true );
     }
 
+
+// disable GUI elements (make gray), used BEFORE run benchmarking process
+// plus disable application termination,
+// plus redefine button "Run" to "Stop"
+protected void disableGuiBeforeRun()
+    {
+    frame.setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
+    guiStateHelper( false );
+    }
+
+// re-enable GUI elements (no gray), used AFTER run benchmarking process
+// plus disable application termination,
+// plus redefine button "Run" to "Stop"
+protected void enableGuiAfterRun()
+    {
+    frame.setDefaultCloseOperation( EXIT_ON_CLOSE );
+    guiStateHelper( true );
+    }
+
+private void guiStateHelper( boolean enableFlag )
+    {
+    DescriptButton[] db = mglst.getDescriptButtons();
+    int n = db.length;
+    for( int i=0; i<n; i++ )
+        {
+        if ( db[i] instanceof ButtonRun )
+            {
+            ( ( ButtonRun ) db[i] ).setRunStop( enableFlag );
+            b[i].setText( db[i].getName() );
+            }
+        else if ( ! ( ( db[i] instanceof ButtonOpenLog        ) || 
+                      ( db[i] instanceof ButtonOpenStatistics ) || 
+                      ( db[i] instanceof ButtonOpenDraw       ) ) )
+            {
+            b[i].setEnabled( enableFlag );
+            }
+        }
+    DescriptCombo[] dc = mglst.getDescriptCombos();
+    n = dc.length;
+    for( int i=0; i<n; i++ )
+        {
+        boolean resultFlag = enableFlag & dc[i].getFunctional();
+        c[i].setEnabled( resultFlag );
+        }
+    }
+
 // handler for close session when exit by System.exit(n);
 // this software emulation required because JVM calls windowClosing
 // handler one when window closing.
@@ -318,14 +365,17 @@ private class CloseSessionListener extends WindowAdapter
     {
     @Override public void windowClosing( WindowEvent e )
         {
-        OpStatus ops = taskShell.closeSession();  // delete unpacked binaries
-        if ( ! ops.getStatusFlag() )
-            {
-            JOptionPane.showMessageDialog
-                ( frame, ops.getStatusString(), About.getShortName(), 
-                  JOptionPane.ERROR_MESSAGE ); 
+        // skip this action if try close during benchmarking process
+        if ( frame.getDefaultCloseOperation() != DO_NOTHING_ON_CLOSE )
+            {  // delete unpacked binaries
+            OpStatus ops = taskShell.closeSession();
+            if ( ! ops.getStatusFlag() )
+                {  // message if delete operation error
+                JOptionPane.showMessageDialog
+                    ( frame, ops.getStatusString(), About.getShortName(), 
+                    JOptionPane.ERROR_MESSAGE ); 
+                }
             }
         }
     }
-
 }

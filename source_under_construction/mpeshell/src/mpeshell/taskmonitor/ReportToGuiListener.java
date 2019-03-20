@@ -13,9 +13,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
-import mpeshell.BenchmarkTableModel;
+import mpeshell.SysBenchmarkTableModel;
 import mpeshell.MpeGui;
 import mpeshell.MpeGuiList;
+import mpeshell.MpeGuiList.MeasurementModes;
 import mpeshell.opendraw.ActionDraw;
 import mpeshell.opendraw.DrawModelInterface;
 import mpeshell.opendraw.DrawViewInterface;
@@ -38,7 +39,7 @@ private final CopyOnWriteArrayList<NumericEntry>
     dataArray = new CopyOnWriteArrayList<>();
 
 private final JTextArea mainText;
-private final BenchmarkTableModel mainTable;
+private final SysBenchmarkTableModel mainTable;
 private final JProgressBar mainProgress;
 private final DefaultBoundedRangeModel mainProgressModel;
 private final ActionDraw openableDraw;
@@ -132,7 +133,24 @@ public ReportToGuiListener( MpeGuiList x )
                             BigDecimal[] point = new BigDecimal[2];
                             point[0] = entry.bigdecs[0].
                                 divideToIntegralValue( new BigDecimal (1024) );
-                            point[1] = entry.bigdecs[3];
+                            
+                            MeasurementModes mm = 
+                                mglst.getBandwidthOrLatency();
+                            if ( mm == null )
+                                point[1] = BigDecimal.ZERO;
+                            else switch ( mm ) 
+                                {
+                                case BANDWIDTH:
+                                    point[1] = entry.bigdecs[3];
+                                    break;
+                                case LATENCY:
+                                    point[1] = entry.bigdecs[2];
+                                    break;
+                                default:
+                                    point[1] = BigDecimal.ZERO;
+                                    break;
+                                }
+                            
                             drawModel.updateValue( point );
                             drawModel.rescaleYmax();
                             drawView.getPanel().repaint();

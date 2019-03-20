@@ -11,6 +11,7 @@
 package mpeshell.opendraw;
 
 import java.math.BigDecimal;
+import mpeshell.MpeGuiList.MeasurementModes;
 
 public interface DrawModelInterface 
 {
@@ -37,6 +38,7 @@ public void rescaleXmax( int x );        // set x-scale by input x
 public void rescaleYmax();               // set y-scale automatically by values
 public void updateValue( BigDecimal[] x );  // add new element to array
 
-public void reset();                     // reset data
+public void reset();                         // reset data
+public void setMode( MeasurementModes x );   // set Bandwidth or Latency mode
 
 }

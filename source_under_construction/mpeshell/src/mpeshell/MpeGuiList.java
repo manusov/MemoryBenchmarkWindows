@@ -18,6 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.table.AbstractTableModel;
+import mpeshell.MpeGuiList.MeasurementModes;
 import mpeshell.service.About;
 import mpeshell.service.ActionAbout;
 import mpeshell.service.ActionGraph;
@@ -27,6 +28,8 @@ import mpeshell.taskmonitor.ActionRun;
 
 public class MpeGuiList 
 {
+public enum MeasurementModes { BANDWIDTH, LATENCY, UNKNOWN };
+    
 private final MpeGui mg;
 public MpeGui getMpeGui() { return mg; }  // provides MpeGui for scenarios
         
@@ -179,22 +182,26 @@ private long stepsHelper( int id )
     return dc.getLongValues()[index];
     }
 
-
 // Fields for extracts parameters for native application run
 private final static String PREFIX = "out=file";
 private int optionWidth;
 private String optionString; 
+private MeasurementModes bandwidthOrLatency;
 
 public int getOptionWidth()     { return optionWidth;  }  // get mode 32/64
 public String getOptionString() { return optionString; }  // get options
+public MeasurementModes getBandwidthOrLatency() 
+    { return bandwidthOrLatency; }                        // get mode b/w
 
 // extracts parameters for native application run,
 // this parameters = f ( GUI editable components state ).
 public void extractParmsFromGui()
     {
+    // defaults, width = 32 bit
     optionWidth = 0;
     optionString = null;
         
+    // determine strings for native application command line options
     JComboBox[] c = mg.getCombos();
     DescriptCombo[] dc = getDescriptCombos();
     optionWidth = c[0].getSelectedIndex();       // Combo = Application 32/64
@@ -208,6 +215,7 @@ public void extractParmsFromGui()
     String repeats  = helperOption( c, dc, 9  );  // Combo = Repeats
     String adaptive = helperOption( c, dc, 10 );  // Combo = Adaptive
     
+    // determine start, stop, step values for benchmarks measurements
     int k1 = c[11].getSelectedIndex();
     int k2 = c[12].getSelectedIndex();
     int k3 = c[13].getSelectedIndex();
@@ -223,6 +231,12 @@ public void extractParmsFromGui()
         step  = helperOption( c, dc, 13  );  // Combo = step
         }
     
+    // select bandwidth or latency = f ( asm combo box )
+    k1 = c[4].getSelectedIndex();
+    bandwidthOrLatency = (( ComboAsm ) dc[4] ).askMode( k1 );
+    mg.getChildDraw().getController().getModel().setMode( bandwidthOrLatency );
+    
+    // build command line options for native application
     optionString = PREFIX + runmode + memtype + asminstr + numaopt + pageopt +
                             threads + htopt + repeats + adaptive +
                             start + end + step;
@@ -327,22 +341,40 @@ protected ButtonOpenDraw( MpeGuiList x ) { mglst = x; }
 class ButtonRun extends DescriptButton {
 private final MpeGuiList mglst;
 protected ButtonRun( MpeGuiList x ) { mglst = x; }
-@Override public String getName() { return "Run"; }
-@Override public String getText() { return "run benchmarks"; }
+
+private boolean runStop = true;
+public void setRunStop( boolean b ) { runStop = b; }
+@Override public String getName() 
+    { 
+    String s = runStop ? "Run" : "Stop";
+    return s;
+    }
+
+@Override public String getText() { return "run/stop benchmarks"; }
 @Override public Dimension getSize() { return new Dimension( 78, 24 ); }
+
 @Override public void actionPerformed( ActionEvent e )
     {
-    BenchmarkAction benchmarkAction = new BenchmarkAction();
-    Thread benchmarkThread = new Thread ( benchmarkAction );
-    benchmarkThread.start();
+    if ( runStop )
+        {
+        BenchmarkAction benchmarkAction = new BenchmarkAction();
+        Thread benchmarkThread = new Thread ( benchmarkAction );
+        benchmarkThread.start();
+        }
+    else
+        {
+        mglst.getMpeGui().getTaskShell().interruptBenchmark();
+        }
     }
 // this nested class running benchmark task at parallel thread
 private class BenchmarkAction implements Runnable
     {
     @Override public void run()
         {
+        mglst.getMpeGui().disableGuiBeforeRun();
         mglst.extractParmsFromGui();
-        mglst.getMpeGui().getTaskShell().runBenchmark(); 
+        mglst.getMpeGui().getTaskShell().runBenchmark();
+        mglst.getMpeGui().enableGuiAfterRun();
         }
     }
 }
@@ -719,7 +751,6 @@ private static final String[] ASM_NAMES_64 =
     "Modify NOT64",
     "Write strings 64",
     "Copy strings 64",
-    ASM_NAMES_32[6],
     ASM_NAMES_32[7],
     ASM_NAMES_32[8],
     ASM_NAMES_32[9],
@@ -748,7 +779,8 @@ private static final String[] ASM_NAMES_64 =
     ASM_NAMES_32[32],
     ASM_NAMES_32[33],
     ASM_NAMES_32[34],
-    ASM_NAMES_32[35]
+    ASM_NAMES_32[35],
+    ASM_NAMES_32[36]
     };
 private final static String ASM = "asm";
 private final static String[] ASM_32 =
@@ -772,19 +804,29 @@ private final static String[] ASM_64 =
     { null,
       "readmov64", "writemov64", "copymov64", "modifynot64",
       "writestring64", "copystring64",
-      ASM_32[6],   ASM_32[7],   ASM_32[8],
-      ASM_32[9],   ASM_32[10],  ASM_32[11],
-      ASM_32[12],  ASM_32[13],  ASM_32[14],
-      ASM_32[15],  ASM_32[16],  ASM_32[17],
-      ASM_32[18],  ASM_32[19],
-      ASM_32[20],  ASM_32[21],
-      ASM_32[22],  ASM_32[23],
-      ASM_32[24],  ASM_32[25],
-      ASM_32[26],  ASM_32[27],
-      ASM_32[28],  ASM_32[29],
-      ASM_32[30],  ASM_32[31],
-      ASM_32[32],  ASM_32[33],
-      ASM_32[34],  ASM_32[35] };
+      ASM_32[7],   ASM_32[8],   ASM_32[9],
+      ASM_32[10],  ASM_32[11],  ASM_32[12],
+      ASM_32[13],  ASM_32[14],  ASM_32[15],
+      ASM_32[16],  ASM_32[17],  ASM_32[18],
+      ASM_32[19],  ASM_32[20],
+      ASM_32[21],  ASM_32[22],
+      ASM_32[23],  ASM_32[24],
+      ASM_32[25],  ASM_32[26],
+      ASM_32[27],  ASM_32[28],
+      ASM_32[29],  ASM_32[30],
+      ASM_32[31],  ASM_32[32],
+      ASM_32[33],  ASM_32[34],
+      ASM_32[35],  ASM_32[36] };
+
+protected MeasurementModes askMode( int num )
+    {
+    MeasurementModes x = MeasurementModes.UNKNOWN;
+    if ( num <= 34 )
+        x = MeasurementModes.BANDWIDTH;
+    else if ( num <= 36 )
+        x = MeasurementModes.LATENCY;
+    return x;
+    }
 
 private boolean mode64 = true;
 private long bitmapAsm = -1;

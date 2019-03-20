@@ -2,6 +2,7 @@
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
  * Summary Table Model for memory benchmark, part of main window.
+ * Share view field with SysInfoTableModel.
  *
  */
 
@@ -10,7 +11,7 @@ package mpeshell;
 import javax.swing.table.AbstractTableModel;
 import mpeshell.openstatistics.EntryStatistics;
 
-public class BenchmarkTableModel extends AbstractTableModel
+public class SysBenchmarkTableModel extends AbstractTableModel
 {
 // table model class fields
 private final String[] COLUMNS_NAMES = 

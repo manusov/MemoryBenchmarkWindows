@@ -161,6 +161,11 @@ public void runBenchmark()
     progressUpdate( progressModel, progressBar, 100 );
     }
 
+public void interruptBenchmark()
+    {
+    taskMonitor.interruptTask();
+    }
+
 public void progressUpdate( DefaultBoundedRangeModel model, JProgressBar bar, 
                                int percentage )
     {

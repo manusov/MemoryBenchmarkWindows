@@ -257,4 +257,10 @@ public OpStatus executeTask()
     return new OpStatus( true, stime );
     }
 
+// interrupt runned native benchmark application
+public void interruptTask()
+    {
+    process.destroy();
+    }
+
 }

@@ -3,9 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/service/ActionLoad.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/opendraw/DrawModel.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/opendraw/DrawController.java</file>
             <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/MpeShell.java</file>
-            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/service/ActionReport.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/taskmonitor/ReportToGuiListener.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/opendraw/ActionDraw.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/opendraw/DrawView.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/MpeGuiList.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/prototyping_3/mpeshell/src/mpeshell/opendraw/DrawModelInterface.java</file>
         </group>
     </open-files>
 </project-private>

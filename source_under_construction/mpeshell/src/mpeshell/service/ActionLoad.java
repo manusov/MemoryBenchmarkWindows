@@ -87,7 +87,7 @@ public void loadReportDialogue()
             ( parentWin, "Report loaded successfully", "LOAD REPORT",
             JOptionPane.WARNING_MESSAGE ); 
         }
-    else
+    else if ( select == JFileChooser.APPROVE_OPTION )
         {  // error message
         JOptionPane.showMessageDialog
             ( parentWin, "Load report failed", "ERROR",

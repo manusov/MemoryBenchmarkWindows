@@ -10,17 +10,22 @@
 package mpeshell.opendraw;
 
 import java.math.BigDecimal;
+import mpeshell.MpeGuiList.MeasurementModes;
 
 public class DrawModel implements DrawModelInterface
 {
 
 private BigDecimal[][] function;
 
-private final int DEFAULT_SCALE_BASE  = 1000;
-private final int DEFAULT_SCALE_DELTA = 100;
+private final double BIG_SCALE_BASE  = 1000.0;
+private final double BIG_SCALE_DELTA = 100.0;
+private final double SMALL_SCALE_BASE  = 10.0;  // note divisors 10.0 and 50.0
+private final double SMALL_SCALE_DELTA = 5.0;
+
 private final int DEFAULT_MAX_COUNT = 100;
 
-private int scale;
+private double scaleValue;
+private double scaleDelta;
 private int maxCount;
 private int currentCount;
 
@@ -31,7 +36,8 @@ public DrawModel( DrawControllerInterface x )
 
 @Override final public void reset()
     {
-    scale = DEFAULT_SCALE_BASE;
+    scaleValue = BIG_SCALE_BASE;
+    scaleDelta = BIG_SCALE_DELTA;
     maxCount = DEFAULT_MAX_COUNT;
     currentCount = 0;
     rescaleXmax( maxCount );
@@ -56,7 +62,7 @@ public DrawModel( DrawControllerInterface x )
 
 @Override public void startModel() 
     {
-    scale = DEFAULT_SCALE_BASE;
+    scaleValue = BIG_SCALE_BASE;
     currentCount = 0;
     }
 
@@ -70,10 +76,35 @@ public DrawModel( DrawControllerInterface x )
     // return "iteration";
     }
 
+private MeasurementModes mode = MeasurementModes.BANDWIDTH;
+@Override public void setMode( MeasurementModes x )
+    {
+    mode = x;
+    }
+
 @Override public String[] getYnames()
     {
     // return new String[] { "MBPS  single-thread", " multi-thread" };
-    return new String[] { "MBPS" };
+    String[] s;
+    switch ( mode )
+        {
+        case BANDWIDTH:
+            {
+            s = new String[] { "Bandwidth, MBPS" };
+            break;
+            }
+        case LATENCY:
+            {
+            s = new String[] { "Latency, ns" };
+            break;
+            }
+        default:
+            {
+            s = new String[] { "?" };
+            break;
+            }
+        }
+    return s;
     }
 
 @Override public BigDecimal getXmin()
@@ -107,20 +138,17 @@ public DrawModel( DrawControllerInterface x )
         
 @Override public BigDecimal getYmax()
     {
-    double x = scale;
-    return new BigDecimal( x );
+    return new BigDecimal( scaleValue );
     }
 
 @Override public BigDecimal getYsmallUnits()
     {
-    double x = scale / 50.0;
-    return new BigDecimal( x );
+    return new BigDecimal( scaleValue / 50.0 );
     }
 
 @Override public BigDecimal getYbigUnits()
     {
-    double x = scale / 10.0;
-    return new BigDecimal( x );
+    return new BigDecimal( scaleValue / 10.0 );
     }
 
 @Override public final void rescaleXmax( int x )
@@ -154,12 +182,19 @@ public DrawModel( DrawControllerInterface x )
                 if ( max < temp ) max = temp;
                 }
             }
-        int tempScale = 0;
+        
+        if ( max < SMALL_SCALE_BASE )
+            {
+            scaleDelta = SMALL_SCALE_DELTA;
+            }
+        
+        double tempScale = 0;
         while ( max > tempScale )
             {
-            tempScale += DEFAULT_SCALE_DELTA;
+            tempScale += scaleDelta;
             }
-        scale = tempScale;
+        
+        scaleValue = tempScale;
         }
     }
 

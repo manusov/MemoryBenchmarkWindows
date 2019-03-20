@@ -120,10 +120,10 @@ private class FunctionDrawPanel extends JPanel
         if ( ytop < ybottom )
             {  // Y axis
             g.drawLine( xleft, ybottom, xleft, ytop-13 );
-            int dy = 
+            int dy =  // dy = number of small intervals
                ( ( ymax.subtract( ymin ) ).divideToIntegralValue( ysmall ) ).
                intValue();
-            int py = ( ybottom - ytop ) / dy;
+            int py = ( ybottom - ytop ) / dy;  // py = pixels per small interval
             if ( py > 3 )
                 {
                 for( int i = ybottom-py; i >= ytop; i -= py )
@@ -131,6 +131,7 @@ private class FunctionDrawPanel extends JPanel
                     g.drawLine( xleft-1, i, xleft+1, i );
                     }
                 }
+            // ry = small intervals per big interval
             int ry = ybig.divideToIntegralValue( ysmall ).intValue();
             if ( (py*ry) > 3 )
                 {
