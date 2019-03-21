@@ -1,0 +1,79 @@
+
+Memory Performance Engine. v0.60.06 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.22.00 for Windows x64. (C)2018 IC Book Labs.
+run memory benchmark scenario.
+asm method ID=36, bytes per instruction BPI=8
+TSC frequency F=2403.054 MHz, period T=0.416 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000001000000 0000000001800000 0000000001000000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 1 , list allocated at base = 0000000000746F60h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=0000000000000090 rxevent=00000000000000D4 txevent=00000000000000D8
+     base1 =0000000001000000 base2  =0000000001C00000 sizeins=0000000000018000
+     repeat=00000000000001F4 large page mode =0001    method id =0024
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done ( dTSC=000000000271BB83h )
+allocate statistics arrays...done
+bandwidth statistics, BASE=0000000000F1A7B0h, SIZE=0000000000000080h
+latency statistics,   BASE=0000000000F1A840h, SIZE=0000000000000080h
+RUN: method=36, threads=1, repeats=ADAPTIVE
+     page mode=1, page size=4.00 KB
+     start=768.00 KB, end=12.00 MB, delta=768.00 KB, bpi=8 bytes
+
+[ prepare walk list for latency measure by RDRAND ]
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1      786432  24.540  10.212   783.394   
+   2     1572864  27.481  11.436   699.565   
+   3     2359296  28.711  11.948   669.581   
+   4     3145728  30.642  12.751   627.393   
+   5     3932160  31.298  13.024   614.230   
+   6     4718592  39.545  16.456   486.135   
+   7     5505024  51.285  21.342   374.852   
+   8     6291456  66.453  27.654   289.292   
+   9     7077888  75.841  31.560   253.483   
+  10     7864320  90.425  37.629   212.600   
+  11     8650752 102.482  42.647   187.588   
+  12     9437184 115.458  48.046   166.505   
+  13    10223616 120.551  50.166   159.472   
+  14    11010048 120.806  50.272   159.134   
+  15    11796480 130.816  54.437   146.958   
+  16    12582912 131.941  54.906   145.704   
+-------------------------------------------------------
+
+ Latency ( nanoseconds )
+------------------------------------------------------------------------------
+ | max=54.906     | min=10.212     | average=30.905     | median=29.607     |
+------------------------------------------------------------------------------
+
+delete local objects...done
+delete global objects...done
+

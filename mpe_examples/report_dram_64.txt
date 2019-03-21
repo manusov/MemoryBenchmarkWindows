@@ -1,0 +1,93 @@
+
+Memory Performance Engine. v0.60.06 for Windows x64. (C)2018 IC Book Labs.
+get command line parameters...done
+load API...done
+detect processor features...done
+detect SMP and cache levels...done
+detect memory...done
+detect paging...done
+initializing domains builder...done
+initializing threads builder...done
+measure TSC clock...done
+get library data...done
+MPE native library. v0.22.00 for Windows x64. (C)2018 IC Book Labs.
+run memory benchmark scenario.
+asm method ID=20, bytes per instruction BPI=16
+TSC frequency F=2411.851 MHz, period T=0.415 ns
+cache points for data read/write:
+L1=32 KB, L2=256 KB, L3=6144 KB, L4=0 KB
+CPU core count=4, HyperThreading=1
+memory allocation...done
+NUMA-unaware mode, list allocated at base = 0000000000445640h
+
+ ID  allocated base   allocated size   original (all hex)
+---------------------------------------------------------
+ 0   0000000000D70000 0000000014000000 0000000000D70000 
+---------------------------------------------------------
+
+threads allocation...done
+threads entries created = 4 , list allocated at base = 0000000000D66F90h
+
+ ID  (values hex)
+-------------------------------------------------------------------------------
+ 0   thread=00000000000000CC rxevent=00000000000000D0 txevent=00000000000000D4
+     base1 =0000000000D70000 base2  =0000000003570000 sizeins=0000000000200000
+     repeat=00000000000000C8 large page mode =0001    method id =0014
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 1   thread=00000000000000D8 rxevent=00000000000000DC txevent=00000000000000E0
+     base1 =0000000005D70000 base2  =0000000008570000 sizeins=0000000000200000
+     repeat=00000000000000C8 large page mode =0001    method id =0014
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 2   thread=00000000000000E4 rxevent=00000000000000E8 txevent=00000000000000EC
+     base1 =000000000AD70000 base2  =000000000D570000 sizeins=0000000000200000
+     repeat=00000000000000C8 large page mode =0001    method id =0014
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+ 3   thread=00000000000000F0 rxevent=00000000000000F4 txevent=00000000000000F8
+     base1 =000000000FD70000 base2  =0000000012570000 sizeins=0000000000200000
+     repeat=00000000000000C8 large page mode =0001    method id =0014
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 0000000000445100
+
+-------------------------------------------------------------------------------
+
+running threads...done ( dTSC=00000000A24D4548h )
+allocate statistics arrays...done
+bandwidth statistics, BASE=0000000000D61B50h, SIZE=0000000000000048h
+latency statistics,   BASE=0000000000D61BA0h, SIZE=0000000000000048h
+RUN: method=20, threads=4, repeats=200
+     page mode=1, page size=4.00 KB
+     start=32.00 MB, end=40.00 MB, delta=1.00 MB, bpi=16 bytes
+
+[ non-temporal write 128-bit SSE MOVNTPS ]
+
+   #        size   CPI     nsPI    MBPS
+-------------------------------------------------------
+   1    33554432   1.600   0.663   24121.881 
+   2    34603008   1.598   0.663   24144.095 
+   3    35651584   1.601   0.664   24109.729 
+   4    36700160   1.595   0.661   24195.633 
+   5    37748736   1.611   0.668   23952.818 
+   6    38797312   1.597   0.662   24170.692 
+   7    39845888   1.595   0.661   24200.646 
+   8    40894464   1.608   0.667   23992.149 
+   9    41943040   1.610   0.668   23967.789 
+-------------------------------------------------------
+
+ Bandwidth ( megabytes per second )
+------------------------------------------------------------------------------
+ | max=24200.646  | min=23952.818  | average=24095.048  | median=24121.881  |
+------------------------------------------------------------------------------
+
+delete local objects...done
+delete global objects...done
+

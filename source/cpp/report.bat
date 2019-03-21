@@ -1,1 +1,0 @@
-debug1 info=all > report.txt
