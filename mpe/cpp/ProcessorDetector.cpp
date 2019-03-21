@@ -41,23 +41,23 @@ const BYTE ProcessorDetector::bytesPerInstruction[] =
 const char* ProcessorDetector::instructionStrings[] =
 {
 #if NATIVE_WIDTH == 32
-	"read 32-bit MOV",
+	"read 32-bit MOV",           // ID = 0
 	"write 32-bit MOV",
 	"copy 32-bit MOV",
 	"modify 32-bit NOT",
 	"write 32-bit REP STOSD",
-	"copy 32-bit REP MOVSD",
+	"copy 32-bit REP MOVSD",     // ID = 5
 #endif
 #if NATIVE_WIDTH == 64
-	"read 64-bit MOV",
+	"read 64-bit MOV",           // ID = 0
 	"write 64-bit MOV",
 	"copy 64-bit MOV",
 	"modify 64-bit NOT",
 	"write 64-bit REP STOSQ",
-	"copy 64-bit REP MOVSQ",
+	"copy 64-bit REP MOVSQ",     // ID = 5
 #endif
 // start of added at v0.60.03
-	"read 64-bit MMX MOVQ",
+	"read 64-bit MMX MOVQ",     // ID = 6
 	"write 64-bit MMX MOVQ",
 	"copy 64-bit MMX MOVQ",
 // end of added at v0.60.03
@@ -71,7 +71,7 @@ const char* ProcessorDetector::instructionStrings[] =
 	"write 512-bit AVX VMOVAPD",
 	"copy 512-bit AVX VMOVAPD",
 	"dot product 256-bit FMA VFMADD231PD",
-	"dot product 512-bit FMA VFMADD231PD",
+	"dot product 512-bit FMA VFMADD231PD",                // ID = 19
 	"non-temporal write 128-bit SSE MOVNTPS",
 	"non-temporal copy 128-bit SSE MOVAPS+MOVNTPS",
 	"non-temporal write 256-bit AVX VMOVNTPD",
@@ -83,12 +83,12 @@ const char* ProcessorDetector::instructionStrings[] =
 	"non-temporal read 256-bit AVX VMOVNTDQA",
 	"non-temporal copy 256-bit AVX VMOVNTDQA+VMOVNTPD",
 	"non-temporal read 512-bit AVX VMOVNTDQA",
-	"non-temporal copy 512-bit AVX VMOVNTDQA+VMOVNTPD",
-	"non-temporal read 128-bit SSE PREFETCHNTA+MOVAPS",
-	"reserved",
-	"non-temporal read 256-bit AVX PREFETCHNTA+VMOVAPD",
-	"prepare walk list for latency measure by LCM",
-	"prepare walk list for latency measure by RDRAND",
+	"non-temporal copy 512-bit AVX VMOVNTDQA+VMOVNTPD",    // ID = 31
+	"non-temporal read 128-bit SSE PREFETCHNTA+MOVAPS",    // ID = 32
+	"non-temporal copy 128-bit SSE PREFETCHNTA+MOVNTPS",   // ID = 33
+	"non-temporal read 256-bit AVX PREFETCHNTA+VMOVAPD",   // ID = 34
+	"prepare walk list for latency measure by LCM",        // ID = 35
+	"prepare walk list for latency measure by RDRAND",     // ID = 36
 	"latency measure by walk list",
 	NULL	
 };

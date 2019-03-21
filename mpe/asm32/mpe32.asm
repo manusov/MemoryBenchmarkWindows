@@ -268,24 +268,22 @@ include 'latency_walk.inc'
 ; Data section
 section '.data' data readable writeable
 StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.22.01 for Windows ia32.',0
+StringVersion    DB 'v0.22.02 for Windows ia32.',0
 StringCopyright  DB '(C)2019 IC Book Labs.',0
 
 ; Pointers to performance patterns
 align 8
 PerformancePatterns:
 ; Temporal (cacheable read and write) mode
-DD  Pattern_Read_MOV32
+DD  Pattern_Read_MOV32      ; ID = 0
 DD  Pattern_Write_MOV32
 DD  Pattern_Copy_MOV32
 DD  Pattern_Modify_NOT32
 DD  Pattern_Write_STOSD
 DD  Pattern_Copy_MOVSD
-;
 DD  Pattern_Read_MMX64
 DD  Pattern_Write_MMX64
 DD  Pattern_Copy_MMX64
-;
 DD  Pattern_Read_SSE128
 DD  Pattern_Write_SSE128
 DD  Pattern_Copy_SSE128
@@ -296,32 +294,32 @@ DD  Pattern_Read_AVX512
 DD  Pattern_Write_AVX512
 DD  Pattern_Copy_AVX512
 DD  Pattern_Dot_FMA256  
-DD  Pattern_Dot_FMA512  
+DD  Pattern_Dot_FMA512      ; ID = 19  
 ; Non-temporal (non-cacheable write) mode 
-DD  Pattern_NtWrite_SSE128
+DD  Pattern_NtWrite_SSE128  ; ID = 20 
 DD  Pattern_NtCopy_SSE128   ; This duplicated 1
 DD  Pattern_NtWrite_AVX256
 DD  Pattern_NtCopy_AVX256
 DD  Pattern_NtWrite_AVX512
-DD  Pattern_NtCopy_AVX512
+DD  Pattern_NtCopy_AVX512   ; ID = 25
 ; Non-temporal (non-cacheable read and write) mode
-DD  Pattern_NtRead_SSE128
+DD  Pattern_NtRead_SSE128   ; ID = 26
 DD  Pattern_NtRCopy_SSE128
 DD  Pattern_NtRead_AVX256
 DD  Pattern_NtRCopy_AVX256
 DD  Pattern_NtRead_AVX512   
-DD  Pattern_NtRCopy_AVX512
+DD  Pattern_NtRCopy_AVX512  ; ID = 31
 ; Non-temporal (non-cacheable read-by-prefetch and write) mode
-DD  Pattern_NtpRead_SSE128
+DD  Pattern_NtpRead_SSE128  ; ID = 32
 DD  Pattern_NtCopy_SSE128   ; This duplicated 1
-DD  Pattern_NtpRead_AVX256
+DD  Pattern_NtpRead_AVX256  ; ID = 34
 ; Reserved for same 256-512 bit operations
 ; FMA with non-temporal store
 ; ... reserved ...
 ; Latency measurement
-DD  Pattern_Latency_LCM
-DD  Pattern_Latency_RDRAND  
-DD  Pattern_Latency_Walk   
+DD  Pattern_Latency_LCM     ; ID = 35
+DD  Pattern_Latency_RDRAND  ; ID = 36  
+DD  Pattern_Latency_Walk    ; ID = 37   
 
 ; Export section
 section '.edata' export data readable

@@ -82,6 +82,7 @@ void MemoryScenario::execute( )
 	{
 		snprintf( saveDst, saveMax, "\nERROR: selected read-write method (%d) not supported by CPU instruction set.\n\n", opAsm );
 		AppConsole::transmit( saveDst );
+		return;
 		;
 	}
 	// Check selected read-write method supported by OS context management features
@@ -89,6 +90,7 @@ void MemoryScenario::execute( )
 	{
 		snprintf( saveDst, saveMax, "\nERROR: selected read-write method (%d) not supported by OS context management.\n\n", opAsm );
 		AppConsole::transmit( saveDst );
+		return;
 		;
 	}
 	size_t bytesPerInstruction = controlSet->pProcessorDetector->getBytesPerInstruction( opAsm );

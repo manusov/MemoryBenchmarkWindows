@@ -39,35 +39,35 @@ const char* CommandLine::keysOut[] = {
 const char* CommandLine::keysAsm[] = { 
 // default temporal methods
 #if NATIVE_WIDTH == 32
-	"readmov32", "writemov32", "copymov32", "modifynot32",
-	"writestring32", "copystring32",
+	"readmov32", "writemov32", "copymov32", "modifynot32",   // ID = 0...3 (ia32 variant)
+	"writestring32", "copystring32",                         // ID = 4...5 (ia32 variant)
 #endif
 #if NATIVE_WIDTH == 64
-	"readmov64", "writemov64", "copymov64", "modifynot64",
-	"writestring64", "copystring64",
+	"readmov64", "writemov64", "copymov64", "modifynot64",   // ID = 0...3 (x64 variant)
+	"writestring64", "copystring64",                         // ID = 4...5 (x64 variant)
 #endif
 // start of added at v0.60.03
-	"readmmx64", "writemmx64", "copymmx64",
+	"readmmx64", "writemmx64", "copymmx64",                  // ID = 6...8
 // end of added at v0.60.03
-	"readsse128", "writesse128", "copysse128",
-	"readavx256", "writeavx256", "copyavx256",
-	"readavx512", "writeavx512", "copyavx512",
-	"dotfma256",  "dotfma512",
+	"readsse128", "writesse128", "copysse128",               // ID = 9...11
+	"readavx256", "writeavx256", "copyavx256",               // ID = 12...14
+	"readavx512", "writeavx512", "copyavx512",               // ID = 15...17
+	"dotfma256",  "dotfma512",                               // ID = 18...19
 // methods with nontemporal write ((v)movntps, ((v)movntpd)
-	"ntwwritesse128", "ntwcopysse128",
+	"ntwwritesse128", "ntwcopysse128",                       // ID = 20...21
 	"ntwwriteavx256", "ntwcopyavx256",
-	"ntwwriteavx512", "ntwcopyavx512",
+	"ntwwriteavx512", "ntwcopyavx512",                       // ID = 24...25
 // methods with nontemporal read ((v)movntdqa) and write ((v)movntps, ((v)movntpd)
-	"ntrwreadsse128", "ntrwcopysse128",
+	"ntrwreadsse128", "ntrwcopysse128",                      // ID = 26...27
 	"ntrwreadavx256", "ntrwcopyavx256",
-	"ntrwreadavx512", "ntrwcopyavx512",
+	"ntrwreadavx512", "ntrwcopyavx512",                      // ID = 30...31
 // methods with nontemporal prefetched read (prefetchnta) and write ((v)movntps, ((v)movntpd) 
-	"ntprwreadsse128", "ntprwcopysse128",
-	"ntprwreadsse128",
+	"ntprwreadsse128", "ntprwcopysse128",                    // ID = 32...33
+	"ntprwreadavx256",                                       // ID = 34
 // Reserved for extensions ( 256(copy), 512(read, copy) )
 // ... VERIFY MATCH WITH DLL 32/64 ...
 // methods for latency check
-	"latencylcm", "latencyrdrand",
+	"latencylcm", "latencyrdrand",                           // ID = 35...36
 // ... WALK ROUTINE NOT DIRECTLY ASSIGNED TO "ASM" KEY
 // keys list termination
     NULL

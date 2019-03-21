@@ -781,8 +781,8 @@ class ComboAsm extends DescriptCombo {
 protected ComboAsm( MpeGuiList x ) { super( x, 4 ); }
 private static final String[] ASM_NAMES_32 =
     { 
-    "auto",
-    "Read MOV32",
+    "auto",                                // ID = -1
+    "Read MOV32",                          // ID = 0
     "Write MOV32",
     "Copy MOV32",
     "Modify NOT32",
@@ -801,28 +801,29 @@ private static final String[] ASM_NAMES_32 =
     "Write AVX512",
     "Copy AVX512",
     "Dot product FMA256",
-    "Dot product FMA512",
-    "Write SSE128 NT",
+    "Dot product FMA512",                  // ID = 19
+    "Write SSE128 NT",                     // ID = 20
     "Copy SSE128 NT write",
     "Write AVX256 NT",
     "Copy AVX256 NT write",
     "Write AVX512 NT",
-    "Copy AVX512 NT write",
-    "Read SSE128 NT",
+    "Copy AVX512 NT write",                // ID = 25
+    "Read SSE128 NT",                      // ID = 26
     "Copy SSE128 NT read+write",
     "Read AVX256 NT",
     "Copy AVX256 NT read+write",
     "Read AVX512 NT",
-    "Copy AVX512 NT read+write",
-    "Read SSE128 NT prefetch",
-    "Copy SSE128 NT prefetch NT write",
-    "Latency LCM",
-    "Latency RDRAND"
+    "Copy AVX512 NT read+write",           // ID = 31
+    "Read SSE128 NT prefetch",             // ID = 32
+    "Copy SSE128 NT prefetch NT write",    // ID = 33
+    "Read AVX256 NT prefetch",             // ID = 34
+    "Latency LCM",                         // ID = 35
+    "Latency RDRAND"                       // ID = 36
     }; 
 private static final String[] ASM_NAMES_64 =
     {
-    ASM_NAMES_32[0],
-    "Read MOV64",
+    ASM_NAMES_32[0],                       // ID = -1
+    "Read MOV64",                          // ID = 0
     "Write MOV64",
     "Copy MOV64",
     "Modify NOT64",
@@ -857,7 +858,8 @@ private static final String[] ASM_NAMES_64 =
     ASM_NAMES_32[33],
     ASM_NAMES_32[34],
     ASM_NAMES_32[35],
-    ASM_NAMES_32[36]
+    ASM_NAMES_32[36],    // ID = 35
+    ASM_NAMES_32[37]     // ID = 36
     };
 private final static String ASM = "asm";
 private final static String[] ASM_32 =
@@ -876,6 +878,7 @@ private final static String[] ASM_32 =
       "ntrwreadavx256", "ntrwcopyavx256",
       "ntrwreadavx512", "ntrwcopyavx512",
       "ntprwreadsse128", "ntprwcopysse128",
+      "ntprwreadavx256",
       "latencylcm", "latencyrdrand" };
 private final static String[] ASM_64 =
     { null,
@@ -893,14 +896,15 @@ private final static String[] ASM_64 =
       ASM_32[29],  ASM_32[30],
       ASM_32[31],  ASM_32[32],
       ASM_32[33],  ASM_32[34],
-      ASM_32[35],  ASM_32[36] };
+      ASM_32[35],
+      ASM_32[36],  ASM_32[37] };
 
 protected MeasurementModes askMode( int num )
     {
     MeasurementModes x = MeasurementModes.UNKNOWN;
-    if ( num <= 34 )
+    if ( num <= 35 )
         x = MeasurementModes.BANDWIDTH;
-    else if ( num <= 36 )
+    else if ( num <= 37 )
         x = MeasurementModes.LATENCY;
     return x;
     }
