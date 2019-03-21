@@ -12,10 +12,10 @@ public class SystemInformation
 
 // cache and DRAM control, units = Kilobytes
 private final static int DEFAULT_X_SCALE_L1   = 80;
-private final static int DEFAULT_X_SCALE_L2   = 600;
+private final static int DEFAULT_X_SCALE_L2   = 800;
 private final static int DEFAULT_X_SCALE_L3   = 20000;
 private final static int DEFAULT_X_SCALE_L4   = 40000;
-private final static int DEFAULT_X_SCALE_DRAM = 100000;
+private final static int DEFAULT_X_SCALE_DRAM = 80000;
 
 private int scale1;
 private int scale2;

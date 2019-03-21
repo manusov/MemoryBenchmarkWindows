@@ -193,7 +193,7 @@ public String getOptionString() { return optionString; }  // get options
 public enum UnitsModes { KILOBYTES, MEGABYTES, UNKNOWN };
 public enum MeasurementModes { BANDWIDTH, LATENCY, UNKNOWN };
 
-public UnitsModes blockSizeUnits()
+public UnitsModes getBlockSizeUnits()
     { return blockSizeUnits; }                            // get units KB/MB
 public MeasurementModes getBandwidthOrLatency() 
     { return bandwidthOrLatency; }                        // get mode bw/lat
@@ -260,25 +260,51 @@ public void extractParmsFromGui()
             scale = sysinfo.getScaleDram();
             break;
         case 5:
-            //scale = (int) ( dc[12].getLongValues()[k2-1] / 1024 );
-            //scale = scale / 1000 * 1000;
-            //if ( scale <= 0 ) scale = 80;
-            
-            // DEBUG
-            scale = 80;
-            
+            long[] arraySizes = dc[12].getLongValues();
+            int arrayIndex = k2 - 1;
+            if ( ( arrayIndex >= 0 ) && ( arrayIndex < arraySizes.length ) )
+                {
+                long selectedSize = arraySizes[ arrayIndex ];
+                scale = ( int )( selectedSize / 1024 );
+                
+                if ( scale < 40 )
+                    scale = 40;
+                else if ( scale < 80 )
+                    scale = 80;
+                else if ( scale < 200 )
+                    scale = 200;
+                else if ( scale % 400 == 0 )
+                    scale = scale / 400 * 400;
+                else
+                    scale = scale / 400 * 400 + 400;
+                
+                }
+            else
+                {
+                scale = 80;
+                }
             break;
         default:
             scale = 80;
         }
     
+    // support X-axis: select KB or MB units = f ( selected scale )
+    // YET LOCKED, CAREFULLY CHANGE BECAUSE PRECISION BUG, VERIFY FOR ALL
+    // PARAMETERS: START, END, STEP.
+    // if ( scale < 32*1024 )
+    //     {
+        blockSizeUnits = UnitsModes.KILOBYTES;
+    //     }
+    // else
+    //     {
+    //     blockSizeUnits = UnitsModes.MEGABYTES;
+    //     scale /= ( 400 * 3 );
+    //     }
+    mg.getChildDraw().getController().getModel().setModeX( blockSizeUnits );
+
+    // select X-scale
     mg.getChildDraw().getController().getModel().reset();
     mg.getChildDraw().getController().getModel().rescaleXmax( scale );
-    
-    // support X-axis: select KB or MB units = f ( selected scale )
-    blockSizeUnits = UnitsModes.KILOBYTES;
-    // ...
-    mg.getChildDraw().getController().getModel().setModeX( blockSizeUnits );
     
     // support Y-axis: select bandwidth or latency = f ( asm combo box )
     k4 = c[4].getSelectedIndex();

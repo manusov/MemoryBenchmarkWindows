@@ -17,6 +17,7 @@ import mpeshell.SysBenchmarkTableModel;
 import mpeshell.MpeGui;
 import mpeshell.MpeGuiList;
 import mpeshell.MpeGuiList.MeasurementModes;
+import mpeshell.MpeGuiList.UnitsModes;
 import mpeshell.opendraw.ActionDraw;
 import mpeshell.opendraw.DrawModelInterface;
 import mpeshell.opendraw.DrawViewInterface;
@@ -129,11 +130,33 @@ public ReportToGuiListener( MpeGuiList x )
                             // update statistic table, openable window
                             openableTable.measurementNotify( ests );
                             
-                            // update drawings Y=F(X), openable window
+                            // Prepare update drawings Y=F(X), openable window
                             BigDecimal[] point = new BigDecimal[2];
-                            point[0] = entry.bigdecs[0].
-                                divideToIntegralValue( new BigDecimal (1024) );
                             
+                            // X-coordinate logic
+                            // optional: KB or MB
+                            UnitsModes um = mglst.getBlockSizeUnits();
+                            if ( um == null )
+                                point[0] = BigDecimal.ZERO;
+                            else switch ( um )
+                                {
+                                case KILOBYTES:
+                                    point[0] = entry.bigdecs[0].
+                                        divideToIntegralValue
+                                            ( new BigDecimal (1024) );
+                                    break;
+                                case MEGABYTES:
+                                    point[0] = entry.bigdecs[0].
+                                        divideToIntegralValue
+                                            ( new BigDecimal (1024*1024) );
+                                    break;
+                                default:
+                                    point[0] = BigDecimal.ZERO;
+                                    break;
+                                }
+                            
+                            // Y-coordinate logic
+                            // optional: Bandwidth or Latency
                             MeasurementModes mm = 
                                 mglst.getBandwidthOrLatency();
                             if ( mm == null )
@@ -151,6 +174,7 @@ public ReportToGuiListener( MpeGuiList x )
                                     break;
                                 }
                             
+                            // send (X,Y) to drawings model, auto-rescale Y
                             drawModel.updateValue( point );
                             drawModel.rescaleYmax();
                             drawView.getPanel().repaint();
