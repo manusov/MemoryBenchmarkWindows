@@ -75,13 +75,17 @@ public void loadReportDialogue()
         {
         ReportToGuiListener listener = new ReportToGuiListener( mglst );
         OpStatus status = new OpStatus( true, "OK" );
-        listener.dataHandler( report, status );
+        listener.dataHandler( report, status );  // report parsing
         // set progress indicator to 100 percents
         JProgressBar progressBar = mglst.getMpeGui().getProgressBar();
         DefaultBoundedRangeModel progressModel = ( DefaultBoundedRangeModel )
             progressBar.getModel();
         ActionRun ar = mglst.getMpeGui().getTaskShell();
         ar.progressUpdate( progressModel, progressBar, 100 );
+        // re-initializing GUI (combo boxes) by system information,
+        // extracted from loaded report
+        mglst.getMpeGui().updateGuiBySysInfo();
+        
         // message box about report loaded successfully
         JOptionPane.showMessageDialog
             ( parentWin, "Report loaded successfully", "LOAD REPORT",

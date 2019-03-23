@@ -68,42 +68,6 @@ public void setPrevious( int n ) { previous = n;    }
 
 // helpers methods useable by child classes
 
-String printRoundSize( long x )
-    {
-    return printRoundSize( x, true );
-    }
-
-String printRoundSize( long x, boolean b )
-    {
-    String s = "?";
-    if ( x < 0 )
-        return s;
-    else if ( x < 1024L )
-        {  // print as bytes
-        int y = ( int )( x );
-        s = b ? String.format( "%d Bytes", y ) 
-              : String.format( "%d", y );
-        }
-    else if ( x < 1024*1024L )
-        {  // print as kilobytes
-        int y = ( int )( x / 1024L );
-        s = String.format( "%dK", y );
-        }
-    else if ( x < 1024*1024*1024L )
-        {  // print as megabytes
-        int y = ( int )( x / (1024*1024L) );
-        s = String.format( "%dM", y );
-        }
-    else if ( x < 1024*1024*1024*1024L )
-        {  // print as gigabytes
-        int y = ( int )( x / (1024*1024*1024L) );
-        s = String.format( "%dG", y );
-        }
-    // otherwise return string="?" for big sizes at this method context
-    // terabytes not supported yet
-    return s;    
-    }
-
 final long[] buildRoundNumbersArray( long x, int n )
     {
     long[] array = new long[n];
@@ -120,7 +84,7 @@ String[] printRoundSizesArray( long x, int n, boolean b )
     String[] s = new String[n];
     for( int i=0; i<n; i++ )
         {
-        s[i] = printRoundSize( x, b );
+        s[i] = PrintHelper.printRoundSize( x, b );
         x = x << 1;
         }
     return s;

@@ -111,7 +111,7 @@ public ReportToGuiListener( MpeGuiList x )
                             detectedUp = false;  // mark end of results table
                         }
                     else if ( detectedUp )
-                        {
+                        {  // accept current element inside results table
                         NumericEntry entry = rpk.detectTableEntry( words );
                         if ( ( entry != null )             && 
                              ( entry.doubles != null )     && 
@@ -185,6 +185,11 @@ public ReportToGuiListener( MpeGuiList x )
                                 ( mainProgressModel, mainProgress, 
                                  (int)progressValue );
                             }
+                        }
+                    else
+                        {  // parse system information, for re-initializing GUI
+                        SysInfoEntry se = rpk.detectSysInfoParameter( words );
+                        mg.getSysInfo().acceptEntry( se );
                         }
                     }
                 }

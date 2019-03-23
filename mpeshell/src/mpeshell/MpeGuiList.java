@@ -36,6 +36,25 @@ public MpeGuiList( MpeGui x )
     mg = x;
     }
 
+// update GUI descriptors list (for combo boxes) after load system information
+protected void updateGuiListBySysInfo( SystemInformation sysinfo )
+    {
+    JComboBox[] c = mg.getCombos();
+    DescriptCombo[] dc = getDescriptCombos();
+    int n = c.length;   // number of descriptors / combo boxes
+    String[] items = ( (ComboMemory) dc[3] ).getUpdateableValues();
+    String newItem = PrintHelper.printSize( sysinfo.getL1() );
+    items[0] = items[0] + " (" + newItem + ")";
+    newItem = PrintHelper.printSize( sysinfo.getL2() );
+    items[1] = items[1] + " (" + newItem + ")";
+    newItem = PrintHelper.printSize( sysinfo.getL3() );
+    items[2] = items[2] + " (" + newItem + ")";
+    newItem = PrintHelper.printSize( sysinfo.getL4() );
+    items[3] = items[3] + " (" + newItem + ")";
+    newItem = PrintHelper.printSize( sysinfo.getDram() );
+    items[4] = items[4] + " (" + newItem + ")";
+    }
+
 // this method implements combo boxes logic, some boxes depends on other.
 // id = combo box number, e = combo box click event
 protected void changesMonitor( int id, ActionEvent e )
@@ -214,14 +233,14 @@ public void extractParmsFromGui()
     DescriptCombo[] dc = getDescriptCombos();
     optionWidth = c[0].getSelectedIndex();       // Combo = Application 32/64
     String runmode  = " " + dc[1].getCmdValues()[ c[1].getSelectedIndex() ];
-    String memtype  = helperOption( c, dc, 3  );  // Combo = Memory type
-    String asminstr = helperOption( c, dc, 4  );  // Combo = Asm.CPU instr.
-    String numaopt  = helperOption( c, dc, 5  );  // Combo = NUMA
-    String pageopt  = helperOption( c, dc, 6  );  // Combo = Pages
-    String threads  = helperOption( c, dc, 7  );  // Combo = Threads
-    String htopt    = helperOption( c, dc, 8  );  // Combo = Hyper Threading
-    String repeats  = helperOption( c, dc, 9  );  // Combo = Repeats
-    String adaptive = helperOption( c, dc, 10 );  // Combo = Adaptive
+    String memtype  = optionHelper( c, dc, 3  );  // Combo = Memory type
+    String asminstr = optionHelper( c, dc, 4  );  // Combo = Asm.CPU instr.
+    String numaopt  = optionHelper( c, dc, 5  );  // Combo = NUMA
+    String pageopt  = optionHelper( c, dc, 6  );  // Combo = Pages
+    String threads  = optionHelper( c, dc, 7  );  // Combo = Threads
+    String htopt    = optionHelper( c, dc, 8  );  // Combo = Hyper Threading
+    String repeats  = optionHelper( c, dc, 9  );  // Combo = Repeats
+    String adaptive = optionHelper( c, dc, 10 );  // Combo = Adaptive
     
     // determine start, stop, step values for benchmarks measurements
     int k1 = c[11].getSelectedIndex();  // start
@@ -234,9 +253,9 @@ public void extractParmsFromGui()
     if ( ( k1 > 0 ) && ( k2 > 0 ) && ( k3 > 0 ) )
         {
         memtype = "";
-        start = helperOption( c, dc, 11  );  // Combo = start
-        end   = helperOption( c, dc, 12  );  // Combo = end
-        step  = helperOption( c, dc, 13  );  // Combo = step
+        start = optionHelper( c, dc, 11  );  // Combo = start
+        end   = optionHelper( c, dc, 12  );  // Combo = end
+        step  = optionHelper( c, dc, 13  );  // Combo = step
         }
     
     // support X-axis: select X scale
@@ -317,7 +336,7 @@ public void extractParmsFromGui()
                             start + end + step;
     }
 
-private String helperOption( JComboBox[] c, DescriptCombo[] dc, int n )
+private String optionHelper( JComboBox[] c, DescriptCombo[] dc, int n )
     {
     int index = c[n].getSelectedIndex();
     String s1 = dc[n].getCmdName();
@@ -756,13 +775,12 @@ private final static String MEMORY = "memory";
 private final static String[] MEMTYPES = 
     { "l1", "l2", "l3", "l4", "dram", "custom"  };
 protected ComboMemory( MpeGuiList x ) { super( x, 3 ); }
+private final String[] updateableValues = 
+    { "L1 cache", "L2 cache", "L3 cache", "L4 cache", "DRAM", "Custom block" };
+public String[] getUpdateableValues() { return updateableValues; }
 @Override public String[] getValues()
     { 
-    return getAvailable() ? 
-        new String[] 
-        { "L1 cache", "L2 cache", "L3 cache", "L4 cache", "DRAM", 
-          "Custom block" }
-        : NA;
+    return getAvailable() ? updateableValues : NA;
     }
 @Override public String getText()      
     { 

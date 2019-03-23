@@ -33,6 +33,7 @@ import mpeshell.opendraw.ActionDraw;
 import mpeshell.openlog.ActionTextLog;
 import mpeshell.openstatistics.ActionStatistics;
 import mpeshell.service.About;
+import mpeshell.taskmonitor.ActionInit;
 import mpeshell.taskmonitor.ActionRun;
 import mpeshell.taskmonitor.OpStatus;
 
@@ -141,10 +142,10 @@ public void runBenchmarkGui()
         p.add( a[i] );
         }
     
-    // combos
-    DescriptCombo[] desccom = mglst.getDescriptCombos();
-    n = desccom.length;
-    c = new JComboBox[n];
+    // combo boxes, elements of options editor
+    DescriptCombo[] desccom = mglst.getDescriptCombos();  // descriptors
+    c = new JComboBox[n];                                 // combo boxes
+    n = desccom.length;   // number of descriptors / combo boxes
     for( int i=0; i<n; i++ )
         {
         c[i] = new JComboBox();
@@ -279,7 +280,7 @@ public void runBenchmarkGui()
     sl.putConstraint( SpringLayout.WEST,  c[12], 0, SpringLayout.WEST,  c[11] );
     sl.putConstraint( SpringLayout.NORTH, c[13], 4, SpringLayout.SOUTH, c[12] );
     sl.putConstraint( SpringLayout.WEST,  c[13], 0, SpringLayout.WEST,  c[12] );
-    
+
     // initializing child windows and native application runner
     childDraw = new ActionDraw( frame );
     childStatistics = new ActionStatistics( frame );
@@ -303,6 +304,27 @@ public void runBenchmarkGui()
     String logcopy = getTextArea().getText();
     getChildTextLog().write( logcopy );
     
+    // initializing, run native for detect system information parameters
+    ActionInit taskInit = new ActionInit( mglst );
+    taskInit.runSysInfo();
+    
+    // update combo boxes by detected system information
+    n = desccom.length;   // number of descriptors / combo boxes
+    for( int i=0; i<n; i++ )
+        {
+        String[] s = desccom[i].getValues();
+        int m = s.length;
+        c[i].removeAllItems();
+        for( int j=0; j<m; j++ )
+            c[i].addItem( s[j] );
+        int k1 = desccom[i].getDefaultSelection();
+        if ( k1 >= 0 )
+            c[i].setSelectedIndex( k1 );
+        boolean k2 = desccom[i].getDefaultEnable();
+        if ( ! k2 )
+            c[i].setEnabled( false );
+        }
+
     // visual main application frame
     frame.add( p );
     frame.setDefaultCloseOperation( EXIT_ON_CLOSE );
@@ -312,6 +334,12 @@ public void runBenchmarkGui()
     frame.setVisible( true );
     }
 
+// update GUI elements (combo boxes) after load system information
+public void updateGuiBySysInfo()
+    {
+    mglst.updateGuiListBySysInfo( sysinfo );
+    sysinfo.init();
+    }
 
 // disable GUI elements (make gray), used BEFORE run benchmarking process
 // plus disable application termination,

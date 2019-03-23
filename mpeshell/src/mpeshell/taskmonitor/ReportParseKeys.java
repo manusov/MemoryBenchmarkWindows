@@ -9,13 +9,12 @@
 package mpeshell.taskmonitor;
 
 import java.math.BigDecimal;
+import mpeshell.taskmonitor.SysInfoEntry.InfoTypes;
 
 public class ReportParseKeys 
 {
 private final static String[] 
         PATTERN_TABLE_UP = { "#", "size", "CPI", "nsPI", "MBPS" };
-private final static String 
-        PATTERN_TABLE_BOUND = "-";
 
 // detect string with measurement results table up with parameters names
 protected boolean detectBenchmarkTableUp( String[] words )
@@ -36,6 +35,8 @@ protected boolean detectBenchmarkTableUp( String[] words )
         }
     return b;
     }
+
+private final static String PATTERN_TABLE_BOUND = "-";
 
 // detect string with table bound line "---...---"
 protected boolean detectTableBoundLine( String[] words )
@@ -63,5 +64,97 @@ protected NumericEntry detectTableEntry( String[] words )
     else
         return null;
     }
-    
+
+// extract cache or DRAM size, bitmaps or threads count from report line
+protected SysInfoEntry detectSysInfoParameter( String[] words )
+    {
+    InfoTypes type = null;
+    long value = -1;
+    if ( ( words != null )&&( words.length >= 3 )&&
+         ( words[0] != null )&&( words[1] != null )&&( words[2] != null ) )
+        {
+        if ( cacheHelper( words, "L1" ) )
+            {
+            type = InfoTypes.L1;
+            value = kilobytesHelper( words[2], value );
+            }
+        if ( cacheHelper( words, "L2" ) )
+            {
+            type = InfoTypes.L2;
+            value = kilobytesHelper( words[2], value );
+            }
+        if ( cacheHelper( words, "L3" ) )
+            {
+            type = InfoTypes.L3;
+            value = kilobytesHelper( words[2], value );
+            }
+        if ( cacheHelper( words, "L4" ) )
+            {
+            type = InfoTypes.L4;
+            value = kilobytesHelper( words[2], value );
+            }
+        if ( dramHelper( words ) )
+            {
+            if ( words.length >= 5 )
+                {
+                type = InfoTypes.DRAM;
+                value = sizesHelper( words[3], words[4], value );
+                }
+            }
+        }
+    if ( type == null )
+        return null;
+    else
+        return new SysInfoEntry( type, value );
+    }
+
+private boolean cacheHelper( String[] w, String key )
+    {
+    return ( ( w[0].equals( key ) ) &&
+           ( ( w[1].equals( "data" ) ) || ( w[1].equals( "unified" ) ) ) );
+    }
+
+private boolean dramHelper( String[] w )
+    {
+    return ( ( w[0].equals( "installed" ) ) &&
+           ( ( w[1].equals( "memory" ) ) || ( w[1].equals( "=" ) ) ) );
+    }
+
+private long kilobytesHelper( String numstr, long value )
+    {
+    if ( numstr.chars().allMatch( Character::isDigit ) );
+        value = Integer.parseInt( numstr );
+    return value * 1024;
+    }
+
+private long sizesHelper( String numstr, String unitstr, long value )
+    {
+    double size = 0.0;
+    if ( numstr.matches( "[+-]?\\d*(\\.\\d+)?" ) )
+        {
+        size = Double.parseDouble( numstr );
+        }
+    double mul = 1.0;
+    if ( unitstr.length() > 0 )
+        {
+        char c = unitstr.charAt( 0 );
+        switch ( c )
+            {
+            case 'K':
+                mul = 1024;
+                break;
+            case 'M':
+                mul = 1024*1024;
+                break;
+            case 'G':
+                mul = 1024*1024*1024;
+                break;
+            default:
+                mul = 1.0;
+                break;
+            }
+        }
+    return ( long )( size * mul );
+    }
+
 }

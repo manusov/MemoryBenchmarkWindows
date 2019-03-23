@@ -1,7 +1,7 @@
 /*
  *
  * Memory Performance Engine (MPE) Shell. (C)2019 IC Book Labs.
- * Scenario for benchmark session:
+ * Scenario for benchmark session ("Run" button handler):
  * run native application, intercept text report file updates.
  * 
  */
@@ -20,11 +20,11 @@ import mpeshell.taskmonitor.PlatformDetector.PlatformTypes;
 
 public class ActionRun 
 {
-private final MpeGuiList mglst;
-private final PlatformDetector platformDetector;
-private final TaskMonitor taskMonitor;
-private final DirectoryMonitor directoryMonitor;
-private final String tempDir;
+final MpeGuiList mglst;
+final PlatformDetector platformDetector;
+final TaskMonitor taskMonitor;
+final DirectoryMonitor directoryMonitor;
+final String tempDir;
 private final String reportName;
 private final String[][] binariesList;
 private final OpStatus initStatus;
@@ -69,7 +69,7 @@ protected int getProgress1() { return PROGRESS_1; }
 protected int getProgress2() { return PROGRESS_2; }
 
 // entry point for run benchmark scenario, get option by mglst,
-// note executable binaries (EXE, DLL) must be unpacked
+// note executable binaries (EXE, DLL) must be already unpacked
 public void runBenchmark()
     {
     // Initializing progress indicator, update it for 0 percents
@@ -156,6 +156,10 @@ public void runBenchmark()
 
     // Close session for drawings window
     drawModel.stopModel();
+    
+    // re-initializing GUI (combo boxes) by system information,
+    // extracted from loaded report
+    mglst.getMpeGui().updateGuiBySysInfo();
     
     // Done, update progress indicator: 100 percents
     progressUpdate( progressModel, progressBar, 100 );
