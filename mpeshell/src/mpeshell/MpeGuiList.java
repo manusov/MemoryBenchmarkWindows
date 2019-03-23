@@ -39,10 +39,13 @@ public MpeGuiList( MpeGui x )
 // update GUI descriptors list (for combo boxes) after load system information
 protected void updateGuiListBySysInfo( SystemInformation sysinfo )
     {
+    sysinfo.init();
     JComboBox[] c = mg.getCombos();
     DescriptCombo[] dc = getDescriptCombos();
-    int n = c.length;   // number of descriptors / combo boxes
-    String[] items = ( (ComboMemory) dc[3] ).getUpdateableValues();
+
+    // cache and DRAM size visualization at "Memory" combo box
+    ( ( ComboMemory ) dc[3] ).restoreUpdateableValues();
+    String[] items = ( ( ComboMemory ) dc[3] ).getUpdateableValues();
     String newItem = PrintHelper.printSize( sysinfo.getL1() );
     items[0] = items[0] + " (" + newItem + ")";
     newItem = PrintHelper.printSize( sysinfo.getL2() );
@@ -53,6 +56,13 @@ protected void updateGuiListBySysInfo( SystemInformation sysinfo )
     items[3] = items[3] + " (" + newItem + ")";
     newItem = PrintHelper.printSize( sysinfo.getDram() );
     items[4] = items[4] + " (" + newItem + ")";
+
+    // coloring supported/not supported CPU instructions at "Asm" combo box
+    long asmBitmap = sysinfo.getAsmBitmap();
+    ( ( ComboAsm ) dc[4] ).setBitmapAsm( asmBitmap );
+
+    // reserved for other combo boxes
+    
     }
 
 // this method implements combo boxes logic, some boxes depends on other.
@@ -774,9 +784,20 @@ protected void setItemsAvailable( boolean b )  { itemsAvailable = b;       }
 private final static String MEMORY = "memory";
 private final static String[] MEMTYPES = 
     { "l1", "l2", "l3", "l4", "dram", "custom"  };
-protected ComboMemory( MpeGuiList x ) { super( x, 3 ); }
-private final String[] updateableValues = 
+protected ComboMemory( MpeGuiList x ) 
+    { 
+    super( x, 3 ); 
+    restoreUpdateableValues();
+    }
+private final String[] constantValues = 
     { "L1 cache", "L2 cache", "L3 cache", "L4 cache", "DRAM", "Custom block" };
+private String[] updateableValues;
+public final void restoreUpdateableValues()
+    {
+    int n = constantValues.length;
+    updateableValues = new String[n];
+    System.arraycopy( constantValues, 0, updateableValues, 0, n );
+    }
 public String[] getUpdateableValues() { return updateableValues; }
 @Override public String[] getValues()
     { 

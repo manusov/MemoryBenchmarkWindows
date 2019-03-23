@@ -3,11 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/taskmonitor/ActionInit.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/SystemInformation.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/taskmonitor/ReportParseKeys.java</file>
             <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/MpeShell.java</file>
+            <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/SysInfoEntry.java</file>
             <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/MpeGui.java</file>
             <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/MpeGuiList.java</file>
-            <file>file:/C:/3-java/project_MPE_SHELL/mpeshell/src/mpeshell/taskmonitor/ActionRun.java</file>
         </group>
     </open-files>
 </project-private>

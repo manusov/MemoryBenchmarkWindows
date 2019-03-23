@@ -8,6 +8,7 @@
 
 package mpeshell.taskmonitor;
 
+import mpeshell.SysInfoEntry;
 import java.math.BigDecimal;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.DefaultBoundedRangeModel;

@@ -6,12 +6,12 @@
  *
  */
 
-package mpeshell.taskmonitor;
+package mpeshell;
 
 public class SysInfoEntry 
 {
 public enum InfoTypes
-    { L1, L2, L3, L4, DRAM, CPUBITMAP, HTBITMAP, THREADSCOUNT, UNKNOWN }
+    { L1, L2, L3, L4, DRAM, ASMBITMAP, HTBITMAP, THREADSCOUNT, UNKNOWN }
 public InfoTypes infoType;
 public long value;
 public SysInfoEntry( InfoTypes type, long x )

@@ -7,8 +7,6 @@
 
 package mpeshell;
 
-import mpeshell.taskmonitor.SysInfoEntry;
-
 public class SystemInformation 
 {
 
@@ -18,18 +16,21 @@ private final static int DEFAULT_X_SCALE_L2   = 800;
 private final static int DEFAULT_X_SCALE_L3   = 20000;
 private final static int DEFAULT_X_SCALE_L4   = 40000;
 private final static int DEFAULT_X_SCALE_DRAM = 80000;
+private final static int DEFAULT_ASM_BITMAP = -1;
 
 private long l1 = 0;
 private long l2 = 0;
 private long l3 = 0;
 private long l4 = 0;
 private long dram = 0;
+private long asmBitmap = DEFAULT_ASM_BITMAP;
+private long extractedBitmap = DEFAULT_ASM_BITMAP;
 
-public long getL1()   { return l1;   }
-public long getL2()   { return l2;   }
-public long getL3()   { return l3;   }
-public long getL4()   { return l4;   }
-public long getDram() { return dram; }
+public long getL1()        { return l1;         }
+public long getL2()        { return l2;         }
+public long getL3()        { return l3;         }
+public long getL4()        { return l4;         }
+public long getDram()      { return dram;       }
 
 private int scale1;
 private int scale2;
@@ -37,11 +38,12 @@ private int scale3;
 private int scale4;
 private int scaleDram;
 
-public int getScale1()    { return scale1;    }
-public int getScale2()    { return scale2;    }
-public int getScale3()    { return scale3;    }
-public int getScale4()    { return scale4;    }
-public int getScaleDram() { return scaleDram; }
+public int getScale1()     { return scale1;     }
+public int getScale2()     { return scale2;     }
+public int getScale3()     { return scale3;     }
+public int getScale4()     { return scale4;     }
+public int getScaleDram()  { return scaleDram;  }
+public long getAsmBitmap() { return asmBitmap; }
 
 public void setScale1( int n )    { scale1 = n;    }
 public void setScale2( int n )    { scale2 = n;    }
@@ -56,11 +58,12 @@ public SystemInformation()
 
 final protected void reset()
     {
-    scale1    = DEFAULT_X_SCALE_L1;
-    scale2    = DEFAULT_X_SCALE_L2;
-    scale3    = DEFAULT_X_SCALE_L3;
-    scale4    = DEFAULT_X_SCALE_L4;
-    scaleDram = DEFAULT_X_SCALE_DRAM;
+    scale1     = DEFAULT_X_SCALE_L1;
+    scale2     = DEFAULT_X_SCALE_L2;
+    scale3     = DEFAULT_X_SCALE_L3;
+    scale4     = DEFAULT_X_SCALE_L4;
+    scaleDram  = DEFAULT_X_SCALE_DRAM;
+    asmBitmap  = DEFAULT_ASM_BITMAP;
     }
 
 protected void init()
@@ -70,6 +73,7 @@ protected void init()
     scale3 = cacheScaleHelper( l3, DEFAULT_X_SCALE_L3 );
     scale4 = cacheScaleHelper( l4, DEFAULT_X_SCALE_L4 );
     scaleDram = DEFAULT_X_SCALE_DRAM;
+    asmBitmap = ( extractedBitmap << 1 ) | 1;  // insert "1" bit for "auto"
     }
 
 private int cacheScaleHelper( long value, int def  )
@@ -107,6 +111,9 @@ public void acceptEntry( SysInfoEntry entry )
                 break;
             case DRAM:
                 dram = entry.value;
+                break;
+            case ASMBITMAP:
+                extractedBitmap = entry.value;
                 break;
             default:
                 break;

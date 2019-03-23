@@ -8,8 +8,9 @@
 
 package mpeshell.taskmonitor;
 
+import mpeshell.SysInfoEntry;
 import java.math.BigDecimal;
-import mpeshell.taskmonitor.SysInfoEntry.InfoTypes;
+import mpeshell.SysInfoEntry.InfoTypes;
 
 public class ReportParseKeys 
 {
@@ -73,6 +74,11 @@ protected SysInfoEntry detectSysInfoParameter( String[] words )
     if ( ( words != null )&&( words.length >= 3 )&&
          ( words[0] != null )&&( words[1] != null )&&( words[2] != null ) )
         {
+        if ( asmHelper( words ) )
+            {
+            type = InfoTypes.ASMBITMAP;
+            value = asmExtractHelper( words[3], words[8] );
+            }
         if ( cacheHelper( words, "L1" ) )
             {
             type = InfoTypes.L1;
@@ -106,6 +112,22 @@ protected SysInfoEntry detectSysInfoParameter( String[] words )
         return null;
     else
         return new SysInfoEntry( type, value );
+    }
+
+private boolean asmHelper( String[] w )
+    {
+    return ( ( w.length >= 9 ) &&
+             ( w[0].equals( "cpuid" ) ) && ( w[5].equals( "xgetbv" ) ) &&
+             ( w[3].length() == 17    ) && ( w[8].length() == 17   ) );
+    }
+
+private long asmExtractHelper( String cpumap, String osmap )
+    {
+    cpumap = cpumap.substring( 0, 16 );
+    osmap = osmap.substring( 0, 16 );
+    long cpubits = Long.parseLong( cpumap, 16 );
+    long osbits  = Long.parseLong( osmap, 16 );
+    return cpubits & osbits;
     }
 
 private boolean cacheHelper( String[] w, String key )
