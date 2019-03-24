@@ -360,6 +360,10 @@ protected void enableGuiAfterRun()
     {
     frame.setDefaultCloseOperation( EXIT_ON_CLOSE );
     guiStateHelper( true );
+    
+    // bitton #5 = load is UNDER CONSTRUCTION, it bug = context can mismatch
+    b[5].setEnabled( false );
+    
     }
 
 private void guiStateHelper( boolean enableFlag )
