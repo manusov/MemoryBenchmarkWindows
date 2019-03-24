@@ -226,7 +226,7 @@ public OpStatus executeTask()
     while ( process.isAlive() )
         {
         try {
-            Thread.sleep(1);
+            Thread.sleep( 20 );  // OLD = Thread.sleep( 1 );
             }
         catch ( InterruptedException e )
             {

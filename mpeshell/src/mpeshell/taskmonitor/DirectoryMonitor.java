@@ -73,7 +73,7 @@ public OpStatus monitorStart()
                 int fcount = flst.size();
                 for( int i=0; i<fcount; i++ )
                     {  // cycle for all file listeners
-                    flst.get( i ).fileHandler( event );
+                    flst.get( i ).fileHandler( event );   // call file listener
                     int dcount = dlst.size();
                     for( int j=0; j<dcount; j++ )
                         {  // cycle for all data listeners
@@ -81,7 +81,7 @@ public OpStatus monitorStart()
                             flst.get( i ).getReport();
                         OpStatus reportStatus =
                             flst.get( i ).getStatus();
-                        dlst.get( j ).dataHandler
+                        dlst.get( j ).dataHandler   // call data listener
                             ( reportStrings, reportStatus );
                         }
                     }

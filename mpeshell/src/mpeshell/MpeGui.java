@@ -129,6 +129,9 @@ public void runBenchmarkGui()
         b[i].addActionListener( descbut[i] );
         p.add( b[i] );
         }
+    
+    // bitton #5 = load is UNDER CONSTRUCTION, it bug = context can mismatch
+    b[5].setEnabled( false );
 
     // labels
     DescriptLabelConst[] desclab = mglst.getDescriptLabels();

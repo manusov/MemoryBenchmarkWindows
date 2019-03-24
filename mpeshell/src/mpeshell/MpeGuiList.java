@@ -511,6 +511,11 @@ protected ButtonLoad( MpeGuiList x ) { mglst = x; }
 @Override public Dimension getSize() { return new Dimension( 80, 24 ); }
 @Override public void actionPerformed( ActionEvent e )
     {
+        
+    // DEBUG, OPTION STATE WHEN LOAD AND SAVE MUST MATCH
+    mglst.extractParmsFromGui();
+    // DEBUG
+        
     final ActionLoad a = new ActionLoad( mglst );
     a.loadReportDialogue();
     }
@@ -1046,7 +1051,7 @@ protected ComboThreads( MpeGuiList x )
     textValues = buildNumbersOptions( numericValues );
     }
 private final static String THREADS = "threads";
-private int[] numericValues = { 1, 2, 4, 8, 64 };
+private int[] numericValues = { 1, 2, 4, 8, 10, 12, 16, 20, 24, 32, 48, 64 };
 private String[] textValues;
 @Override public int[] getIntValues() { return numericValues; }
 protected void setNumericValues( int[] x )   
@@ -1173,10 +1178,11 @@ protected void setTextValues( String[] s ) { textValues = s;    }
 class ComboStart extends DescriptCombo {
 protected ComboStart( MpeGuiList x ) 
     { 
-    super( x, 11 ); 
-    textValuesCombo = buildSizesOptions( 512, 22 );
-    textValuesCmd = buildSizesOptions( 512, 22, false );
-    longValues = buildRoundNumbersArray( 512, 22 );
+    super( x, 11 );
+    // 512 bytes mode and smaller is UNDER CONSTRUCTION, it bug = X-axis numbers
+    textValuesCombo = buildSizesOptions( 1024, 21 );      // ( 512, 22 );
+    textValuesCmd = buildSizesOptions( 1024, 21, false ); // ( 512, 22, false );
+    longValues = buildRoundNumbersArray( 1024, 21 );      // ( 512, 22 );
     }
 private final static String START = "start";
 private final String[] textValuesCombo;
@@ -1202,10 +1208,11 @@ private final long[] longValues;
 class ComboEnd extends DescriptCombo {
 protected ComboEnd( MpeGuiList x ) 
     {
-    super( x, 12 ); 
-    textValuesCombo  = buildSizesOptions( 512, 22 );
-    textValuesCmd = buildSizesOptions( 512, 22, false );
-    longValues = buildRoundNumbersArray( 512, 22 );
+    super( x, 12 );
+    // 512 bytes mode and smaller is UNDER CONSTRUCTION, it bug = X-axis numbers
+    textValuesCombo  = buildSizesOptions( 1024, 21 );     // ( 512, 22 );
+    textValuesCmd = buildSizesOptions( 1024, 21, false ); // ( 512, 22, false );
+    longValues = buildRoundNumbersArray( 1024, 21 );      // ( 512, 22 );
     }
 private final static String END = "end";
 private final String[] textValuesCombo;
@@ -1231,10 +1238,11 @@ private final long[] longValues;
 class ComboStep extends DescriptCombo {
 protected ComboStep( MpeGuiList x ) 
     {
-    super( x, 13 ); 
-    textValuesCombo = buildSizesOptions( 512, 22 );
-    textValuesCmd = buildSizesOptions( 512, 22, false );
-    longValues = buildRoundNumbersArray( 512, 22 );
+    super( x, 13 );
+    // 512 bytes mode and smaller is UNDER CONSTRUCTION, it bug = X-axis numbers
+    textValuesCombo = buildSizesOptions( 1024, 21 );      // ( 512, 22 );
+    textValuesCmd = buildSizesOptions( 1024, 21, false ); // ( 512, 22, false );
+    longValues = buildRoundNumbersArray( 1024, 21 );      // ( 512, 22 );
     }
 private final static String STEP = "step";
 private final String[] textValuesCombo;
