@@ -1,0 +1,13 @@
+Clear warnings:
+
+Remove this requirements:
+ \ C/C++ \ Preprocessor \ Preprocessor definitions
+_CRT_SECURE_NO_WARNINGS
+
+Correct:
+"MPE native library" to "NCRB ..."
+
+For ia32 и x64.
+For Debug и Release.
+
+EBX:EBP = repeats counter for ia32 version, must be 64-bit even for 32-bit version.
