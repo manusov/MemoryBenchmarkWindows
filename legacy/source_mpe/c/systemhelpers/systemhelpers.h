@@ -1,5 +1,0 @@
-/*
- *    System support routines.
- */
- 
- // Reserved.
