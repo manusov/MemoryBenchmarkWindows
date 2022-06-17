@@ -1,0 +1,11 @@
+Customized options:
+
+ \ ... \ Char set \ Unicode.
+
+ \ C/C++ \ Preprocessor \ Preprocessor definitions
+_CRT_SECURE_NO_WARNINGS
+
+Project Properties -> 
+ C/C++ -> 
+  Code Generation -> 
+   Runtime Library = Multi-threaded (/MT)

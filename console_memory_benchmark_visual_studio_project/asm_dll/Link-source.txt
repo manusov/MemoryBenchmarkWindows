@@ -1,0 +1,7 @@
+DLL source location:
+
+"Development - Win7"  Oracle VirtualBox machine.
+C:\1-asm\Project_NCRB_v2\asm_dll.
+
+This virtual HDD location at physical machine:
+F:\Images\Win7_64_Development_ACTUAL.vdi.
