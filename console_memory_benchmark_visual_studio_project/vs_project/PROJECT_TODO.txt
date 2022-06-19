@@ -10,4 +10,11 @@ Correct:
 For ia32 и x64.
 For Debug и Release.
 
-EBX:EBP = repeats counter for ia32 version, must be 64-bit even for 32-bit version.
+1) EBX:EBP = repeats counter for ia32 version, must be 64-bit even for 32-bit version.
+2) Also correct C++ code, repeats counter must be 64-bit.
+3) Special verify adaptive mode.
+4) Latency measurement bug for multi-thread.
+
+ThreadsBuilder.cpp (47)
+ThreadsBuilder.cpp (334).
+

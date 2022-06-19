@@ -167,34 +167,35 @@ xor eax,eax   ; RAX = 0 means CPU clock measured ERROR
 jmp .exit
 
 ; Performance patterns caller gate
-; Parm#1 = RCX         = Pattern selector 
-; Parm#2 = RDX         = Block #1 pointer
-; Parm#3 = R8          = Block #2 pointer
-; Parm#4 = R9          = Block length, instructions
-; Parm#5 = [rsp+32+08] = Measurement repeats
-; Parm#6 = [rsp+32+16] = Pointer for update output variable = dTSC
+; Parm#1 = RCX                   = Pattern selector 
+; Parm#2 = RDX                   = Block #1 pointer
+; Parm#3 = R8                    = Block #2 pointer
+; Parm#4 = R9                    = Block length, instructions
+; Parm#5 = qword [rsp + 32 + 08] = Measurement repeats, for x64 here High:Low
+; Parm#6 = qword [rsp + 32 + 16] = Measurement repeats, High, for x64 not used 
+; Parm#7 = qword [rsp + 32 + 24] = Pointer for update output variable = dTSC
 ; OUTPUT:
 ; RAX = Reserved for status, return TRUE
 PerformanceGate:
 push rbx rsi rdi rbp r12 r13 r14 r15
 ; Load input parameters, part 1
-mov rsi,rdx            ; RSI = Block #1 pointer (64-bit flat)
-mov rdi,r8             ; RDI = Block #2 pointer (64-bit flat)
-mov rbp,[rsp+32+8+64]  ; RBP = Number of measurement repeats
+mov rsi,rdx                  ; RSI = Block #1 pointer (64-bit flat)
+mov rdi,r8                   ; RDI = Block #2 pointer (64-bit flat)
+mov rbp,[rsp + 32 + 8 + 64]  ; RBP = Number of measurement repeats
 movzx rcx,cx
 mov r14,[PerformancePatterns + rcx*8]
 ; Serialization, note EAX,EBX,ECX,EDX changed
-xor eax,eax        ; EAX=0 means function 0 for CPUID
-cpuid              ; This CPUID for serialization only, results ignored
+xor eax,eax          ; EAX=0 means function 0 for CPUID
+cpuid                ; This CPUID for serialization only, results ignored
 ; Load input parameters, part 1
-mov rcx,r9         ; RCX = Block length, units = instructions 
-mov rbx,r14        ; RBX = Target subroutine address
+mov rcx,r9           ; RCX = Block length, units = instructions 
+mov rbx,r14          ; RBX = Target subroutine address
 ; Get start time
-rdtsc               ; EDX:EAX = TSC value at start: EDX=High, EAX=Low
-shl rdx,32          ; Positioning TSC high 32 bits to RDX.[63-32]
-lea r14,[rax +rdx]  ; R14 = Interval start TSC value, integral 64 bits
+rdtsc                ; EDX:EAX = TSC value at start: EDX=High, EAX=Low
+shl rdx,32           ; Positioning TSC high 32 bits to RDX.[63-32]
+lea r14,[rax + rdx]  ; R14 = Interval start TSC value, integral 64 bits
 ; Call target routine (required not destroy R14, R15)
-call rbx           ; Run target operation
+call rbx             ; Run target operation
 ; Get end time
 rdtsc              ; EDX:EAX = TSC value at end: EDX=High, EAX=Low
 shl rdx,32         ; Positioning TSC high 32 bits to RDX.[63-32]
@@ -206,7 +207,7 @@ cpuid              ; This CPUID for events serialization only, results ignored
 pop rax
 pop r15 r14 r13 r12 rbp rdi rsi rbx
 ; Return with update output
-mov rcx,[rsp + 32 + 16]
+mov rcx,[rsp + 32 + 24]
 mov [rcx],rax
 mov eax,-1
 ret
@@ -367,8 +368,8 @@ DQ  NT_WRITE_AVX_512
 DQ  NT_COPY_AVX_512
 DQ  NTR_COPY_AVX_512
 
-StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.80.00 for Windows x64.',0
+StringProduct    DB 'NCRB performance library.',0
+StringVersion    DB 'v0.00.01 for Windows x64.',0
 StringCopyright  DB '(C) 2022 Ilya Manusov.',0
 
 section '.edata' export data readable

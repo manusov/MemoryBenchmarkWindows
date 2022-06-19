@@ -179,43 +179,35 @@ xor eax,eax   ; RAX = 0 means CPU clock measured ERROR
 jmp .exit
 
 ; Performance patterns caller gate
-; Parm#1 = [ESP+04] = Pattern selector 
-; Parm#2 = [ESP+08] = Block #1 pointer
-; Parm#3 = [ESP+12] = Block #2 pointer
-; Parm#4 = [ESP+16] = Block length, instructions
-; Parm#5 = [ESP+20] = Measurement repeats
-; Parm#6 = [ESP+24] = Pointer for update output variable = dTSC
+; Parm#1 = dword [ESP+04] = Pattern selector 
+; Parm#2 = dword [ESP+08] = Block #1 pointer
+; Parm#3 = dword [ESP+12] = Block #2 pointer
+; Parm#4 = dword [ESP+16] = Block length, instructions
+; Parm#5 = dword [ESP+20] = Measurement repeats, Low 32 bits
+; Parm#5 = dword [ESP+24] = Measurement repeats, High 32 bits
+; Parm#6 = dword [ESP+28] = Pointer for update output variable = dTSC
 ; OUTPUT:
 ; EAX = Reserved for status, return TRUE
 PerformanceGate:
 push ebx esi edi ebp
 ; Load input parameters, part 1
-mov esi,[esp+08+16]                    ; ESI = Block #1 pointer (32-bit flat)
-mov edi,[esp+12+16]                    ; EDI = Block #2 pointer (32-bit flat)
-mov ebp,[esp+20+16]                    ; EBP = Number of measurement repeats 
+mov esi,[esp + 08 + 16]                ; ESI = Block #1 pointer (32-bit flat)
+mov edi,[esp + 12 + 16]                ; EDI = Block #2 pointer (32-bit flat)
+mov ebp,[esp + 20 + 16]                ; EBP = Measurement repeats, Low 32 bits 
 ; This CPUID for events serialization only, results ignored
 xor eax,eax                            ; EAX=0 means function 0 for CPUID
 cpuid                                  ; This CPUID for serialization only
 ; Load input parameters, part 2
-movzx ebx,word [esp+04+16]             ; EBX = Pattern selector
+movzx ebx,word [esp + 04 + 16]         ; EBX = Pattern selector
 mov ebx,[PerformancePatterns + ebx*4]  ; EBX = Target routine entry point
-mov ecx,[esp+16+16]                    ; ECX = Block length, units=instructions 
+mov ecx,[esp + 16 + 16]                ; ECX = Block length, units=instructions 
 ; Get start time
 rdtsc
 push eax edx
 ; Call target routine
-
-
-; DEBUG PATCH
-
-; call ebx
-
-MOV EAX,EBX
-XOR EBX,EBX
-CALL EAX
-
-; DEBUG PATCH
-
+mov eax,[esp + 24 + 16 + 08]         ; EAX = Measurement repeats, High 32 bits
+xchg eax,ebx                         ; EAX = Call address, EBX = Repeats, High
+call eax
 ; Get end time, calculate delta
 rdtsc
 pop ecx ebx
@@ -229,11 +221,11 @@ pop edx eax
 ; Restore registers non-volatile by ia32 calling convention
 pop ebp edi esi ebx
 ; Return with update output
-mov ecx,[esp+24]
-mov [ecx+00],eax
-mov [ecx+04],edx
+mov ecx,[esp + 28]
+mov [ecx + 00],eax
+mov [ecx + 04],edx
 mov eax,-1
-ret 24
+ret 28
 
 ; Performance patterns
 READ_MOV_32:
@@ -414,8 +406,8 @@ DD  NT_WRITE_AVX_512
 DD  NT_COPY_AVX_512
 DD  NTR_COPY_AVX_512
 
-StringProduct    DB 'MPE native library.',0
-StringVersion    DB 'v0.80.00 for Windows ia32.',0
+StringProduct    DB 'NCRB performance library.',0
+StringVersion    DB 'v0.00.01 for Windows ia32.',0
 StringCopyright  DB '(C) 2022 Ilya Manusov.',0
 
 section '.edata' export data readable

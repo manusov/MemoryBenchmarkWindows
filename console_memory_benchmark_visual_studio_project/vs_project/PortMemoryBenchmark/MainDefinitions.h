@@ -14,11 +14,11 @@
 
 // Build type strings definition
 #if _WIN64
-#define BUILD_STRING "v0.00.00 for Windows x64."
+#define BUILD_STRING "v0.00.01 for Windows x64."
 #define NATIVE_LIBRARY_NAME "ncrb64.dll"
 #define NATIVE_WIDTH 64
 #elif _WIN32
-#define BUILD_STRING "v0.00.00 for Windows ia32."
+#define BUILD_STRING "v0.00.01 for Windows ia32."
 #define NATIVE_LIBRARY_NAME "ncrb32.dll"
 
 #define NATIVE_WIDTH 32
@@ -152,7 +152,7 @@ typedef void(__stdcall* DLL_ExecuteCpuid) (DWORD, DWORD, DWORD*, DWORD*, DWORD*,
 typedef void(__stdcall* DLL_ExecuteRdtsc) (DWORDLONG*);
 typedef void(__stdcall* DLL_ExecuteXgetbv) (DWORDLONG*);
 typedef BOOL(__stdcall* DLL_MeasureTsc) (DWORDLONG*);
-typedef BOOL(__stdcall* DLL_PerformanceGate) (DWORD, byte*, byte*, size_t, size_t, DWORDLONG*);
+typedef BOOL(__stdcall* DLL_PerformanceGate) (DWORD, byte*, byte*, size_t, size_t, size_t, DWORDLONG*);
 
 // Structure for OS API dynamical import and native DLL functions entry points list
 typedef struct {

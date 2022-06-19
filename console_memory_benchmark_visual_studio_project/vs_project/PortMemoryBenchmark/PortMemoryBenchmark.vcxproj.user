@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>test=memory memory=l1 asm=latencyrdrand32x2</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>test=memory memory=l1 asm=latencyrdrand adaptive=256M</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

@@ -1,5 +1,5 @@
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.00.00 for Windows x64. (C) 2022 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.00.01 for Windows x64. (C) 2022 Ilya Manusov.
 get command line parameters...done
 load API...done
 detect processor features...done
@@ -10,60 +10,60 @@ initializing domains builder...done
 initializing threads builder...done
 measure TSC clock...done
 get library data...done
-MPE native library. v0.80.00 for Windows x64. (C) 2022 Ilya Manusov.
+NCRB performance library. v0.00.01 for Windows x64. (C) 2022 Ilya Manusov.
 run memory benchmark scenario.
 asm method ID=34, bytes per instruction BPI=16
-TSC frequency F=2497.191 MHz, period T=0.400 ns
+TSC frequency F=2496.810 MHz, period T=0.401 ns
 cache points for data read/write:
 L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB
 CPU core count=8, HyperThreading=1
 memory allocation...done
-NUMA-unaware mode, list allocated at base = 00007FF7D95B4150h
+NUMA-unaware mode, list allocated at base = 00007FF674384150h
 
  ID  allocated base   allocated size   original (all hex)
 ---------------------------------------------------------
- 0   000001F9C1D60000 0000000014000000 000001F9C1D60000 
+ 0   0000027660060000 0000000014000000 0000027660060000 
 ---------------------------------------------------------
 
 threads allocation...done
-threads entries created = 4 , list allocated at base = 000001F9C1ACFC30h
+threads entries created = 4 , list allocated at base = 000002765FE400D0h
 
  ID  (values hex)
 -------------------------------------------------------------------------------
- 0   thread=00000000000000F4 rxevent=00000000000000F8 txevent=00000000000000FC
-     base1 =000001F9C1D60000 base2  =000001F9C4560000 sizeins=0000000000200000
+ 0   thread=00000000000000F0 rxevent=00000000000000F4 txevent=00000000000000F8
+     base1 =0000027660060000 base2  =0000027662860000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 00007FF7D95B41E0
+     control set pointer          = 00007FF6743841E0
 
- 1   thread=0000000000000100 rxevent=0000000000000104 txevent=0000000000000108
-     base1 =000001F9C6D60000 base2  =000001F9C9560000 sizeins=0000000000200000
+ 1   thread=00000000000000FC rxevent=0000000000000100 txevent=0000000000000104
+     base1 =0000027665060000 base2  =0000027667860000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 00007FF7D95B41E0
+     control set pointer          = 00007FF6743841E0
 
- 2   thread=000000000000010C rxevent=0000000000000110 txevent=0000000000000114
-     base1 =000001F9CBD60000 base2  =000001F9CE560000 sizeins=0000000000200000
+ 2   thread=0000000000000108 rxevent=000000000000010C txevent=0000000000000110
+     base1 =000002766A060000 base2  =000002766C860000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 00007FF7D95B41E0
+     control set pointer          = 00007FF6743841E0
 
- 3   thread=0000000000000118 rxevent=000000000000011C txevent=0000000000000120
-     base1 =000001F9D0D60000 base2  =000001F9D3560000 sizeins=0000000000200000
+ 3   thread=0000000000000114 rxevent=0000000000000118 txevent=000000000000011C
+     base1 =000002766F060000 base2  =0000027671860000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 00007FF7D95B41E0
+     control set pointer          = 00007FF6743841E0
 
 -------------------------------------------------------------------------------
 
-running threads...done ( dTSC=000000005BE396B9h )
+running threads...done ( dTSC=000000005C7B707Ch )
 allocate statistics arrays...done
-bandwidth statistics, BASE=000001F9C1AAAD10h, SIZE=0000000000000048h
-latency statistics,   BASE=000001F9C1AAAE50h, SIZE=0000000000000048h
+bandwidth statistics, BASE=000002765FE1AB30h, SIZE=0000000000000048h
+latency statistics,   BASE=000002765FE1AC70h, SIZE=0000000000000048h
 RUN: method=34, threads=4, repeats=200
      page mode=1, page size=4.00 KB
      start=32.00 MB, end=40.00 MB, delta=1.00 MB, bpi=16 bytes
@@ -72,20 +72,20 @@ RUN: method=34, threads=4, repeats=200
 
    #        size   CPI     nsPI    MBPS
 -------------------------------------------------------
-   1    33554432   0.905   0.362   44161.847 
-   2    34603008   0.913   0.366   43757.284 
-   3    35651584   0.908   0.364   44013.008 
-   4    36700160   0.913   0.366   43769.452 
-   5    37748736   0.905   0.363   44131.881 
-   6    38797312   0.903   0.362   44254.954 
-   7    39845888   0.901   0.361   44325.302 
-   8    40894464   0.909   0.364   43964.197 
-   9    41943040   0.906   0.363   44116.606 
+   1    33554432   3.594   1.439   44461.114 
+   2    34603008   3.596   1.440   44440.258 
+   3    35651584   3.593   1.439   44473.147 
+   4    36700160   3.601   1.442   44373.676 
+   5    37748736   3.610   1.446   44261.868 
+   6    38797312   3.631   1.454   44012.336 
+   7    39845888   3.621   1.450   44126.351 
+   8    40894464   3.630   1.454   44020.773 
+   9    41943040   3.618   1.449   44162.324 
 -------------------------------------------------------
 
  Bandwidth ( megabytes per second )
 ----------------------------------------------------------------------------------------
-| max=44325.302     | min=43757.284     | average=44054.948     | median=44116.606     |
+| max=44473.147     | min=44012.336     | average=44259.094     | median=44261.868     |
 ----------------------------------------------------------------------------------------
 
 delete local objects...done

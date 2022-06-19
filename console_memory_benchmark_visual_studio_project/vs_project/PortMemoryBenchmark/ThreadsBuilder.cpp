@@ -174,13 +174,16 @@ DWORD WINAPI threadEntry(LPVOID threadControl)
 		LPVOID bufferAlignedSrc = p->base1;
 		LPVOID bufferAlignedDst = p->base2;
 		SIZE_T instructionsCount = (SIZE_T)p->sizeInstructions;
-		SIZE_T repeatsCount = (SIZE_T)p->measurementRepeats;
+		SIZE_T repeatsCount    = (SIZE_T)p->measurementRepeats;
+		SIZE_T repeatsCountExt = p->measurementRepeats >> 32;
 		DWORD64 deltaTSC = 0;
 		DWORD result = 0;
+		
 		// Thread main work
 		(r->dll_PerformanceGate)
 			(rwMethodSelect, (BYTE*)bufferAlignedSrc, (BYTE*)bufferAlignedDst,
-				instructionsCount, repeatsCount, &deltaTSC);
+             instructionsCount, repeatsCount, repeatsCountExt, &deltaTSC);
+		
 		// Thread coordination
 		SetEvent(rxHandle);
 		WaitForSingleObject(txHandle, INFINITE);

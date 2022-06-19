@@ -526,13 +526,19 @@ void MemoryScenario::execute()
 		if (r3value > 0) x2 = r3value;           // this for adaptive repeats mode
 		DWORD64 x3 = opThreads;                  // number of threads
 		double x4 = (double)ov.resultDeltaTsc;   // time interval in TSC clocks
-		cpi = x4 / (x1 * x2 * x3 / bytesPerInstruction);
+
+		// clocks per instruction, nanoseconds per instruction, here x3 = number of threads, NOT used for calculation
+		// cpi = x4 / (x1 * x2 * x3 / bytesPerInstruction);  // old variant with x3 used
+		   cpi = x4 / (x1 * x2 / bytesPerInstruction);
+		// patched cpi calc.
 		nspi = cpi * periodSeconds * 1000000000.0;
 
+		// megabytes per second, here x3 = number of threads, used for calculation
 		megabytes = x1 * x2 * x3 / 1000000.0;
 		seconds = ov.resultDeltaTsc * periodSeconds;
 		mbps = megabytes / seconds;
 
+		// send parameters to log
 		snprintf(saveDst, saveMax, "%4d%12d%8.3f%8.3f   %-10.3f\n", blockCount + 1, blockSize, cpi, nspi, mbps);
 		AppConsole::transmit(saveDst);
 

@@ -1,5 +1,5 @@
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.00.00 for Windows ia32. (C) 2022 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.00.01 for Windows ia32. (C) 2022 Ilya Manusov.
 get command line parameters...done
 load API...done
 detect processor features...done
@@ -10,14 +10,14 @@ initializing domains builder...done
 initializing threads builder...done
 measure TSC clock...done
 get library data...done
-MPE native library. v0.80.00 for Windows ia32. (C) 2022 Ilya Manusov.
+NCRB performance library. v0.00.01 for Windows ia32. (C) 2022 Ilya Manusov.
 run system information scenario.
 
 [ --- PROCESSOR INFORMATION --- ]
 
 processor vendor = GenuineIntel
 processor model  = 11th Gen Intel(R) Core(TM) i7-11700F @ 2.50GHz
-time stamp counter (TSC) frequency = 2496.9 MHz, period = 0.401 ns
+time stamp counter (TSC) frequency = 2496.9 MHz, period = 0.400 ns
 cpuid bitmap = 0007FFFFFF7FFFFFh , xgetbv bitmap = 0007FFFFFFFFFFFFh
 
  #    CPU  OS   cpu functionality and instructions
@@ -183,7 +183,7 @@ cpuid bitmap = 0007FFFFFF7FFFFFh , xgetbv bitmap = 0007FFFFFFFFFFFFh
 
 [ --- MEMORY INFORMATION --- ]
 
-installed memory = 63.84 GB, free = 58.21 GB
+installed memory = 63.84 GB, free = 56.90 GB
 
 [ --- PAGING INFORMATION --- ]
 
@@ -193,31 +193,31 @@ default page = 4 KB, large page = 2048 KB, privileges = 0
 
  module           function                            pointer (hex)
 -----------------------------------------------------------------------
- kernel32         GetLogicalProcessorInformation      778A91C0
- kernel32         GetLogicalProcessorInformationEx    7681D800
- kernel32         GlobalMemoryStatusEx                778B1DE0
- kernel32         GetActiveProcessorCount             778B1A90
- kernel32         GetActiveProcessorGroupCount        778ECAE0
- kernel32         GetNumaHighestNodeNumber            778A98F0
- kernel32         GetNumaNodeProcessorMask            778EDB50
- kernel32         GetNumaNodeProcessorMaskEx          778C3670
- kernel32         VirtualAllocExNuma                  778C4FD0
- kernel32         SetThreadAffinityMask               778EF5F0
- kernel32         SetThreadGroupAffinity              778C4D40
- kernel32         GetLargePageMinimum                 778C35C0
- kernel32         GetSystemFirmwareTable              778C1310
- ncrb32.dll       GetDllStrings                       60FF1008
- ncrb32.dll       CheckCpuid                          60FF1037
- ncrb32.dll       ExecuteCpuid                        60FF105C
- ncrb32.dll       ExecuteRdtsc                        60FF1087
- ncrb32.dll       ExecuteXgetbv                       60FF1097
- ncrb32.dll       MeasureTsc                          60FF10AC
- ncrb32.dll       PerformanceGate                     60FF111A
+ kernel32         GetLogicalProcessorInformation      759491C0
+ kernel32         GetLogicalProcessorInformationEx    75CDD800
+ kernel32         GlobalMemoryStatusEx                75951DE0
+ kernel32         GetActiveProcessorCount             75951A90
+ kernel32         GetActiveProcessorGroupCount        7598CAE0
+ kernel32         GetNumaHighestNodeNumber            759498F0
+ kernel32         GetNumaNodeProcessorMask            7598DB50
+ kernel32         GetNumaNodeProcessorMaskEx          75963670
+ kernel32         VirtualAllocExNuma                  75964FD0
+ kernel32         SetThreadAffinityMask               7598F5F0
+ kernel32         SetThreadGroupAffinity              75964D40
+ kernel32         GetLargePageMinimum                 759635C0
+ kernel32         GetSystemFirmwareTable              75961310
+ ncrb32.dll       GetDllStrings                       72DA1008
+ ncrb32.dll       CheckCpuid                          72DA1037
+ ncrb32.dll       ExecuteCpuid                        72DA105C
+ ncrb32.dll       ExecuteRdtsc                        72DA1087
+ ncrb32.dll       ExecuteXgetbv                       72DA1097
+ ncrb32.dll       MeasureTsc                          72DA10AC
+ ncrb32.dll       PerformanceGate                     72DA111A
 -----------------------------------------------------------------------
 
 [ --- NUMA DOMAINS INFORMATION --- ]
 
-NUMA nodes detected = 1 , list allocated at base = 00C182B0h
+NUMA nodes detected = 1 , list allocated at base = 013786B8h
 
  ID affinity group\mask   allocated base   allocated size   original (all hex)
 -------------------------------------------------------------------------------
@@ -226,6 +226,6 @@ NUMA nodes detected = 1 , list allocated at base = 00C182B0h
 
 [ --- THREADS INFORMATION --- ]
 
-threads entries created = 0 , list allocated at base = 00C189B8h
+threads entries created = 0 , list allocated at base = 01378DC0h
 
 delete global objects...done.

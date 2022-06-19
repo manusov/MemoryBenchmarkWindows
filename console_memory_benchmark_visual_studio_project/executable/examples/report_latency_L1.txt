@@ -1,5 +1,5 @@
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.00.00 for Windows x64. (C) 2022 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.00.01 for Windows x64. (C) 2022 Ilya Manusov.
 get command line parameters...done
 load API...done
 detect processor features...done
@@ -10,39 +10,39 @@ initializing domains builder...done
 initializing threads builder...done
 measure TSC clock...done
 get library data...done
-MPE native library. v0.80.00 for Windows x64. (C) 2022 Ilya Manusov.
+NCRB performance library. v0.00.01 for Windows x64. (C) 2022 Ilya Manusov.
 run memory benchmark scenario.
 asm method ID=26, bytes per instruction BPI=8
-TSC frequency F=2497.683 MHz, period T=0.400 ns
+TSC frequency F=2496.995 MHz, period T=0.400 ns
 cache points for data read/write:
 L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB
 CPU core count=8, HyperThreading=1
 memory allocation...done
-NUMA-unaware mode, list allocated at base = 00007FF7D95B4150h
+NUMA-unaware mode, list allocated at base = 00007FF674384150h
 
  ID  allocated base   allocated size   original (all hex)
 ---------------------------------------------------------
- 0   000001D633800000 0000000000030000 000001D633800000 
+ 0   000001E761B20000 0000000000030000 000001E761B20000 
 ---------------------------------------------------------
 
 threads allocation...done
-threads entries created = 1 , list allocated at base = 000001D6336BFCF0h
+threads entries created = 1 , list allocated at base = 000001E761B80040h
 
  ID  (values hex)
 -------------------------------------------------------------------------------
- 0   thread=00000000000000F0 rxevent=00000000000000F4 txevent=00000000000000F8
-     base1 =000001D633800000 base2  =000001D633818000 sizeins=0000000000000300
+ 0   thread=00000000000000B0 rxevent=00000000000000F0 txevent=00000000000000F4
+     base1 =000001E761B20000 base2  =000001E761B38000 sizeins=0000000000000300
      repeat=00000000000186A0 large page mode =0001    method id =001A
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 00007FF7D95B41E0
+     control set pointer          = 00007FF6743841E0
 
 -------------------------------------------------------------------------------
 
-running threads...done ( dTSC=00000000001229D0h )
+running threads...done ( dTSC=000000000013298Ah )
 allocate statistics arrays...done
-bandwidth statistics, BASE=000001D6336BD9B0h, SIZE=0000000000000080h
-latency statistics,   BASE=000001D6336BED50h, SIZE=0000000000000080h
+bandwidth statistics, BASE=000001E761B7F0A0h, SIZE=0000000000000080h
+latency statistics,   BASE=000001E761B7F130h, SIZE=0000000000000080h
 RUN: method=26, threads=1, repeats=ADAPTIVE
      page mode=1, page size=4.00 KB
      start=6.00 KB, end=96.00 KB, delta=6.00 KB, bpi=8 bytes
@@ -51,27 +51,27 @@ RUN: method=26, threads=1, repeats=ADAPTIVE
 
    #        size   CPI     nsPI    MBPS
 -------------------------------------------------------
-   1        6144   2.777   1.112   7195.522  
-   2       12288   2.721   1.089   7342.864  
-   3       18432   2.687   1.076   7435.398  
-   4       24576   2.698   1.080   7406.868  
-   5       30720   2.675   1.071   7468.325  
-   6       36864   2.672   1.070   7477.835  
-   7       43008   2.685   1.075   7442.578  
-   8       49152   2.701   1.082   7396.695  
-   9       55296   3.217   1.288   6210.650  
-  10       61440   3.699   1.481   5401.847  
-  11       67584   4.006   1.604   4987.466  
-  12       73728   4.295   1.720   4651.867  
-  13       79872   4.449   1.781   4491.353  
-  14       86016   4.654   1.863   4293.468  
-  15       92160   4.857   1.945   4114.117  
-  16       98304   4.926   1.972   4055.932  
+   1        6144   2.795   1.119   7146.630  
+   2       12288   2.690   1.077   7426.056  
+   3       18432   2.654   1.063   7527.704  
+   4       24576   2.653   1.062   7530.522  
+   5       30720   2.668   1.069   7486.424  
+   6       36864   2.647   1.060   7547.451  
+   7       43008   2.659   1.065   7513.650  
+   8       49152   2.674   1.071   7471.712  
+   9       55296   3.164   1.267   6313.756  
+  10       61440   3.642   1.459   5484.204  
+  11       67584   3.998   1.601   4996.461  
+  12       73728   4.229   1.694   4723.401  
+  13       79872   4.439   1.778   4499.739  
+  14       86016   4.626   1.853   4317.885  
+  15       92160   4.784   1.916   4175.329  
+  16       98304   4.923   1.972   4057.739  
 -------------------------------------------------------
 
  Latency ( nanoseconds )
 ----------------------------------------------------------------------------------------
-| max=1.972         | min=1.070         | average=1.394         | median=1.200         |
+| max=1.972         | min=1.060         | average=1.383         | median=1.193         |
 ----------------------------------------------------------------------------------------
 
 delete local objects...done
