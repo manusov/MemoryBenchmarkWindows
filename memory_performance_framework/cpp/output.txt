@@ -1,0 +1,81 @@
+Debug template v0.00.02. (Windows ia32).
+
+NUMA CPU&RAM Benchmarks. Console Edition. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Get command line parameters...done.
+Load API...done.
+Detect processor features...done.
+Detect SMP and cache levels...done.
+Detect memory...done.
+Detect paging...done.
+Initializing domains builder...done.
+Initializing threads builder...done.
+Measure TSC clock...done.
+Get library data...done.
+NCRB performance library. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Run memory benchmark scenario.
+
+Asm method ID=0, bytes per instruction BPI=4.
+TSC frequency F=2497.058 MHz, period T=0.400 ns.
+Cache points for data read/write:
+L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB
+CPU core count=8, HyperThreading=1.
+
+Memory allocation...
+NUMA-unaware mode, list allocated at base = 00CF4E80h.
+--------------------------------------------------------------------------------
+ ID  allocated base    allocated size    original (all hex)
+--------------------------------------------------------------------------------
+  0  0000000000990000  0000000000030000  0000000000990000
+--------------------------------------------------------------------------------
+
+Threads allocation...
+Threads entries created = 1 , list allocated at base = 00664748h
+--------------------------------------------------------------------------------
+ ID  (values hex)
+--------------------------------------------------------------------------------
+  0  thread=00000000000000EC rxevent=0000000000000134 txevent=0000000000000138
+     base1 =0000000000990000 base2  =00000000009A8000 sizeins=0000000000000600
+     repeat=00000000001E8480 large page mode =0001    method id =0000
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 000000000065E530
+--------------------------------------------------------------------------------
+
+Running threads...
+Runned with delta TSC = 0000000030E5FAC0h.
+Allocate statistics arrays...done.
+Bandwidth statistics, base=0000000000663C70h, size=0000000000000080h
+Latency statistics,   base=0000000000663CF8h, size=0000000000000080h
+Run: method=0, threads=1, repeats=2000000
+     page mode=1, page size=4.000 KB
+     start=6.000 KB, end=96.000 KB, delta=6.000 KB, bpi=4 bytes
+Calibration...Done ( delay=7.370 seconds, update repeats=271359 ).
+[ read 32-bit MOV ]
+--------------------------------------------------------------------------------
+   #     size      CPI     nsPI    MBPS
+--------------------------------------------------------------------------------
+   1        6144   0.267   0.107   37347.247 
+   2       12288   0.264   0.106   37901.667 
+   3       18432   0.262   0.105   38061.083 
+   4       24576   0.263   0.105   37969.648 
+   5       30720   0.264   0.106   37774.284 
+   6       36864   0.267   0.107   37359.338 
+   7       43008   0.264   0.106   37899.374 
+   8       49152   0.273   0.109   36548.366 
+   9       55296   0.372   0.149   26831.306 
+  10       61440   0.373   0.149   26803.201 
+  11       67584   0.373   0.149   26806.050 
+  12       73728   0.375   0.150   26604.616 
+  13       79872   0.372   0.149   26867.614 
+  14       86016   0.375   0.150   26608.984 
+  15       92160   0.374   0.150   26699.082 
+  16       98304   0.373   0.149   26798.142 
+--------------------------------------------------------------------------------
+Bandwidth statistics ( megabytes per second ):
+max=38061.083,  min=26604.616,  average=32179.625,  median=31707.990.
+--------------------------------------------------------------------------------
+Delete local objects...done.
+
+Delete headblock global objects...done.
+
+OK.

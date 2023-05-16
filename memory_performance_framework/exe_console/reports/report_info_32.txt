@@ -1,0 +1,244 @@
+Debug template v0.00.02. (Windows ia32).
+
+NUMA CPU&RAM Benchmarks. Console Edition. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Get command line parameters...done.
+Load API...done.
+Detect processor features...done.
+Detect SMP and cache levels...done.
+Detect memory...done.
+Detect paging...done.
+Initializing domains builder...done.
+Initializing threads builder...done.
+Measure TSC clock...done.
+Get library data...done.
+NCRB performance library. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Run system information scenario.
+
+[Processor information]
+
+Time stamp counter (TSC) frequency = 2497.3 MHz, period = 0.400 ns.
+CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
+--------------------------------------------------------------------------------
+  #   CPU  OS  CPU functionality and instructions
+--------------------------------------------------------------------------------
+  0    1   1   read 32-bit MOV
+  1    1   1   write 32-bit MOV
+  2    1   1   copy 32-bit MOV
+  3    1   1   modify 32-bit NOT
+  4    1   1   write 32-bit REP STOSD
+  5    1   1   copy 32-bit REP MOVSD
+  6    1   1   read 64-bit MMX MOVQ
+  7    1   1   write 64-bit MMX MOVQ
+  8    1   1   copy 64-bit MMX MOVQ
+  9    1   1   read SSE128 MOVAPS
+ 10    1   1   write SSE128 MOVAPS
+ 11    1   1   copy SSE128 MOVAPS
+ 12    1   1   read AVX256 VMOVAPD
+ 13    1   1   write AVX256 VMOVAPD
+ 14    1   1   copy AVX256 VMOVAPD
+ 15    1   1   read AVX512 VMOVAPD
+ 16    1   1   write AVX512 VMOVAPD
+ 17    1   1   copy AVX512 VMOVAPD
+ 18    1   1   dot product FMA256 VFMADD231PD
+ 19    1   1   dot product FMA512 VFMADD231PD
+ 20    1   1   gather AVX256 VGATHERQPD
+ 21    1   1   gather AVX512 VGATHERQPD
+ 22    1   1   scatter AVX512 VSCATTERQPD
+ 23    0   1   optimized write CLZERO (AMD)
+ 24    1   1   prepare walk list for latency measure by LCM
+ 25    1   1   prepare walk list for latency measure by LCM, 32x2
+ 26    1   1   prepare walk list for latency measure by RDRAND
+ 27    1   1   prepare walk list for latency measure by RDRAND, 32x2
+ 28    1   1   latency measure by walk list
+ 29    1   1   latency measure by walk list, 32x2
+ 30    1   1   non-temporal read SSE128 MOVNTDQA
+ 31    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, default distance
+ 32    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, medium distance
+ 33    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, long distance
+ 34    1   1   non-temporal write SSE128 MOVNTPS
+ 35    1   1   non-temporal (for write) copy SSE128 MOVAPS+MOVNTPS
+ 36    1   1   non-temporal (for read and write) copy SSE128 PREFETCHNTA+MOVAPS+MOVNTPS
+ 37    1   1   non-temporal read AVX256 VMOVNTDQA
+ 38    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, default distance
+ 39    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, medium distance
+ 40    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, long distance
+ 41    1   1   non-temporal write AVX256 VMOVNTPD
+ 42    1   1   non-temporal (for write) copy AVX256 VMOVAPD+VMOVNTPD
+ 43    1   1   non-temporal (for read and write) copy AVX256 PREFETCHNTA+VMOVAPD+VMOVNTPD
+ 44    1   1   non-temporal read AVX512 VMOVNTDQA
+ 45    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, default distance
+ 46    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, medium distance
+ 47    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, long distance
+ 48    1   1   non-temporal write AVX512 VMOVNTPD
+ 49    1   1   non-temporal (for write) copy AVX512 VMOVAPD+VMOVNTPD
+ 50    1   1   non-temporal (for read and write) copy AVX512 PREFETCHNTA+VMOVAPD+VMOVNTPD
+--------------------------------------------------------------------------------
+
+[Platform topology and cache information]
+
+--------------------------------------------------------------------------------
+ core  affinity mask (hex)   ht   logical processors
+--------------------------------------------------------------------------------
+ 0     0000000000000003      1    0-1
+ 1     000000000000000C      1    2-3
+ 2     0000000000000030      1    4-5
+ 3     00000000000000C0      1    6-7
+ 4     0000000000000300      1    8-9
+ 5     0000000000000C00      1    10-11
+ 6     0000000000003000      1    12-13
+ 7     000000000000C000      1    14-15
+--------------------------------------------------------------------------------
+ cache  type          size (KB)    associativity   line     logical processors
+--------------------------------------------------------------------------------
+ L1     data          48           12              64       0-1
+ L1     instruction   32           8               64       0-1
+ L2     unified       512          8               64       0-1
+ L1     data          48           12              64       2-3
+ L1     instruction   32           8               64       2-3
+ L2     unified       512          8               64       2-3
+ L1     data          48           12              64       4-5
+ L1     instruction   32           8               64       4-5
+ L2     unified       512          8               64       4-5
+ L1     data          48           12              64       6-7
+ L1     instruction   32           8               64       6-7
+ L2     unified       512          8               64       6-7
+ L1     data          48           12              64       8-9
+ L1     instruction   32           8               64       8-9
+ L2     unified       512          8               64       8-9
+ L1     data          48           12              64       10-11
+ L1     instruction   32           8               64       10-11
+ L2     unified       512          8               64       10-11
+ L1     data          48           12              64       12-13
+ L1     instruction   32           8               64       12-13
+ L2     unified       512          8               64       12-13
+ L1     data          48           12              64       14-15
+ L1     instruction   32           8               64       14-15
+ L2     unified       512          8               64       14-15
+ L3     unified       16384        16              64       0-15
+--------------------------------------------------------------------------------
+ domain   affinity mask (hex)   logical processors
+--------------------------------------------------------------------------------
+ 0        000000000000FFFF      0-15
+--------------------------------------------------------------------------------
+ package   affinity mask (hex)   logical processors
+--------------------------------------------------------------------------------
+ 0         000000000000FFFF      0-15
+--------------------------------------------------------------------------------
+
+[Platform topology and cache information, extended]
+
+--------------------------------------------------------------------------------
+ core   ht   efficiency   group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0      1    0            0000\0000000000000003
+ 1      1    0            0000\000000000000000C
+ 2      1    0            0000\0000000000000030
+ 3      1    0            0000\00000000000000C0
+ 4      1    0            0000\0000000000000300
+ 5      1    0            0000\0000000000000C00
+ 6      1    0            0000\0000000000003000
+ 7      1    0            0000\000000000000C000
+--------------------------------------------------------------------------------
+ cache  type          size (KB)    group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ L1     data          48           0000\0000000000000003
+ L1     instruction   32           0000\0000000000000003
+ L2     unified       512          0000\0000000000000003
+ L3     unified       16384        0000\000000000000FFFF
+ L1     data          48           0000\000000000000000C
+ L1     instruction   32           0000\000000000000000C
+ L2     unified       512          0000\000000000000000C
+ L1     data          48           0000\0000000000000030
+ L1     instruction   32           0000\0000000000000030
+ L2     unified       512          0000\0000000000000030
+ L1     data          48           0000\00000000000000C0
+ L1     instruction   32           0000\00000000000000C0
+ L2     unified       512          0000\00000000000000C0
+ L1     data          48           0000\0000000000000300
+ L1     instruction   32           0000\0000000000000300
+ L2     unified       512          0000\0000000000000300
+ L1     data          48           0000\0000000000000C00
+ L1     instruction   32           0000\0000000000000C00
+ L2     unified       512          0000\0000000000000C00
+ L1     data          48           0000\0000000000003000
+ L1     instruction   32           0000\0000000000003000
+ L2     unified       512          0000\0000000000003000
+ L1     data          48           0000\000000000000C000
+ L1     instruction   32           0000\000000000000C000
+ L2     unified       512          0000\000000000000C000
+--------------------------------------------------------------------------------
+ domain   group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0        0000\000000000000FFFF
+--------------------------------------------------------------------------------
+ group   maximum   active   maximum   active   affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0       1         1        16        16       000000000000FFFF
+--------------------------------------------------------------------------------
+
+[Memory information]
+
+Installed memory = 63.837 GB, free = 56.575 GB.
+
+[Paging information]
+
+Default page = 4 KB, large page = 2048 KB, privileges = 0.
+
+[OS API and FASM DLL information]
+
+--------------------------------------------------------------------------------
+ Module           Function                            Pointer (hex)
+--------------------------------------------------------------------------------
+ KERNEL32.DLL     QueryPerformanceFrequency           76F21D80
+ KERNEL32.DLL     QueryPerformanceCounter             76F1E570
+ KERNEL32.DLL     GetLogicalProcessorInformation      76F191C0
+ KERNEL32.DLL     GetLogicalProcessorInformationEx    76C6ECF0
+ KERNEL32.DLL     GlobalMemoryStatusEx                76F22480
+ KERNEL32.DLL     GetActiveProcessorCount             76F22130
+ KERNEL32.DLL     GetActiveProcessorGroupCount        76F5DD70
+ KERNEL32.DLL     GetNumaHighestNodeNumber            76F198F0
+ KERNEL32.DLL     GetNumaNodeProcessorMask            76F5EDF0
+ KERNEL32.DLL     GetNumaNodeProcessorMaskEx          76F349F0
+ KERNEL32.DLL     VirtualAllocExNuma                  76F36350
+ KERNEL32.DLL     SetThreadAffinityMask               76F60890
+ KERNEL32.DLL     SetThreadGroupAffinity              76F360C0
+ KERNEL32.DLL     GetLargePageMinimum                 76F34940
+ KERNEL32.DLL     GetSystemFirmwareTable              76F32690
+ ADVAPI32.DLL     OpenProcessToken                    77B4EAF0
+ ADVAPI32.DLL     LookupPrivilegeValueA               77B54540
+ ADVAPI32.DLL     AdjustTokenPrivileges               77B4FE00
+ MPE32.DLL        GetDllStrings                       64D61008
+ MPE32.DLL        CheckCpuid                          64D61037
+ MPE32.DLL        ExecuteCpuid                        64D6105C
+ MPE32.DLL        ExecuteRdtsc                        64D61087
+ MPE32.DLL        ExecuteXgetbv                       64D61097
+ MPE32.DLL        MeasureTsc                          64D610AC
+ MPE32.DLL        MeasureTscByFileTime                00000000
+ MPE32.DLL        MeasureTscByPcounter                00000000
+ MPE32.DLL        PerformanceGate                     64D6111A
+--------------------------------------------------------------------------------
+
+[NUMA domains information]
+
+NUMA nodes detected = 1, list allocated at base = 00A835E8h.
+--------------------------------------------------------------------------------
+ ID  affinity group\mask    allocated base    allocated size    original (hex)
+--------------------------------------------------------------------------------
+  0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
+--------------------------------------------------------------------------------
+
+NUMA-unaware mode, list allocated at base = 008E4E80h.
+--------------------------------------------------------------------------------
+ ID  allocated base    allocated size    original (all hex)
+--------------------------------------------------------------------------------
+  0  0000000000000000  0000000000000000  0000000000000000
+--------------------------------------------------------------------------------
+
+[Platform topology information]
+
+Threads entries created = 0 , list allocated at base = 00A83CF0h
+--------------------------------------------------------------------------------
+
+Delete headblock global objects...done.
+
+OK.
