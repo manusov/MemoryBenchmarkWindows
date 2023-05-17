@@ -14,14 +14,23 @@ https://ravesli.com/uroki-cpp/
 
 Main source file.
 TODO.
-1) Correct bytes per instruction (BPI) table for MOV32/MOV64 and some other.
-2) Memory size for benchmarks write at KB/MB/GB units, now bytes.
+
+1)+ Memory size for benchmarks write at KB/MB/GB units, now bytes.
    See file Benchmark.cpp, line 554.
    But same units for all test session, even if optimal unit = f(block size) changed.
-3) Use PerformanceCounter instead file time for precision measure TSC clock.
-4) Can set name for output report file.
-5) Why console initialization error when output redirection.
-6) See "TODO" list below main() routine at this file.
+
+2)+ Correct bytes per instruction (BPI) table for MOV32/MOV64 and some other.
+   Verify include STOS/MOVS.
+
+3)+ Bug if block size = 2GB.
+
+4) Use Performance Counter instead File Time for precision measure TSC clock.
+
+5) Can set name for output report file.
+
+6) Why console initialization error when output redirection.
+
+7) See "TODO" list below main() routine at this file.
 
 */
 
@@ -185,7 +194,7 @@ TODO:
 
 24) ThreadsBuilder.cpp , line 333, use terminate threads by return and wait by thread handle, not by TerminateThread().
 
-25) lear warningsn:
+25) learn warnings:
 
 Remove this requirements:
  - C/C++ - Preprocessor - Preprocessor definitions

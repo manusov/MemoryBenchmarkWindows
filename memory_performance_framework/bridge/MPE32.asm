@@ -407,7 +407,7 @@ DD  NT_COPY_AVX_512
 DD  NTR_COPY_AVX_512
 
 StringProduct    DB 'NCRB performance library.',0
-StringVersion    DB 'v0.01.01 for Windows ia32.',0
+StringVersion    DB 'v0.01.02 for Windows ia32.',0
 StringCopyright  DB '(C) 2023 Ilya Manusov.',0
 
 section '.edata' export data readable

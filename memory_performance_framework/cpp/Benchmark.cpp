@@ -130,7 +130,7 @@ void Benchmark::execute()
 	int kcc = pTopology->coresCount;
 	int kht = pTopology->hyperThreadingFlag;
 	snprintf(msg, APPCONST::MAX_TEXT_STRING,
-		"Cache points for data read/write:\r\nL1=%d KB, L2=%d KB, L3=%d KB, L4=%d KB\r\nCPU core count=%d, HyperThreading=%d.\r\n",
+		"Cache points for data read/write:\r\nL1=%d KB, L2=%d KB, L3=%d KB, L4=%d KB.\r\nCPU core count=%d, HyperThreading=%d.\r\n",
 		kl1, kl2, kl3, kl4, kcc, kht);
 	AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
 
@@ -301,7 +301,6 @@ void Benchmark::execute()
 		pNuma = controlSet->pDomainsBuilder->getSimpleList();
 		controlSet->pDomainsBuilder->writeReportSimple();
 	}
-	// AppLib::writeColor("\r\nDone.\r\n", APPCONST::VALUE_COLOR);
 	if (!opStatus)
 	{
 		AppLib::writeColor("\r\nMemory allocation error.\r\n\r\n", APPCONST::ERROR_COLOR);
@@ -314,7 +313,6 @@ void Benchmark::execute()
 	// Text control data.
 	opStatus = controlSet->pThreadsBuilder->buildThreadsList(&ic, &iv, pNuma);
 	controlSet->pThreadsBuilder->writeReport();
-	// AppLib::writeColor("\r\nDone.\r\n", APPCONST::VALUE_COLOR);
 	if (!opStatus)
 	{
 		AppLib::writeColor("\r\nThreads allocation error.\r\n\r\n", APPCONST::ERROR_COLOR);
@@ -344,8 +342,8 @@ void Benchmark::execute()
 	double nspi = 0.0;
 	int blockMax = 0;
 	int blockCount = 0;
-	int blockSize = 0;
-	int blockDelta = 0;
+	DWORD64 blockSize = 0;
+	DWORD64 blockDelta = 0;
 
 	// Statistic variables for measured memory speed values.
 	double resultMin = 0.0;
@@ -362,8 +360,8 @@ void Benchmark::execute()
 	{
 		blockMax = (int)((ic.startSize - ic.endSize) / ic.deltaSize);
 	}
-	blockSize = (int)ic.startSize;
-	blockDelta = (int)ic.deltaSize;
+	blockSize = ic.startSize;
+	blockDelta = ic.deltaSize;
 
 	// Build statistics list, print allocation.
 	// blockMax = elements count, ma = element size in bytes,
@@ -385,9 +383,10 @@ void Benchmark::execute()
 		AppLib::writeColor("done.\r\nBandwidth statistics, ", APPCONST::VALUE_COLOR);
 		AppLib::storeBaseAndSize(msg, APPCONST::MAX_TEXT_STRING, (DWORD64)pMbps, ma);
 		AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
-		AppLib::writeColor("\r\nLatency statistics,   ", APPCONST::VALUE_COLOR);
+		AppLib::writeColor(".\r\nLatency statistics,   ", APPCONST::VALUE_COLOR);
 		AppLib::storeBaseAndSize(msg, APPCONST::MAX_TEXT_STRING, (DWORD64)pNs, ma);
 		AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
+		AppLib::writeColor(".", APPCONST::VALUE_COLOR);
 	}
 
 	// Blank both statistics arrays.
@@ -434,7 +433,7 @@ void Benchmark::execute()
 	AppLib::writeColor(", bpi=", APPCONST::VALUE_COLOR);
 	AppLib::storeCellMemorySize(msg, APPCONST::MAX_TEXT_STRING, bytesPerInstruction, 1);
 	AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
-	AppLib::writeColor("\r\n", APPCONST::VALUE_COLOR);
+	AppLib::writeColor(".\r\n", APPCONST::VALUE_COLOR);
 
 	// Calibration
 	if ((opRepeats2 == APPCONST::OPTION_NOT_SET) && (opRepeats3 == APPCONST::OPTION_NOT_SET))
@@ -471,7 +470,7 @@ void Benchmark::execute()
 		double cRepeats = opRepeats1 * (cTarget / cTime);
 		opRepeats1 = (int)cRepeats;
 		snprintf(msg, APPCONST::MAX_TEXT_STRING,
-			"Done ( delay=%.3f seconds, update repeats=%d ).\r\n", cTime, opRepeats1);
+			"done ( delay=%.3f seconds, update repeats=%d ).\r\n", cTime, opRepeats1);
 		AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
 		iv.currentMeasurementRepeats = opRepeats1;
 		controlSet->pThreadsBuilder->updateThreadsList(&iv);
@@ -484,8 +483,30 @@ void Benchmark::execute()
 
 	// Print parameters names and table up line
 	AppLib::writeColorLine(APPCONST::TABLE_WIDTH, APPCONST::TABLE_COLOR);
-	AppLib::writeColor("   #     size      CPI     nsPI    MBPS\r\n", APPCONST::TABLE_COLOR);
+	AppLib::writeColor(" #     size        CPI        nsPI      MBPS\r\n", APPCONST::TABLE_COLOR);
 	AppLib::writeColorLine(APPCONST::TABLE_WIDTH, APPCONST::TABLE_COLOR);
+
+	// Select units for print measured memory block size.
+	int printSizeUnits = PRINT_SIZE_AUTO;
+	DWORD64 umx = max(ic.startSize, ic.endSize);
+	DWORD64 umn = min(ic.startSize, ic.endSize);
+	DWORD64 udt = ic.deltaSize;
+	if ((umx < APPCONST::KILO) || (umn % APPCONST::KILO) || (umx % APPCONST::KILO) || (udt % APPCONST::KILO))
+	{
+		printSizeUnits = PRINT_SIZE_BYTES;
+	}
+	else if ((umx < APPCONST::MEGA) || (umn % APPCONST::MEGA) || (umx % APPCONST::MEGA) || (udt % APPCONST::MEGA))
+	{
+		printSizeUnits = PRINT_SIZE_KB;
+	}
+	else if ((umx < APPCONST::GIGA) || (umn % APPCONST::GIGA) || (umx % APPCONST::GIGA) || (udt % APPCONST::GIGA))
+	{
+		printSizeUnits = PRINT_SIZE_MB;
+	}
+	else
+	{
+		printSizeUnits = PRINT_SIZE_GB;
+	}
 
 	// Start measurements cycle for different block sizes, show table: speed = f(size).
 	pMbps1 = pMbps;
@@ -550,9 +571,17 @@ void Benchmark::execute()
 		seconds = ov.resultDeltaTsc * periodSeconds;
 		mbps = megabytes / seconds;
 
-		// send parameters to log
+		// Write string with one benchmark iteration results and send parameters to log.
+/*
 		snprintf(msg, APPCONST::MAX_TEXT_STRING,
 			"%4d%12d%8.3f%8.3f   %-10.3f\r\n", blockCount + 1, blockSize, cpi, nspi, mbps);
+		AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
+*/
+		snprintf(msg, APPCONST::MAX_TEXT_STRING, " %-4d  ", blockCount + 1);
+		AppLib::writeColor(msg, APPCONST::TABLE_COLOR);
+		AppLib::storeCellMemorySizeInt(msg, APPCONST::MAX_TEXT_STRING, blockSize, 12, printSizeUnits);
+		AppLib::writeColor(msg, APPCONST::TABLE_COLOR);
+		snprintf(msg, APPCONST::MAX_TEXT_STRING, "%-11.3f%-10.3f%-11.3f\r\n", cpi, nspi, mbps);
 		AppLib::writeColor(msg, APPCONST::VALUE_COLOR);
 
 		*pMbps1++ = mbps;

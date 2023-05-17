@@ -43,9 +43,9 @@ namespace APPCONST
 	constexpr size_t TEXT_SIZE = 100 * 1024;
 	constexpr size_t TX_SIZE   = 4095;
 	#if _WIN64
-	const char* const BUILD_STRING        = "v0.01.01 for Windows x64.";
+	const char* const BUILD_STRING        = "v0.01.02 for Windows x64.";
 	#elif _WIN32
-	const char* const BUILD_STRING        = "v0.01.01 for Windows ia32.";
+	const char* const BUILD_STRING        = "v0.01.02 for Windows ia32.";
 	#endif
 
 	// Parameters depend on x64 or ia32 build.
@@ -79,13 +79,13 @@ namespace APPCONST
 	constexpr int TABLE_WIDTH          = 80;
 	constexpr size_t MAX_OUT_FILE_SIZE = 4 * 1024 * 1024;
 
-	// Topology and threads timing operational parameters
+	// Topology and threads timing operational parameters.
 	constexpr int MAXIMUM_THREADS          = 256;
 	constexpr int MAXIMUM_THREADS_PER_NODE = 64;
 	constexpr int MAXIMUM_NODES            = 64;
 	constexpr int THREAD_TIMEOUT           = 60000;
 
-	// Benchmark scenario options
+	// Benchmark scenario options.
 	constexpr int OPTION_NOT_SET = -1;
 	constexpr int CONST_DRAM_BLOCK = 32 * 1024 * 1024;
 
@@ -103,7 +103,7 @@ namespace APPCONST
 	constexpr int DEFAULT_HT_MODE             = OPTION_NOT_SET;
 	constexpr int DEFAULT_NUMA_MODE           = OPTION_NOT_SET;
 
-	// 0-50, total 51 methods
+	// 0-50, total 51 methods.
 	constexpr int MAXIMUM_ASM_METHOD = 50;
 
 	constexpr int APPROXIMATION_REPEATS      = 2000000;
@@ -118,6 +118,11 @@ namespace APPCONST
 	constexpr int DEFAULT_START_SIZE_BYTES = 4096;
 	constexpr int DEFAULT_END_SIZE_BYTES   = 65536;
 	constexpr int DEFAULT_DELTA_SIZE_BYTES = 4096;
+
+	// Constants used for print memory block size.
+	constexpr int KILO = 1024;
+	constexpr int MEGA = 1024 * 1024;
+	constexpr int GIGA = 1024 * 1024 * 1024;
 }
 
 #endif  // CONSTANTS_H

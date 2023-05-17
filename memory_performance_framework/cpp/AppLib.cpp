@@ -327,47 +327,62 @@ void AppLib::storeBitsList(char* buffer, size_t limit, DWORD64 x)
 // Print memory size string (Bytes, KB, MB, GB) to buffer.
 void AppLib::storeCellMemorySize(char* buffer, size_t limit, DWORD64 x, size_t cell)
 {
-    constexpr int KILO = 1024;
-    constexpr int MEGA = 1024 * 1024;
-    constexpr int GIGA = 1024 * 1024 * 1024;
-    // Print number
+    // Print number at left of fixed size cell.
     double xd = static_cast<double>(x);
     int count = 0;
-    if ( (x < KILO) || ((x < MEGA) && (x % KILO)) )
+    if ( (x < APPCONST::KILO) || ((x < APPCONST::KILO) && (x % APPCONST::KILO)) )
     {
         int xi = (int)x;
         count = snprintf(buffer, limit, "%d bytes", xi);
     }
-    else if (x < MEGA)
+    else if (x < APPCONST::MEGA)
     {
-        xd /= KILO;
+        xd /= APPCONST::KILO;
         count = snprintf(buffer, limit, "%.3f KB", xd);
     }
-    else if (x < GIGA)
+    else if (x < APPCONST::GIGA)
     {
-        xd /= MEGA;
+        xd /= APPCONST::MEGA;
         count = snprintf(buffer, limit, "%.3f MB", xd);
     }
     else
     {
-        xd /= GIGA;
+        xd /= APPCONST::GIGA;
         count = snprintf(buffer, limit, "%.3f GB", xd);
     }
     buffer += count;
     limit -= count;
-    // Print extra spaces for fill fixed size cell
-    int extra = (int)(cell - count);
-    if ((extra > 0) && (limit > 0))
+    // Print extra spaces for fill fixed size cell.
+    cellPrintHelper(buffer, limit, cell, count);
+}
+void AppLib::storeCellMemorySizeInt(char* buffer, size_t limit, DWORD64 x, size_t cell, int mode)
+{
+    // Print number at left of fixed size cell.
+    int count = 0;
+    if ((mode == PRINT_SIZE_BYTES) || ((mode == PRINT_SIZE_AUTO) && ((x < APPCONST::KILO) || (x % APPCONST::KILO))))
     {
-        for (int i = 0; i < extra; i++)
-        {
-            count = snprintf(buffer, limit, " ");
-            buffer += count;
-            limit -= count;
-            if (limit <= 0) break;
-        }
+        count = snprintf(buffer, limit, "%llu", x);
     }
-    return;
+    else if ((mode == PRINT_SIZE_KB) || ((mode == PRINT_SIZE_AUTO) && ((x < APPCONST::MEGA) || (x % APPCONST::MEGA))))
+    {
+        count = snprintf(buffer, limit, "%lluK", x / APPCONST::KILO);
+    }
+    else if ((mode == PRINT_SIZE_MB) || ((mode == PRINT_SIZE_AUTO) && ((x < APPCONST::GIGA) || (x % APPCONST::GIGA))))
+    {
+        count = snprintf(buffer, limit, "%lluM", x / APPCONST::MEGA);
+    }
+    else if (mode == PRINT_SIZE_GB)
+    {
+        count = snprintf(buffer, limit, "%lluG", x / APPCONST::GIGA);
+    }
+    else
+    {
+        count = snprintf(buffer, limit, "?");
+    }
+    buffer += count;
+    limit -= count;
+    // Print extra spaces for fill fixed size cell.
+    cellPrintHelper(buffer, limit, cell, count);
 }
 void AppLib::storeBaseAndSize(char* buffer, size_t limit, DWORD64 blockBase, DWORD64 blockSize)
 {
@@ -476,6 +491,20 @@ void AppLib::colorRestoreHelper()
     if (screenMode)
     {
         SetConsoleTextAttribute(hStdout, csbi.wAttributes);
+    }
+}
+void AppLib::cellPrintHelper(char* buffer, size_t limit, size_t cell, size_t count)
+{
+    int extra = (int)(cell - count);
+    if ((extra > 0) && (limit > 0))
+    {
+        for (int i = 0; i < extra; i++)
+        {
+            count = snprintf(buffer, limit, " ");
+            buffer += count;
+            limit -= count;
+            if (limit <= 0) break;
+        }
     }
 }
 

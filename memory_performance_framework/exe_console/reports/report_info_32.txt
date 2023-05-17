@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows ia32).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.01.02 for Windows ia32. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,12 +11,12 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.01.01 for Windows ia32. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.01.02 for Windows ia32. (C) 2023 Ilya Manusov.
 Run system information scenario.
 
 [Processor information]
 
-Time stamp counter (TSC) frequency = 2497.3 MHz, period = 0.400 ns.
+Time stamp counter (TSC) frequency = 2496.7 MHz, period = 0.401 ns.
 CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 --------------------------------------------------------------------------------
   #   CPU  OS  CPU functionality and instructions
@@ -178,7 +178,7 @@ CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 
 [Memory information]
 
-Installed memory = 63.837 GB, free = 56.575 GB.
+Installed memory = 63.837 GB, free = 56.056 GB.
 
 [Paging information]
 
@@ -207,27 +207,27 @@ Default page = 4 KB, large page = 2048 KB, privileges = 0.
  ADVAPI32.DLL     OpenProcessToken                    77B4EAF0
  ADVAPI32.DLL     LookupPrivilegeValueA               77B54540
  ADVAPI32.DLL     AdjustTokenPrivileges               77B4FE00
- MPE32.DLL        GetDllStrings                       64D61008
- MPE32.DLL        CheckCpuid                          64D61037
- MPE32.DLL        ExecuteCpuid                        64D6105C
- MPE32.DLL        ExecuteRdtsc                        64D61087
- MPE32.DLL        ExecuteXgetbv                       64D61097
- MPE32.DLL        MeasureTsc                          64D610AC
+ MPE32.DLL        GetDllStrings                       732E1008
+ MPE32.DLL        CheckCpuid                          732E1037
+ MPE32.DLL        ExecuteCpuid                        732E105C
+ MPE32.DLL        ExecuteRdtsc                        732E1087
+ MPE32.DLL        ExecuteXgetbv                       732E1097
+ MPE32.DLL        MeasureTsc                          732E10AC
  MPE32.DLL        MeasureTscByFileTime                00000000
  MPE32.DLL        MeasureTscByPcounter                00000000
- MPE32.DLL        PerformanceGate                     64D6111A
+ MPE32.DLL        PerformanceGate                     732E111A
 --------------------------------------------------------------------------------
 
 [NUMA domains information]
 
-NUMA nodes detected = 1, list allocated at base = 00A835E8h.
+NUMA nodes detected = 1, list allocated at base = 0097FDA0h.
 --------------------------------------------------------------------------------
  ID  affinity group\mask    allocated base    allocated size    original (hex)
 --------------------------------------------------------------------------------
   0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
 --------------------------------------------------------------------------------
 
-NUMA-unaware mode, list allocated at base = 008E4E80h.
+NUMA-unaware mode, list allocated at base = 00215E80h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ NUMA-unaware mode, list allocated at base = 008E4E80h.
 
 [Platform topology information]
 
-Threads entries created = 0 , list allocated at base = 00A83CF0h
+Threads entries created = 0 , list allocated at base = 009804A8h
 --------------------------------------------------------------------------------
 
 Delete headblock global objects...done.

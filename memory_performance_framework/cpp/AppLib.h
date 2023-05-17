@@ -51,6 +51,7 @@ public:
 	static size_t storeHexPointer(char* buffer, size_t limit, LPVOID ptr, bool h);
 	static void storeBitsList(char* buffer, size_t limit, DWORD64 x);
 	static void storeCellMemorySize(char* buffer, size_t limit, DWORD64 x, size_t cell);
+	static void storeCellMemorySizeInt(char* buffer, size_t limit, DWORD64 x, size_t cell, int mode);
 	static void storeBaseAndSize(char* buffer, size_t limit, DWORD64 blockBase, DWORD64 blockSize);
 	// Build execution path for save report to application directory (not current directory).
 	static BOOL storeExecReportPath(char* buffer, size_t limit, const char* name);
@@ -68,6 +69,7 @@ private:
 	static CONSOLE_SCREEN_BUFFER_INFO csbi;
 	static void colorHelper(WORD color);
 	static void colorRestoreHelper();
+	static void cellPrintHelper(char* buffer, size_t limit, size_t cell, size_t count);
 };
 
 #endif  // APPLIB_H

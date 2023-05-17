@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>test=memory memory=l1 asm=readmov64</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>test=memory asm=ntreadavx512 repeats=50 threads=8 start=16M end=128M step=1M</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>test=memory memory=l1 asm=readmov32</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>test=memory asm=ntwritesse128 repeats=200 threads=4 start=32M end=40M step=1M</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>test=memory asm=ntwriteavx512 repeats=20 threads=8 start=16M end=128M step=1M</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommandArguments>test=memory asm=ntwritesse128 repeats=200 threads=4 start=32M end=40M step=1M</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

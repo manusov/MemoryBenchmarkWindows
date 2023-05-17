@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.01.01 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.01.02 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,7 +11,7 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.01.01 for Windows x64. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.01.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run system information scenario.
 
 [Processor information]
@@ -178,7 +178,7 @@ CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 
 [Memory information]
 
-Installed memory = 63.837 GB, free = 56.573 GB.
+Installed memory = 63.837 GB, free = 56.055 GB.
 
 [Paging information]
 
@@ -220,14 +220,14 @@ Default page = 4 KB, large page = 2048 KB, privileges = 0.
 
 [NUMA domains information]
 
-NUMA nodes detected = 1, list allocated at base = 000002B041FC6590h.
+NUMA nodes detected = 1, list allocated at base = 000001B39B11B7C0h.
 --------------------------------------------------------------------------------
  ID  affinity group\mask    allocated base    allocated size    original (hex)
 --------------------------------------------------------------------------------
   0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
 --------------------------------------------------------------------------------
 
-NUMA-unaware mode, list allocated at base = 00007FF7F30F3D30h.
+NUMA-unaware mode, list allocated at base = 00007FF79FC23D30h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ NUMA-unaware mode, list allocated at base = 00007FF7F30F3D30h.
 
 [Platform topology information]
 
-Threads entries created = 0 , list allocated at base = 000002B041FC71A0h
+Threads entries created = 0 , list allocated at base = 000001B39B11C3D0h
 --------------------------------------------------------------------------------
 
 Delete headblock global objects...done.

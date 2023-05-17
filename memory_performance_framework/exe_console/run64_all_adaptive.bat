@@ -6,3 +6,4 @@ mpe64 test=memory memory=l3    adaptive=256M
 copy output.txt reports\report_adaptive_L3.txt
 mpe64 test=memory memory=dram  adaptive=8M
 copy output.txt reports\report_adaptive_DRAM.txt
+pause
