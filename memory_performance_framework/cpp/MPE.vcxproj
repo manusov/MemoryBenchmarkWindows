@@ -141,6 +141,7 @@
     <ClCompile Include="ProcessorDetector.cpp" />
     <ClCompile Include="SysInfo.cpp" />
     <ClCompile Include="ThreadsBuilder.cpp" />
+    <ClCompile Include="Timers.cpp" />
     <ClCompile Include="TopologyDetector.cpp" />
     <ClCompile Include="UDM.cpp" />
     <ClCompile Include="UserHelp.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="ProcessorDetector.h" />
     <ClInclude Include="SysInfo.h" />
     <ClInclude Include="ThreadsBuilder.h" />
+    <ClInclude Include="Timers.h" />
     <ClInclude Include="TopologyDetector.h" />
     <ClInclude Include="UDM.h" />
     <ClInclude Include="UserHelp.h" />

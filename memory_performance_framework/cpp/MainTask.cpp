@@ -27,6 +27,7 @@ TODO.
 #include "PagingDetector.h"
 #include "SysInfo.h"
 #include "Benchmark.h"
+#include "Timers.h"
 #include "UserHelp.h"
 
 int maintask(int argc, char** argv)
@@ -50,6 +51,7 @@ int maintask(int argc, char** argv)
 	UserHelp* pUserHelp = nullptr;
 	SysInfo* pSysinfoScenario = nullptr;
 	Benchmark* pMemoryScenario = nullptr;
+	Timers* pTimersScenario = nullptr;
 	// Pointers to global visible structures.
 	FUNCTIONS_LIST* pFunctionsList = nullptr;
 	// Text report control.
@@ -111,7 +113,7 @@ int maintask(int argc, char** argv)
 	osErrorCode = pCommandLine->parseCommandLine(argc, argv);
 	if (osErrorCode)
 	{   // Report error if command line parse failed
-		AppLib::write("FAILED\r\n");
+		AppLib::write("FAILED.\r\n");
 		statusString = pCommandLine->getStatusString();
 		snprintf(msg, APPCONST::MAX_TEXT_STRING, "\r\nERROR: %s\r\n\r\n", statusString);
 		AppLib::write(msg);
@@ -210,6 +212,28 @@ int maintask(int argc, char** argv)
 					pMemoryScenario = new Benchmark(opTest, &s, pp);
 					pMemoryScenario->execute();
 				}
+				else if (opTest == TEST_STORAGE)
+				{
+					AppLib::writeColor("Storage test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+				}
+				else if (opTest == TEST_CPU)
+				{
+					AppLib::writeColor("CPU test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+				}
+				else if (opTest == TEST_GPU)
+				{
+					AppLib::writeColor("GPU test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+				}
+				else if (opTest == TEST_TIMERS)
+				{
+					AppLib::write("Run timers test scenario.\r\n\r\n");
+					pTimersScenario = new Timers(opTest, &s, pp);
+					pTimersScenario->execute();
+				}
+				else
+				{
+					AppLib::writeColor("Unknown test selected.\r\n", APPCONST::ERROR_COLOR);
+				}
 			}
 
 			// Default scenario, show run help recommendation if scenario not selected
@@ -232,6 +256,7 @@ int maintask(int argc, char** argv)
 	if (pUserHelp)        delete pUserHelp;
 	if (pSysinfoScenario) delete pSysinfoScenario;
 	if (pMemoryScenario)  delete pMemoryScenario;
+	if (pTimersScenario)  delete pTimersScenario;
 
 	// Delete system support classes
 	if (s.pThreadsBuilder)    delete s.pThreadsBuilder;

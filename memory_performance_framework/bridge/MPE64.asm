@@ -118,7 +118,7 @@ mov [r8 + 4],edx
 xor eax,eax
 ret 
 
-; Measure CPU TSC clock, assume support already verified
+; Measure CPU TSC clock by OS file time , assume TSC support already verified
 ; INPUT:
 ; Parm#1 = RCX = Pointer for update output variable, frequency at Hz
 ; OUTPUT:
@@ -161,6 +161,59 @@ mov eax,1     ; RAX = 1 means CPU clock measured OK
 .exit:
 mov rsp,rbp
 pop rbp rbp rdi rsi rbx
+ret
+.error:
+xor eax,eax   ; RAX = 0 means CPU clock measured ERROR
+jmp .exit
+
+; Measure CPU TSC clock by OS performance counter,
+; assume TSC support already verified
+; INPUT:
+; Parm#1 = RCX = Pointer for update output variable, frequency at Hz
+; Parm#2 = RDX = Pointer to dyn. imported function QueryPerformanceCounter
+; Parm#3 = R8  = Number of counter ticks for wait 1 second
+; OUTPUT:
+; RAX = Status, return TRUE if OK, FALSE if error.
+MeasureTscByPcounter:
+push r12 r13 rbx rsi rdi rbp rbp    ; Last push for reserve local variable space
+mov r12,rdx
+mov r13,r8
+mov rbp,rsp                 ; RBP used for restore RSP and addressing variables
+and rsp,0FFFFFFFFFFFFFFF0h
+sub rsp,32                  ; Make parameters shadow
+mov rdi,rcx                 ; Save output variable address
+; Start measure frequency
+mov rcx,rbp
+call r12                     ; Get current count
+mov rsi,[rbp]
+@@:
+mov rcx,rbp
+call r12                    ; Get next count for wait tick. TODO. Check status.
+cmp rsi,[rbp]
+je @b
+mov rsi,[rbp]
+add rsi,r13                 ; dt = 1 second
+rdtsc
+shl rdx,32
+lea rbx,[rax + rdx]         ; RBX = 64-bit TSC at operation start
+@@:
+mov rcx,rbp
+call r12                    ; Get count for wait 1 second. TODO. Check status.
+cmp rsi,[rbp]
+ja @b
+rdtsc
+shl rdx,32
+or rax,rdx    ; RAX = 64-bit TSC at operation end
+sub rax,rbx   ; RAX = Delta TSC
+jbe .error
+; Store result 
+cld
+stosq   ; Store Frequency, as 64-bit integer value, Hz, delta-TSC per second
+; Restore RSP, pop extra registers, exit
+mov eax,1     ; RAX = 1 means CPU clock measured OK
+.exit:
+mov rsp,rbp
+pop rbp rbp rdi rsi rbx r13 r12
 ret
 .error:
 xor eax,eax   ; RAX = 0 means CPU clock measured ERROR
@@ -369,18 +422,19 @@ DQ  NT_COPY_AVX_512
 DQ  NTR_COPY_AVX_512
 
 StringProduct    DB 'NCRB performance library.',0
-StringVersion    DB 'v0.01.02 for Windows x64.',0
+StringVersion    DB 'v0.02.00 for Windows x64.',0
 StringCopyright  DB '(C) 2023 Ilya Manusov.',0
 
 section '.edata' export data readable
-export  'test1.dll'                 ,\
-GetDllStrings   , 'GetDllStrings'   ,\
-CheckCpuid      , 'CheckCpuid'      ,\
-ExecuteCpuid    , 'ExecuteCpuid'    ,\
-ExecuteRdtsc    , 'ExecuteRdtsc'    ,\
-ExecuteXgetbv   , 'ExecuteXgetbv'   ,\
-MeasureTsc      , 'MeasureTsc'      ,\
-PerformanceGate , 'PerformanceGate'  
+export  'MPE64.DLL'                           ,\
+GetDllStrings        , 'GetDllStrings'        ,\
+CheckCpuid           , 'CheckCpuid'           ,\
+ExecuteCpuid         , 'ExecuteCpuid'         ,\
+ExecuteRdtsc         , 'ExecuteRdtsc'         ,\
+ExecuteXgetbv        , 'ExecuteXgetbv'        ,\
+MeasureTsc           , 'MeasureTsc'           ,\
+MeasureTscByPcounter , 'MeasureTscByPcounter' ,\
+PerformanceGate      , 'PerformanceGate'  
 
 section '.idata' import data readable
 library kernel32 , 'KERNEL32.DLL'

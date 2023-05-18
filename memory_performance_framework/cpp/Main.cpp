@@ -15,22 +15,19 @@ https://ravesli.com/uroki-cpp/
 Main source file.
 TODO.
 
-1)+ Memory size for benchmarks write at KB/MB/GB units, now bytes.
-   See file Benchmark.cpp, line 554.
-   But same units for all test session, even if optimal unit = f(block size) changed.
-
-2)+ Correct bytes per instruction (BPI) table for MOV32/MOV64 and some other.
-   Verify include STOS/MOVS.
-
-3)+ Bug if block size = 2GB.
-
-4) Use Performance Counter instead File Time for precision measure TSC clock.
-
-5) Can set name for output report file.
-
-6) Why console initialization error when output redirection.
-
-7) See "TODO" list below main() routine at this file.
+1)+  Memory size for benchmarks write at KB/MB/GB units, now bytes.
+     See file Benchmark.cpp, line 554.
+     But same units for all test session, even if optimal unit = f(block size) changed.
+2)+  Correct bytes per instruction (BPI) table for MOV32/MOV64 and some other.
+     Verify include STOS/MOVS.
+3)+  Bug if block size = 2GB.
+4)   Use Performance Counter instead File Time for precision measure TSC clock.
+5)   Optimize benchmark running sequences and serialization for more accurate results.
+6)   Can set name for output report file.
+7)   Use input scenario file, can set name for it.
+8)   Use inheritance for test scenarios: memory, storage, cpu, gpu, timers.
+9)   Why console initialization error when output redirection.
+10)  See "TODO" list below main() routine at this file.
 
 */
 

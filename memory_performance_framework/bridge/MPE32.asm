@@ -178,6 +178,67 @@ ret 4
 xor eax,eax   ; RAX = 0 means CPU clock measured ERROR
 jmp .exit
 
+; Measure CPU TSC clock by OS performance counter,
+; assume TSC support already verified
+; INPUT:
+; Parm#1   = dword [ESP+04] =
+;            Pointer for update output variable, frequency at Hz
+; Parm#2,3 = dword [ESP+08], dword [ESP+12] =
+;            Pointer to dyn. imported function QueryPerformanceCounter
+; Parm#4   = dword [ESP+16] =
+;            Number of counter ticks for wait 1 second
+; OUTPUT:
+; EAX = Status, return TRUE if OK, FALSE if error.
+MeasureTscByPcounter:
+push ebx esi edi ebp ebp ebp   ; Last 2 pushes = reserve space for local variables
+mov ebp,esp                    ; EBP = pointer to local variables
+mov edi,[esp + 24 + 4]         ; EDI = first parameter, pointer to output
+; Start measure frequency, get current change
+push ebp                          ; Parm#1 = pointer to output 64-bit variable
+call dword [esp + 24 + 8 + 4]     ; Get current count
+mov esi,[ebp]
+@@:                               ; Wait for start 1 second interval
+push ebp
+call dword [esp + 24 + 8 + 4]     ; Get next count for wait Tqp. TODO. Check status.
+cmp esi,[ebp]
+je @b
+mov esi,[ebp + 0]                 ; Set time interval = 1 second
+mov ebx,[ebp + 4]
+add esi,[esp + 24 + 12]           ; N * Tqp = 1 second
+adc ebx,[esp + 24 + 16]
+rdtsc                             ; Get start TSC
+push edx eax
+@@:                               ; Wait for end 1 second interval
+push ebp
+call dword [esp + 24 + 8 + 12]    ; Get count for wait 1 second. TODO. Check status.
+cmp [ebp + 4],ebx
+jb @b
+ja @f
+cmp [ebp + 0],esi
+jb @b
+@@:
+rdtsc           ; Get end TSC, calculate delta-TSC
+pop esi ebx
+sub eax,esi
+sbb edx,ebx     ; EDX:EAX = Delta TSC per 1 second = frequency, Hz
+jb .error       ; Go error if frequency < 0               
+mov ecx,eax
+or ecx,edx
+jz .error       ; Go error if frequency = 0
+; Store Frequency, as 64-bit integer value, Hz, delta-TSC per second
+cld
+stosd           ; Store EAX = Frequency, low dword
+xchg eax,edx
+stosd           ; Store EAX = Frequency, high dword
+; Pop extra registers, exit
+mov eax,1     ; EAX = 1 means CPU clock measured OK
+.exit:
+pop ebp ebp ebp edi esi ebx
+ret 16
+.error:
+xor eax,eax   ; EAX = 0 means CPU clock measured ERROR
+jmp .exit
+
 ; Performance patterns caller gate
 ; Parm#1 = dword [ESP+04] = Pattern selector 
 ; Parm#2 = dword [ESP+08] = Block #1 pointer
@@ -407,18 +468,19 @@ DD  NT_COPY_AVX_512
 DD  NTR_COPY_AVX_512
 
 StringProduct    DB 'NCRB performance library.',0
-StringVersion    DB 'v0.01.02 for Windows ia32.',0
+StringVersion    DB 'v0.02.00 for Windows ia32.',0
 StringCopyright  DB '(C) 2023 Ilya Manusov.',0
 
 section '.edata' export data readable
-export  'test1.dll'                 ,\
-GetDllStrings   , 'GetDllStrings'   ,\
-CheckCpuid      , 'CheckCpuid'      ,\
-ExecuteCpuid    , 'ExecuteCpuid'    ,\
-ExecuteRdtsc    , 'ExecuteRdtsc'    ,\
-ExecuteXgetbv   , 'ExecuteXgetbv'   ,\
-MeasureTsc      , 'MeasureTsc'      ,\
-PerformanceGate , 'PerformanceGate'  
+export  'MPE32.DLL'                           ,\
+GetDllStrings        , 'GetDllStrings'        ,\
+CheckCpuid           , 'CheckCpuid'           ,\
+ExecuteCpuid         , 'ExecuteCpuid'         ,\
+ExecuteRdtsc         , 'ExecuteRdtsc'         ,\
+ExecuteXgetbv        , 'ExecuteXgetbv'        ,\
+MeasureTsc           , 'MeasureTsc'           ,\
+MeasureTscByPcounter , 'MeasureTscByPcounter' ,\
+PerformanceGate      , 'PerformanceGate'  
 
 section '.idata' import data readable
 library kernel32 , 'KERNEL32.DLL'
