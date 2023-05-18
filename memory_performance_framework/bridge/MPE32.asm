@@ -183,9 +183,9 @@ jmp .exit
 ; INPUT:
 ; Parm#1   = dword [ESP+04] =
 ;            Pointer for update output variable, frequency at Hz
-; Parm#2,3 = dword [ESP+08], dword [ESP+12] =
+; Parm#2   = dword [ESP+08] =
 ;            Pointer to dyn. imported function QueryPerformanceCounter
-; Parm#4   = dword [ESP+16] =
+; Parm#3,4 = dword [ESP+12], dword [ESP+16] =
 ;            Number of counter ticks for wait 1 second
 ; OUTPUT:
 ; EAX = Status, return TRUE if OK, FALSE if error.
