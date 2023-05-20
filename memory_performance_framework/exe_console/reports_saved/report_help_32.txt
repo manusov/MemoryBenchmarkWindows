@@ -1,0 +1,52 @@
+Debug template v0.00.02. (Windows ia32).
+
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Get command line parameters...done.
+Load API...done.
+Detect processor features...done.
+Detect SMP and cache levels...done.
+Detect memory...done.
+Detect paging...done.
+Initializing domains builder...done.
+Initializing threads builder...done.
+Measure TSC clock...done.
+Get library data...done.
+NCRB performance library. v0.02.01 for Windows ia32. (C) 2023 Ilya Manusov.
+Run user help scenario.
+
+options list:
+help info test out asm memory threads page repeats adaptive ht numa start end step 
+
+values list:
+help     = brief | full
+info     = cpu | topology | topologyex | memory | paging
+           api | domains | threads | all
+test     = memory | storage | cpu | gpu | timers
+out      = screen | file
+asm      = readmov32 | writemov32 | copymov32 | modifynot32 | writestring32
+           copystring32 | readmmx64 | writemmx64 | copymmx64 | readsse128
+           writesse128 | copysse128 | readavx256 | writeavx256 | copyavx256
+           readavx512 | writeavx512 | copyavx512 | dotfma256 | dotfma512
+           gather256 | gather512 | scatter512 | clzero | latencylcm
+           latencylcm32x2 | latencyrdrand | latencyrdrand32x2 | latencywalk | latencywalk32x2
+           ntreadsse128 | ntpreadsse128default | ntpreadsse128medium | ntpreadsse128long | ntwritesse128
+           ntcopysse128 | ntrcopysse128 | ntreadavx256 | ntpreadavx256default | ntpreadavx256medium
+           ntpreadavx256long | ntwriteavx256 | ntcopyavx256 | ntrcopyavx256 | ntreadavx512
+           ntpreadavx512default | ntpreadavx512medium | ntpreadavx512long | ntwriteavx512 | ntcopyavx512
+           ntrcopyavx512
+memory   = l1 | l2 | l3 | l4 | dram
+threads  = < integer value >
+page     = default | large
+repeats  = < integer value >
+adaptive = < value in memory size units, can use K/M/G, example "4M" >
+ht       = off | on
+numa     = unaware | local | remote
+start    = < value in memory size units, can use K/M/G, example "4M" >
+end      = < value in memory size units, can use K/M/G, example "4M" >
+step     = < value in memory size units, can use K/M/G, example "4M" >
+
+example: mpe64 test=memory memory=dram
+
+Delete headblock global objects...done.
+
+OK.

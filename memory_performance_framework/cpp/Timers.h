@@ -26,17 +26,14 @@ TODO.
 #include "Definitions.h"
 #include "ControlSet.h"
 #include "AppLib.h"
+#include "USM.h"
 
-class Timers
+class Timers : public USM
 {
 public:
 	Timers(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp);
 	~Timers();
 	void execute();  // Execute timers test scenario.
-private:
-	static int enumOp;
-	static SYSTEM_CONTROL_SET* controlSet;
-	static COMMAND_LINE_PARMS* pCmd;
 };
 
 #endif  // TIMERS_H

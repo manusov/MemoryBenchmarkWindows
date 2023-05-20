@@ -179,13 +179,12 @@ char ProcessorDetector::cpuVendorString[VENDOR_SIZE];
 char ProcessorDetector::cpuModelString[MODEL_SIZE];
 
 // Class constructor, initialize pointers, get Processor data.
-ProcessorDetector::ProcessorDetector(FUNCTIONS_LIST* pf)
+ProcessorDetector::ProcessorDetector(FUNCTIONS_LIST* pf) : UDM(pf)
 {
 	// Blank status string
 	snprintf(statusString, APPCONST::MAX_TEXT_STRING, "No data.");
 	status = FALSE;
 	// global initialization and pre-blank output.
-	f = pf;
 	processorData.deltaTsc = 0;
 	processorData.cpuBitmap = 0;
 	processorData.osBitmap = 0;
@@ -209,7 +208,6 @@ ProcessorDetector::ProcessorDetector(FUNCTIONS_LIST* pf)
 // Class destructor, functionality reserved
 ProcessorDetector::~ProcessorDetector()
 {
-
 }
 void ProcessorDetector::writeReport()
 {

@@ -19,13 +19,9 @@ TODO.
 
 #include "SysInfo.h"
 
-int SysInfo::enumOp;
-SYSTEM_CONTROL_SET* SysInfo::controlSet;
-
-SysInfo::SysInfo(int op, SYSTEM_CONTROL_SET* cs)
+SysInfo::SysInfo(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
+	USM(op, cs, pp)
 {
-	enumOp = op;
-	controlSet = cs;
 }
 SysInfo::~SysInfo()
 {

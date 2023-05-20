@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.00 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,12 +11,12 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.00 for Windows x64. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
 Run system information scenario.
 
 [Processor information]
 
-Time stamp counter (TSC) frequency = 2497.1 MHz, period = 0.400 ns.
+Time stamp counter (TSC) frequency = 2497.0 MHz, period = 0.400 ns.
 CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 --------------------------------------------------------------------------------
   #   CPU  OS  CPU functionality and instructions
@@ -178,7 +178,7 @@ CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 
 [Memory information]
 
-Installed memory = 63.837 GB, free = 56.155 GB.
+Installed memory = 63.837 GB, free = 56.147 GB.
 
 [Paging information]
 
@@ -207,27 +207,27 @@ Default page = 4 KB, large page = 2048 KB, privileges = 0.
  ADVAPI32.DLL     OpenProcessToken                    00007FFF3F1E6920
  ADVAPI32.DLL     LookupPrivilegeValueA               00007FFF3F1E29C0
  ADVAPI32.DLL     AdjustTokenPrivileges               00007FFF3F1E7880
- MPE64.DLL        GetDllStrings                       0000000069991006
- MPE64.DLL        CheckCpuid                          0000000069991036
- MPE64.DLL        ExecuteCpuid                        000000006999105B
- MPE64.DLL        ExecuteRdtsc                        000000006999107C
- MPE64.DLL        ExecuteXgetbv                       0000000069991086
- MPE64.DLL        MeasureTsc                          0000000069991098
+ MPE64.DLL        GetDllStrings                       0000000069A91006
+ MPE64.DLL        CheckCpuid                          0000000069A91036
+ MPE64.DLL        ExecuteCpuid                        0000000069A9105B
+ MPE64.DLL        ExecuteRdtsc                        0000000069A9107C
+ MPE64.DLL        ExecuteXgetbv                       0000000069A91086
+ MPE64.DLL        MeasureTsc                          0000000069A91098
  MPE64.DLL        MeasureTscByFileTime                0000000000000000
- MPE64.DLL        MeasureTscByPcounter                000000006999110E
- MPE64.DLL        PerformanceGate                     0000000069991185
+ MPE64.DLL        MeasureTscByPcounter                0000000069A9110E
+ MPE64.DLL        PerformanceGate                     0000000069A91185
 --------------------------------------------------------------------------------
 
 [NUMA domains information]
 
-NUMA nodes detected = 1, list allocated at base = 000002576D9D7240h.
+NUMA nodes detected = 1, list allocated at base = 0000015727077120h.
 --------------------------------------------------------------------------------
  ID  affinity group\mask    allocated base    allocated size    original (hex)
 --------------------------------------------------------------------------------
   0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
 --------------------------------------------------------------------------------
 
-NUMA-unaware mode, list allocated at base = 00007FF6DAE14D50h.
+NUMA-unaware mode, list allocated at base = 00007FF747B14D40h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ NUMA-unaware mode, list allocated at base = 00007FF6DAE14D50h.
 
 [Platform topology information]
 
-Threads entries created = 0 , list allocated at base = 000002576D9D7E50h
+Threads entries created = 0 , list allocated at base = 0000015727077D30h
 --------------------------------------------------------------------------------
 
 Delete headblock global objects...done.

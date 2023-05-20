@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows ia32).
+Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.00 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,27 +11,233 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.00 for Windows ia32. (C) 2023 Ilya Manusov.
-Run timers test scenario.
+NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+Run system information scenario.
 
-Performance frequency = 10.000 MHz, period = 100.0 nanoseconds.
-Performance frequency clock resolution: min = 1 (100.0 ns), max = 1 (100.0 ns).
-File time clock resolution: min = 9774 (977400 ns), max = 10263 (1026300 ns).
-TSC (by file time) frequency = 2497.457 MHz, period = 0.400 nanoseconds.
-TSC (by performance counter) frequency = 2495.998 MHz, period = 0.401 nanoseconds.
-TSC clock resolution: min = 12 (4.808 ns), max = 44 (17.628 ns).
+[Processor information]
 
-TSC measurement stability test by FTIME/PCNT (MHz).
-2496.81787 | 2495.99821.
-2496.81263 | 2495.99828.
-2496.81523 | 2495.99832.
-2496.59573 | 2495.99835.
-2496.81123 | 2495.99826.
-2496.75256 | 2495.99829.
-2497.22549 | 2495.99831.
-2496.81252 | 2495.99830.
-2497.21267 | 2495.99828.
-2496.81336 | 2495.99832.
+Time stamp counter (TSC) frequency = 2496.8 MHz, period = 0.401 ns.
+CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
+--------------------------------------------------------------------------------
+  #   CPU  OS  CPU functionality and instructions
+--------------------------------------------------------------------------------
+  0    1   1   read 64-bit MOV
+  1    1   1   write 64-bit MOV
+  2    1   1   copy 64-bit MOV
+  3    1   1   modify 64-bit NOT
+  4    1   1   write 64-bit REP STOSQ
+  5    1   1   copy 64-bit REP MOVSQ
+  6    1   1   read 64-bit MMX MOVQ
+  7    1   1   write 64-bit MMX MOVQ
+  8    1   1   copy 64-bit MMX MOVQ
+  9    1   1   read SSE128 MOVAPS
+ 10    1   1   write SSE128 MOVAPS
+ 11    1   1   copy SSE128 MOVAPS
+ 12    1   1   read AVX256 VMOVAPD
+ 13    1   1   write AVX256 VMOVAPD
+ 14    1   1   copy AVX256 VMOVAPD
+ 15    1   1   read AVX512 VMOVAPD
+ 16    1   1   write AVX512 VMOVAPD
+ 17    1   1   copy AVX512 VMOVAPD
+ 18    1   1   dot product FMA256 VFMADD231PD
+ 19    1   1   dot product FMA512 VFMADD231PD
+ 20    1   1   gather AVX256 VGATHERQPD
+ 21    1   1   gather AVX512 VGATHERQPD
+ 22    1   1   scatter AVX512 VSCATTERQPD
+ 23    0   1   optimized write CLZERO (AMD)
+ 24    1   1   prepare walk list for latency measure by LCM
+ 25    1   1   prepare walk list for latency measure by LCM, 32x2
+ 26    1   1   prepare walk list for latency measure by RDRAND
+ 27    1   1   prepare walk list for latency measure by RDRAND, 32x2
+ 28    1   1   latency measure by walk list
+ 29    1   1   latency measure by walk list, 32x2
+ 30    1   1   non-temporal read SSE128 MOVNTDQA
+ 31    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, default distance
+ 32    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, medium distance
+ 33    1   1   non-temporal prefetched read SSE128 PREFETCHNTA+MOVAPS, long distance
+ 34    1   1   non-temporal write SSE128 MOVNTPS
+ 35    1   1   non-temporal (for write) copy SSE128 MOVAPS+MOVNTPS
+ 36    1   1   non-temporal (for read and write) copy SSE128 PREFETCHNTA+MOVAPS+MOVNTPS
+ 37    1   1   non-temporal read AVX256 VMOVNTDQA
+ 38    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, default distance
+ 39    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, medium distance
+ 40    1   1   non-temporal prefetched read AVX256 PREFETCHNTA+VMOVAPD, long distance
+ 41    1   1   non-temporal write AVX256 VMOVNTPD
+ 42    1   1   non-temporal (for write) copy AVX256 VMOVAPD+VMOVNTPD
+ 43    1   1   non-temporal (for read and write) copy AVX256 PREFETCHNTA+VMOVAPD+VMOVNTPD
+ 44    1   1   non-temporal read AVX512 VMOVNTDQA
+ 45    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, default distance
+ 46    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, medium distance
+ 47    1   1   non-temporal prefetched read AVX512 PREFETCHNTA+VMOVAPD, long distance
+ 48    1   1   non-temporal write AVX512 VMOVNTPD
+ 49    1   1   non-temporal (for write) copy AVX512 VMOVAPD+VMOVNTPD
+ 50    1   1   non-temporal (for read and write) copy AVX512 PREFETCHNTA+VMOVAPD+VMOVNTPD
+--------------------------------------------------------------------------------
+
+[Platform topology and cache information]
+
+--------------------------------------------------------------------------------
+ core  affinity mask (hex)   ht   logical processors
+--------------------------------------------------------------------------------
+ 0     0000000000000003      1    0-1
+ 1     000000000000000C      1    2-3
+ 2     0000000000000030      1    4-5
+ 3     00000000000000C0      1    6-7
+ 4     0000000000000300      1    8-9
+ 5     0000000000000C00      1    10-11
+ 6     0000000000003000      1    12-13
+ 7     000000000000C000      1    14-15
+--------------------------------------------------------------------------------
+ cache  type          size (KB)    associativity   line     logical processors
+--------------------------------------------------------------------------------
+ L1     data          48           12              64       0-1
+ L1     instruction   32           8               64       0-1
+ L2     unified       512          8               64       0-1
+ L1     data          48           12              64       2-3
+ L1     instruction   32           8               64       2-3
+ L2     unified       512          8               64       2-3
+ L1     data          48           12              64       4-5
+ L1     instruction   32           8               64       4-5
+ L2     unified       512          8               64       4-5
+ L1     data          48           12              64       6-7
+ L1     instruction   32           8               64       6-7
+ L2     unified       512          8               64       6-7
+ L1     data          48           12              64       8-9
+ L1     instruction   32           8               64       8-9
+ L2     unified       512          8               64       8-9
+ L1     data          48           12              64       10-11
+ L1     instruction   32           8               64       10-11
+ L2     unified       512          8               64       10-11
+ L1     data          48           12              64       12-13
+ L1     instruction   32           8               64       12-13
+ L2     unified       512          8               64       12-13
+ L1     data          48           12              64       14-15
+ L1     instruction   32           8               64       14-15
+ L2     unified       512          8               64       14-15
+ L3     unified       16384        16              64       0-15
+--------------------------------------------------------------------------------
+ domain   affinity mask (hex)   logical processors
+--------------------------------------------------------------------------------
+ 0        000000000000FFFF      0-15
+--------------------------------------------------------------------------------
+ package   affinity mask (hex)   logical processors
+--------------------------------------------------------------------------------
+ 0         000000000000FFFF      0-15
+--------------------------------------------------------------------------------
+
+[Platform topology and cache information, extended]
+
+--------------------------------------------------------------------------------
+ core   ht   efficiency   group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0      1    0            0000\0000000000000003
+ 1      1    0            0000\000000000000000C
+ 2      1    0            0000\0000000000000030
+ 3      1    0            0000\00000000000000C0
+ 4      1    0            0000\0000000000000300
+ 5      1    0            0000\0000000000000C00
+ 6      1    0            0000\0000000000003000
+ 7      1    0            0000\000000000000C000
+--------------------------------------------------------------------------------
+ cache  type          size (KB)    group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ L1     data          48           0000\0000000000000003
+ L1     instruction   32           0000\0000000000000003
+ L2     unified       512          0000\0000000000000003
+ L3     unified       16384        0000\000000000000FFFF
+ L1     data          48           0000\000000000000000C
+ L1     instruction   32           0000\000000000000000C
+ L2     unified       512          0000\000000000000000C
+ L1     data          48           0000\0000000000000030
+ L1     instruction   32           0000\0000000000000030
+ L2     unified       512          0000\0000000000000030
+ L1     data          48           0000\00000000000000C0
+ L1     instruction   32           0000\00000000000000C0
+ L2     unified       512          0000\00000000000000C0
+ L1     data          48           0000\0000000000000300
+ L1     instruction   32           0000\0000000000000300
+ L2     unified       512          0000\0000000000000300
+ L1     data          48           0000\0000000000000C00
+ L1     instruction   32           0000\0000000000000C00
+ L2     unified       512          0000\0000000000000C00
+ L1     data          48           0000\0000000000003000
+ L1     instruction   32           0000\0000000000003000
+ L2     unified       512          0000\0000000000003000
+ L1     data          48           0000\000000000000C000
+ L1     instruction   32           0000\000000000000C000
+ L2     unified       512          0000\000000000000C000
+--------------------------------------------------------------------------------
+ domain   group and affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0        0000\000000000000FFFF
+--------------------------------------------------------------------------------
+ group   maximum   active   maximum   active   affinity mask (hex)
+--------------------------------------------------------------------------------
+ 0       1         1        16        16       000000000000FFFF
+--------------------------------------------------------------------------------
+
+[Memory information]
+
+Installed memory = 63.837 GB, free = 54.805 GB.
+
+[Paging information]
+
+Default page = 4 KB, large page = 2048 KB, privileges = 0.
+
+[OS API and FASM DLL information]
+
+--------------------------------------------------------------------------------
+ Module           Function                            Pointer (hex)
+--------------------------------------------------------------------------------
+ KERNEL32.DLL     QueryPerformanceFrequency           00007FFF3FBCB630
+ KERNEL32.DLL     QueryPerformanceCounter             00007FFF3FBC61F0
+ KERNEL32.DLL     GetLogicalProcessorInformation      00007FFF3FBD17F0
+ KERNEL32.DLL     GetLogicalProcessorInformationEx    00007FFF3EB4B9B0
+ KERNEL32.DLL     GlobalMemoryStatusEx                00007FFF3FBD0CB0
+ KERNEL32.DLL     GetActiveProcessorCount             00007FFF3FBCDC30
+ KERNEL32.DLL     GetActiveProcessorGroupCount        00007FFF3FC17040
+ KERNEL32.DLL     GetNumaHighestNodeNumber            00007FFF3FBD0FE0
+ KERNEL32.DLL     GetNumaNodeProcessorMask            00007FFF3FC183B0
+ KERNEL32.DLL     GetNumaNodeProcessorMaskEx          00007FFF3FBEB8B0
+ KERNEL32.DLL     VirtualAllocExNuma                  00007FFF3FBD49C0
+ KERNEL32.DLL     SetThreadAffinityMask               00007FFF3FBCF870
+ KERNEL32.DLL     SetThreadGroupAffinity              00007FFF3FBD12F0
+ KERNEL32.DLL     GetLargePageMinimum                 00007FFF3FBEB7F0
+ KERNEL32.DLL     GetSystemFirmwareTable              00007FFF3FBE9100
+ ADVAPI32.DLL     OpenProcessToken                    00007FFF3F1E6920
+ ADVAPI32.DLL     LookupPrivilegeValueA               00007FFF3F1E29C0
+ ADVAPI32.DLL     AdjustTokenPrivileges               00007FFF3F1E7880
+ MPE64.DLL        GetDllStrings                       0000000069A91006
+ MPE64.DLL        CheckCpuid                          0000000069A91036
+ MPE64.DLL        ExecuteCpuid                        0000000069A9105B
+ MPE64.DLL        ExecuteRdtsc                        0000000069A9107C
+ MPE64.DLL        ExecuteXgetbv                       0000000069A91086
+ MPE64.DLL        MeasureTsc                          0000000069A91098
+ MPE64.DLL        MeasureTscByFileTime                0000000000000000
+ MPE64.DLL        MeasureTscByPcounter                0000000069A9110E
+ MPE64.DLL        PerformanceGate                     0000000069A91185
+--------------------------------------------------------------------------------
+
+[NUMA domains information]
+
+NUMA nodes detected = 1, list allocated at base = 00000178BDFD8960h.
+--------------------------------------------------------------------------------
+ ID  affinity group\mask    allocated base    allocated size    original (hex)
+--------------------------------------------------------------------------------
+  0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
+--------------------------------------------------------------------------------
+
+NUMA-unaware mode, list allocated at base = 00007FF690F9DD00h.
+--------------------------------------------------------------------------------
+ ID  allocated base    allocated size    original (all hex)
+--------------------------------------------------------------------------------
+  0  0000000000000000  0000000000000000  0000000000000000
+--------------------------------------------------------------------------------
+
+[Platform topology information]
+
+Threads entries created = 0 , list allocated at base = 00000178BDFD95A0h
+--------------------------------------------------------------------------------
 
 Delete headblock global objects...done.
 

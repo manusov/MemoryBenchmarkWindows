@@ -20,14 +20,24 @@ TODO.
      But same units for all test session, even if optimal unit = f(block size) changed.
 2)+  Correct bytes per instruction (BPI) table for MOV32/MOV64 and some other.
      Verify include STOS/MOVS.
-3)+  Bug if block size = 2GB.
-4)   Use Performance Counter instead File Time for precision measure TSC clock.
-5)   Optimize benchmark running sequences and serialization for more accurate results.
-6)   Can set name for output report file.
-7)   Use input scenario file, can set name for it.
-8)   Use inheritance for test scenarios: memory, storage, cpu, gpu, timers.
-9)   Why console initialization error when output redirection.
-10)  See "TODO" list below main() routine at this file.
+3)+  Fix bug if block size = 2GB.
+4)+  Use inheritance for test scenarios: benchmark, timers and new added.
+5)   Use Performance Counter instead File Time for precision measure TSC clock.
+6)   Optimize benchmark running sequences and serialization for more accurate results.
+7)   Use deltaTSC returned by pure assembler code, if possible, when single thread.
+8)   Can set name for output report file.
+9)   Use input scenario file, can set name for it.
+10)  Why console initialization error when output redirection?
+11)  See "TODO" list below main() routine at this file.
+
+
+NOW:
+Selections at single threadsRoutine, make variables BYTE instead WORD:
+ BYTE largePagesMode
+ BYTE methodId
+ BYTE asmOrCpp = added.
+ BYTE terminateThread
+and new list of pointers to cpp routines at buildThreadsList input, default = null.
 
 */
 

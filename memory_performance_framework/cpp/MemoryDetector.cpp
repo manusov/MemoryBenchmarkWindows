@@ -23,12 +23,11 @@ TODO.
 // System memory summary report data.
 SYSTEM_MEMORY_DATA MemoryDetector::memoryData;
 
-MemoryDetector::MemoryDetector(FUNCTIONS_LIST* functions)
+MemoryDetector::MemoryDetector(FUNCTIONS_LIST* pf) : UDM(pf)
 {
 	// Blank status string.
 	snprintf(statusString, APPCONST::MAX_TEXT_STRING, "No data.");
 	// global initialization and pre-blank output
-	f = functions;
 	memoryData.physicalMemory = 0;
 	memoryData.freeMemory = 0;
 	// Get memory data.

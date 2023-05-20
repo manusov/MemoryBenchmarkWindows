@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows ia32).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.00 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows ia32. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,12 +11,12 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.00 for Windows ia32. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.02.01 for Windows ia32. (C) 2023 Ilya Manusov.
 Run system information scenario.
 
 [Processor information]
 
-Time stamp counter (TSC) frequency = 2497.0 MHz, period = 0.400 ns.
+Time stamp counter (TSC) frequency = 2496.8 MHz, period = 0.401 ns.
 CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 --------------------------------------------------------------------------------
   #   CPU  OS  CPU functionality and instructions
@@ -220,14 +220,14 @@ Default page = 4 KB, large page = 2048 KB, privileges = 0.
 
 [NUMA domains information]
 
-NUMA nodes detected = 1, list allocated at base = 012F3EC8h.
+NUMA nodes detected = 1, list allocated at base = 006B3878h.
 --------------------------------------------------------------------------------
  ID  affinity group\mask    allocated base    allocated size    original (hex)
 --------------------------------------------------------------------------------
   0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
 --------------------------------------------------------------------------------
 
-NUMA-unaware mode, list allocated at base = 00656E80h.
+NUMA-unaware mode, list allocated at base = 00576E78h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ NUMA-unaware mode, list allocated at base = 00656E80h.
 
 [Platform topology information]
 
-Threads entries created = 0 , list allocated at base = 012F45D0h
+Threads entries created = 0 , list allocated at base = 006B3F80h
 --------------------------------------------------------------------------------
 
 Delete headblock global objects...done.

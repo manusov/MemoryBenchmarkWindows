@@ -31,6 +31,7 @@ class UDM
 {
 public:
 	UDM();
+	UDM(FUNCTIONS_LIST* pf);
 	~UDM();
 	BOOL getStatus();
 	const char* const getStatusString();

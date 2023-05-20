@@ -12,29 +12,23 @@ https://github.com/manusov/Prototyping
 Special thanks for C++ lessons :
 https://ravesli.com/uroki-cpp/
 
-Class header for memory and cache benchmark scenario.
+Class for Unified Scenario Model:
+parent class for benchmarks and diagnostics scenarios in this application.
 TODO.
-	
+
 */
 
-#pragma once
-#ifndef BENCHMARK_H
-#define BENCHMARK_H
-
-#include <windows.h>
-#include "Constants.h"
-#include "Definitions.h"
-#include "ControlSet.h"
-#include "AppLib.h"
 #include "USM.h"
 
-class Benchmark : public USM
+USM::USM(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
+	enumOp(op), controlSet(cs), pCmd(pp)
 {
-public:
-	Benchmark(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp);
-	~Benchmark();
-	void execute();  // Execute memory or cache benchmark scenario.
-};
-
-#endif  // BENCHMARK_H
-
+}
+USM::~USM()
+{
+	// ... destructor functionality yet reserved ...
+}
+void USM::execute()
+{
+	AppLib::writeColor("USM class must be inherited.", APPCONST::ERROR_COLOR);
+}

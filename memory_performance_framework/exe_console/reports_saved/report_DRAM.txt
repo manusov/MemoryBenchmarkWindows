@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.00 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,117 +11,117 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.00 for Windows x64. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
 Run memory benchmark scenario.
 
 Asm method ID=44, bytes per instruction BPI=64.
-TSC frequency F=2497.155 MHz, period T=0.400 ns.
+TSC frequency F=2496.894 MHz, period T=0.400 ns.
 Cache points for data read/write:
 L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB.
 CPU core count=8, HyperThreading=1.
 
 Memory allocation...
-NUMA-unaware mode, list allocated at base = 00007FF6DAE14D50h.
+NUMA-unaware mode, list allocated at base = 00007FF747B14D40h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
-  0  000002FD00000000  0000000040000000  000002FD00000000
+  0  0000029300000000  0000000040000000  0000029300000000
 --------------------------------------------------------------------------------
 
 Threads allocation...
-Threads entries created = 8 , list allocated at base = 000002FD458A72C0h
+Threads entries created = 8 , list allocated at base = 0000029376449B70h
 --------------------------------------------------------------------------------
  ID  (values hex)
 --------------------------------------------------------------------------------
-  0  thread=00000000000000F0 rxevent=00000000000000F4 txevent=00000000000000F8
-     base1 =000002FD00000000 base2  =000002FD04000000 sizeins=0000000000010000
+  0  thread=00000000000000B8 rxevent=00000000000000F8 txevent=00000000000000FC
+     base1 =0000029300000000 base2  =0000029304000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  1  thread=00000000000000FC rxevent=0000000000000100 txevent=0000000000000104
-     base1 =000002FD08000000 base2  =000002FD0C000000 sizeins=0000000000010000
+  1  thread=0000000000000100 rxevent=0000000000000104 txevent=0000000000000108
+     base1 =0000029308000000 base2  =000002930C000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  2  thread=0000000000000108 rxevent=000000000000010C txevent=0000000000000110
-     base1 =000002FD10000000 base2  =000002FD14000000 sizeins=0000000000010000
+  2  thread=000000000000010C rxevent=0000000000000110 txevent=0000000000000114
+     base1 =0000029310000000 base2  =0000029314000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  3  thread=0000000000000114 rxevent=0000000000000118 txevent=000000000000011C
-     base1 =000002FD18000000 base2  =000002FD1C000000 sizeins=0000000000010000
+  3  thread=0000000000000118 rxevent=000000000000011C txevent=0000000000000120
+     base1 =0000029318000000 base2  =000002931C000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  4  thread=0000000000000120 rxevent=0000000000000124 txevent=0000000000000128
-     base1 =000002FD20000000 base2  =000002FD24000000 sizeins=0000000000010000
+  4  thread=0000000000000124 rxevent=0000000000000128 txevent=000000000000012C
+     base1 =0000029320000000 base2  =0000029324000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  5  thread=000000000000012C rxevent=0000000000000130 txevent=0000000000000134
-     base1 =000002FD28000000 base2  =000002FD2C000000 sizeins=0000000000010000
+  5  thread=0000000000000130 rxevent=0000000000000134 txevent=0000000000000138
+     base1 =0000029328000000 base2  =000002932C000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  6  thread=0000000000000138 rxevent=000000000000013C txevent=0000000000000140
-     base1 =000002FD30000000 base2  =000002FD34000000 sizeins=0000000000010000
+  6  thread=000000000000013C rxevent=0000000000000140 txevent=0000000000000144
+     base1 =0000029330000000 base2  =0000029334000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 
-  7  thread=0000000000000144 rxevent=0000000000000148 txevent=000000000000014C
-     base1 =000002FD38000000 base2  =000002FD3C000000 sizeins=0000000000010000
+  7  thread=0000000000000148 rxevent=000000000000014C txevent=0000000000000150
+     base1 =0000029338000000 base2  =000002933C000000 sizeins=0000000000010000
      repeat=00000000000000C8 large page mode =0001    method id =002C
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 000002FD45892E70
+     control set pointer          = 0000029376432E70
 --------------------------------------------------------------------------------
 
 Running threads...
-Runned with delta TSC = 0000000007716486h.
+Runned with delta TSC = 0000000006825CBEh.
 Allocate statistics arrays...done.
-Bandwidth statistics, base=000002FD458B0CE0h, size=0000000000000080h.
-Latency statistics,   base=000002FD458B1AB0h, size=0000000000000080h.
+Bandwidth statistics, base=0000029376439830h, size=0000000000000080h.
+Latency statistics,   base=00000293764398C0h, size=0000000000000080h.
 Run: method=44, threads=8, repeats=200
      page mode=1, page size=4.000 KB
      start=4.000 MB, end=64.000 MB, delta=4.000 MB, bpi=64 bytes.
-Calibration...done ( delay=2.431 seconds, update repeats=82 ).
+Calibration...done ( delay=2.421 seconds, update repeats=82 ).
 [ non-temporal read AVX512 VMOVNTDQA ]
 --------------------------------------------------------------------------------
  #     size        CPI        nsPI      MBPS
 --------------------------------------------------------------------------------
- 1     4M          10.381     4.157     123159.537 
- 2     8M          23.719     9.498     53903.576  
- 3     12M         26.311     10.536    48593.044  
- 4     16M         27.321     10.941    46797.522  
- 5     20M         27.732     11.105    46104.360  
- 6     24M         28.110     11.257    45483.840  
- 7     28M         28.392     11.370    45032.011  
- 8     32M         28.362     11.358    45079.413  
- 9     36M         28.409     11.376    45005.618  
- 10    40M         28.554     11.435    44775.984  
- 11    44M         28.571     11.441    44749.788  
- 12    48M         28.525     11.423    44821.859  
- 13    52M         28.702     11.494    44545.551  
- 14    56M         28.580     11.445    44735.780  
- 15    60M         28.764     11.519    44448.712  
- 16    64M         28.831     11.546    44345.897  
+ 1     4M          10.347     4.144     123550.900 
+ 2     8M          23.912     9.577     53462.545  
+ 3     12M         25.994     10.411    49180.389  
+ 4     16M         27.187     10.888    47022.900  
+ 5     20M         27.848     11.153    45907.088  
+ 6     24M         27.825     11.144    45944.165  
+ 7     28M         28.278     11.325    45209.199  
+ 8     32M         28.350     11.354    45093.721  
+ 9     36M         28.608     11.457    44686.969  
+ 10    40M         28.628     11.466    44655.623  
+ 11    44M         28.649     11.474    44622.467  
+ 12    48M         28.632     11.467    44649.039  
+ 13    52M         28.641     11.471    44635.334  
+ 14    56M         28.618     11.461    44671.579  
+ 15    60M         28.564     11.440    44756.366  
+ 16    64M         28.739     11.510    44482.879  
 --------------------------------------------------------------------------------
 Bandwidth statistics ( megabytes per second ):
-max=123159.537,  min=44345.897,  average=50723.312,  median=45018.814.
+max=123550.900,  min=44482.879,  average=50782.688,  median=44925.044.
 --------------------------------------------------------------------------------
 Delete local objects...done.
 

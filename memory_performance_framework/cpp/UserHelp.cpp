@@ -20,18 +20,14 @@ TODO.
 
 #include "UserHelp.h"
 
-int UserHelp::enumOp;
-const OPTION_ENTRY* UserHelp::optionsList;
 const char* UserHelp::exampleString = "example: mpe64 test=memory memory=dram";
 
-UserHelp::UserHelp(int op, const OPTION_ENTRY* oplist)
+UserHelp::UserHelp(int op, const OPTION_ENTRY* oplist) : 
+	USM (op, nullptr, nullptr), optionsList(oplist)
 {
-	enumOp = op;
-	optionsList = oplist;
 }
 UserHelp::~UserHelp()
 {
-
 }
 void UserHelp::execute()
 {

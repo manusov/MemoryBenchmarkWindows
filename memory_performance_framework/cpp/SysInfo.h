@@ -26,16 +26,14 @@ TODO.
 #include "Definitions.h"
 #include "ControlSet.h"
 #include "AppLib.h"
+#include "USM.h"
 
-class SysInfo
+class SysInfo : public USM
 {
 public:
-	SysInfo(int op, SYSTEM_CONTROL_SET* cs);
+	SysInfo(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp);
 	~SysInfo();
 	void execute();  // Execute system information scenario.
-private:
-	static int enumOp;
-	static SYSTEM_CONTROL_SET* controlSet;
 };
 
 #endif  // SYSINFO_H

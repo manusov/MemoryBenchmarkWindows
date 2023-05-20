@@ -198,7 +198,7 @@ int maintask(int argc, char** argv)
 			if (opInfo != APPCONST::OPTION_NOT_SET)
 			{
 				AppLib::write("Run system information scenario.\r\n");
-				pSysinfoScenario = new SysInfo(opInfo, &s);
+				pSysinfoScenario = new SysInfo(opInfo, &s, pp);
 				pSysinfoScenario->execute();
 			}
 

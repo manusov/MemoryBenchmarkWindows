@@ -26,16 +26,16 @@ TODO.
 #include "Constants.h"
 #include "Definitions.h"
 #include "AppLib.h"
+#include "USM.h"
 
-class UserHelp
+class UserHelp : public USM
 {
 public:
 	UserHelp(int op, const OPTION_ENTRY* oplist);  // Initialize user help scenario.
 	~UserHelp();
 	void execute();  // Execute user help scenario.
 private:
-	static int enumOp;
-	static const OPTION_ENTRY* optionsList;
+	const OPTION_ENTRY* optionsList;
 	static const char* exampleString;
 };
 

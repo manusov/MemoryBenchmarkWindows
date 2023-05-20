@@ -145,6 +145,7 @@
     <ClCompile Include="TopologyDetector.cpp" />
     <ClCompile Include="UDM.cpp" />
     <ClCompile Include="UserHelp.cpp" />
+    <ClCompile Include="USM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLib.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="TopologyDetector.h" />
     <ClInclude Include="UDM.h" />
     <ClInclude Include="UserHelp.h" />
+    <ClInclude Include="USM.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

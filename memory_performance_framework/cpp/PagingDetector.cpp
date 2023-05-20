@@ -29,13 +29,12 @@ TODO.
 // Paging summary report data
 SYSTEM_PAGING_DATA PagingDetector::pagingData;
 
-PagingDetector::PagingDetector(FUNCTIONS_LIST* pf)
+PagingDetector::PagingDetector(FUNCTIONS_LIST* pf) : UDM(pf)
 {
     // Blank status string.
     snprintf(statusString, APPCONST::MAX_TEXT_STRING, "No data.");
     status = TRUE;
     // Global initialization and pre-blank output.
-    f = pf;
     pagingData.defaultPage = 0;
     pagingData.largePage = 0;
     pagingData.pagingRights = 0;

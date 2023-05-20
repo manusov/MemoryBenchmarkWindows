@@ -22,9 +22,8 @@ TODO.
 
 DWORD WINAPI threadEntry(LPVOID threadControl);
 
-ThreadsBuilder::ThreadsBuilder(FUNCTIONS_LIST* pf)
+ThreadsBuilder::ThreadsBuilder(FUNCTIONS_LIST* pf) : UDM(pf)
 {
-	f = pf;
 	// Blank status string.
 	snprintf(statusString, APPCONST::MAX_TEXT_STRING, "No data.");
 	threadsData.threadCount = 0;
@@ -493,7 +492,6 @@ DWORD WINAPI threadEntry(LPVOID threadControl)
 		SIZE_T repeatsCount = (SIZE_T)p->measurementRepeats;
 		SIZE_T repeatsCountExt = p->measurementRepeats >> 32;
 		DWORD64 deltaTSC = 0;
-		DWORD result = 0;
  
 		// Thread main work
 		(r->dll_PerformanceGate)

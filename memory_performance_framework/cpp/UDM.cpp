@@ -22,11 +22,12 @@ TODO.
 
 UDM::UDM() : status(false), f(nullptr)
 {
-	
+}
+UDM::UDM(FUNCTIONS_LIST* pf) : status(false), f(pf)
+{
 }
 UDM::~UDM()
 {
-	
 }
 BOOL UDM::getStatus()
 {

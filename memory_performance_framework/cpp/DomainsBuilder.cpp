@@ -20,9 +20,8 @@ TODO.
 
 #include "DomainsBuilder.h"
 
-DomainsBuilder::DomainsBuilder(FUNCTIONS_LIST* pf)
+DomainsBuilder::DomainsBuilder(FUNCTIONS_LIST* pf) : UDM(pf)
 {
-	f = pf;
 	numaData.nodeCount = 0;
 	numaData.nodeList = nullptr;
 	simpleData.nodeCount = 1;

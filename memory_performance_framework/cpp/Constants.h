@@ -43,9 +43,9 @@ namespace APPCONST
 	constexpr size_t TEXT_SIZE = 100 * 1024;
 	constexpr size_t TX_SIZE   = 4095;
 	#if _WIN64
-	const char* const BUILD_STRING        = "v0.02.00 for Windows x64.";
+	const char* const BUILD_STRING        = "v0.02.01 for Windows x64.";
 	#elif _WIN32
-	const char* const BUILD_STRING        = "v0.02.00 for Windows ia32.";
+	const char* const BUILD_STRING        = "v0.02.01 for Windows ia32.";
 	#endif
 
 	// Parameters depend on x64 or ia32 build.

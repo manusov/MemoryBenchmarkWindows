@@ -1,0 +1,95 @@
+Debug template v0.00.02. (Windows x64).
+
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+Get command line parameters...done.
+Load API...done.
+Detect processor features...done.
+Detect SMP and cache levels...done.
+Detect memory...done.
+Detect paging...done.
+Initializing domains builder...done.
+Initializing threads builder...done.
+Measure TSC clock...done.
+Get library data...done.
+NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+Run memory benchmark scenario.
+
+Asm method ID=24, bytes per instruction BPI=8.
+TSC frequency F=2497.241 MHz, period T=0.400 ns.
+Cache points for data read/write:
+L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB.
+CPU core count=8, HyperThreading=1.
+
+Memory allocation...
+NUMA-unaware mode, list allocated at base = 00007FF747B14D40h.
+--------------------------------------------------------------------------------
+ ID  allocated base    allocated size    original (all hex)
+--------------------------------------------------------------------------------
+  0  000002315CE80000  0000000020000000  000002315CE80000
+--------------------------------------------------------------------------------
+
+Threads allocation...
+Threads entries created = 1 , list allocated at base = 000002315C916DE0h
+--------------------------------------------------------------------------------
+ ID  (values hex)
+--------------------------------------------------------------------------------
+  0  thread=00000000000000B0 rxevent=00000000000000F0 txevent=00000000000000F4
+     base1 =000002315CE80000 base2  =000002316CE80000 sizeins=0000000000200000
+     repeat=0000000000000001 large page mode =0001    method id =0018
+     optimal affinity group\mask  = 0000\0000000000000000
+     original affinity group\mask = 0000\0000000000000000
+     control set pointer          = 000002315C902EF0
+--------------------------------------------------------------------------------
+
+Running threads...
+Runned with delta TSC = 0000000003E92BACh.
+Allocate statistics arrays...done.
+Bandwidth statistics, base=000002315C91DE00h, size=00000000000000F8h.
+Latency statistics,   base=000002315C915E40h, size=00000000000000F8h.
+Run: method=24, threads=1, repeats=1
+     page mode=1, page size=4.000 KB
+     start=16.000 MB, end=256.000 MB, delta=8.000 MB, bpi=8 bytes.
+[ prepare walk list for latency measure by LCM ]
+--------------------------------------------------------------------------------
+ #     size        CPI        nsPI      MBPS
+--------------------------------------------------------------------------------
+ 1     16M         54.017     21.631    369.845    
+ 2     24M         86.565     34.664    230.786    
+ 3     32M         116.054    46.473    172.144    
+ 4     40M         121.597    48.692    164.297    
+ 5     48M         126.167    50.523    158.345    
+ 6     56M         130.792    52.374    152.746    
+ 7     64M         136.845    54.798    145.990    
+ 8     72M         140.521    56.271    142.170    
+ 9     80M         144.182    57.736    138.561    
+ 10    88M         150.588    60.302    132.666    
+ 11    96M         150.797    60.385    132.483    
+ 12    104M        154.529    61.880    129.282    
+ 13    112M        160.155    64.133    124.741    
+ 14    120M        157.945    63.248    126.487    
+ 15    128M        159.989    64.066    124.871    
+ 16    136M        160.762    64.376    124.270    
+ 17    144M        162.274    64.981    123.112    
+ 18    152M        162.680    65.144    122.805    
+ 19    160M        165.148    66.132    120.970    
+ 20    168M        164.914    66.039    121.141    
+ 21    176M        167.630    67.126    119.179    
+ 22    184M        168.032    67.287    118.893    
+ 23    192M        167.454    67.056    119.304    
+ 24    200M        169.835    68.009    117.631    
+ 25    208M        170.121    68.124    117.433    
+ 26    216M        170.546    68.294    117.141    
+ 27    224M        172.113    68.921    116.075    
+ 28    232M        173.110    69.321    115.406    
+ 29    240M        172.783    69.189    115.625    
+ 30    248M        174.270    69.785    114.638    
+ 31    256M        173.153    69.338    115.378    
+--------------------------------------------------------------------------------
+Latency statistics ( nanoseconds ):
+max=69.785,  min=21.631,  average=60.129,  median=64.376.
+--------------------------------------------------------------------------------
+Delete local objects...done.
+
+Delete headblock global objects...done.
+
+OK.

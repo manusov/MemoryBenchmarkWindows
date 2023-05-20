@@ -43,12 +43,11 @@ const char* TopologyDetector::cacheTypes[] =
 	"trace"
 };
 
-TopologyDetector::TopologyDetector(FUNCTIONS_LIST* pf)
+TopologyDetector::TopologyDetector(FUNCTIONS_LIST* pf) : UDM(pf)
 {
 	// Blank status string.
 	snprintf(statusString, APPCONST::MAX_TEXT_STRING, "No data.");
 	// Global initialization.
-	f = pf;
 	blankTopologyData(&topologyData);
 	blankTopologyData(&topologyDataEx);
 	pTopologyBuffer = nullptr;

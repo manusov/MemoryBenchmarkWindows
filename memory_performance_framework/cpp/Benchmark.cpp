@@ -19,15 +19,9 @@ TODO.
 
 #include "Benchmark.h"
 
-int Benchmark::enumOp;
-SYSTEM_CONTROL_SET* Benchmark::controlSet;
-COMMAND_LINE_PARMS* Benchmark::pCmd;
-
-Benchmark::Benchmark(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp)
+Benchmark::Benchmark(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
+	USM (op, cs, pp)
 {
-	enumOp = op;
-	controlSet = cs;
-	pCmd = pp;
 }
 Benchmark::~Benchmark()
 {

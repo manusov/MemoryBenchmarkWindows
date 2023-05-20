@@ -48,7 +48,6 @@ CommandLine::CommandLine()
 }
 CommandLine::~CommandLine()
 {
-
 }
 void CommandLine::writeReport()
 {

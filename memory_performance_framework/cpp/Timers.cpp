@@ -26,15 +26,9 @@ union T64
 	DWORD64 raw;
 };
 
-int Timers::enumOp;
-SYSTEM_CONTROL_SET* Timers::controlSet;
-COMMAND_LINE_PARMS* Timers::pCmd;
-
-Timers::Timers(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp)
+Timers::Timers(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
+	USM(op, cs, pp)
 {
-	enumOp = op;
-	controlSet = cs;
-	pCmd = pp;
 }
 Timers::~Timers()
 {
