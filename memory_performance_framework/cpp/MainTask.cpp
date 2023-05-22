@@ -26,15 +26,14 @@ TODO.
 #include "MemoryDetector.h"
 #include "PagingDetector.h"
 #include "SysInfo.h"
-#include "Benchmark.h"
+#include "BenchmarkMemory.h"
+#include "BenchmarkCpu.h"
+#include "BenchmarkSorting.h"
 #include "Timers.h"
 #include "UserHelp.h"
 
 int maintask(int argc, char** argv)
 {
-	// int status = 0;
-	// AppLib::write("\r\nNCRB CONSOLE integration test.\r\n");
-
 	char msg[APPCONST::MAX_TEXT_STRING];
 
 	// Title and service strings include copyright
@@ -50,7 +49,9 @@ int maintask(int argc, char** argv)
 	// by selected scenario.
 	UserHelp* pUserHelp = nullptr;
 	SysInfo* pSysinfoScenario = nullptr;
-	Benchmark* pMemoryScenario = nullptr;
+	BenchmarkMemory* pMemoryScenario = nullptr;
+	BenchmarkCpu* pCpuScenario = nullptr;
+	BenchmarkSorting* pSortingScenario = nullptr;
 	Timers* pTimersScenario = nullptr;
 	// Pointers to global visible structures.
 	FUNCTIONS_LIST* pFunctionsList = nullptr;
@@ -84,24 +85,6 @@ int maintask(int argc, char** argv)
 		return 1;
 	}
 
-	// Allocate memory for text buffer
-	// int mText = sizeof(char) * APPCONST::TEXT_SIZE;
-	//pTextBuf = (char*)malloc(mText + 1);
-	//if (!pTextBuf)
-	//{
-	//	// Yet simple printf, because buffer not allocated
-	//	printf("\r\nError at memory allocation for text report buffer.\r\n");
-	//	return 1;
-	//}
-
-	// Set input scenario file path (reserved) and output report mode (screen)
-	// AppConsole::setInputOption(IN_DEFAULT, APPCONST::INPUT_FILE_NAME);
-	// AppConsole::setOutputOption(OUT_SCREEN, pExecDir);
-
-	// Initialize console output and report mode, yet ON, ON.
-	// Review this for screen mode = f(options settings). Change flags.
-	// AppLib::initConsole(TRUE, TRUE, pTextBuf, mText);
-
 	// Show title strings
 	snprintf(msg, APPCONST::MAX_TEXT_STRING, "\r\n%s %s %s\r\n", stringTitle1, stringTitle2, stringTitle3);
 	AppLib::write(msg);
@@ -129,17 +112,6 @@ int maintask(int argc, char** argv)
 		AppLib::write("done.\r\n");
 		pCommandLine->correctAfterParse();
 		pp = pCommandLine->getCommandLineParms();
-
-		// Support special file redirection mode
-		//AppConsole::setOutputOption(pp->optionOut, pExecDir);
-		//if (pp->optionOut == OUT_FILE)
-		//{
-		//	AppConsole::initializeOutput();
-		//	// copyright string to file
-		//	snprintf(pTextAlloc, mText, "%s %s %s\n", stringTitle1, stringTitle2, stringTitle3);
-		//	AppConsole::transmit(pTextAlloc);
-		//}
-		// AppLib::initConsole(TRUE, (pp->optionOut == OUT_FILE), pTextAlloc, mText);  // Review this for screen mode = f(options settings). Change flags.
 
 		// Blank system classes pointers
 		s.pFunctionsLoader = nullptr;
@@ -209,26 +181,34 @@ int maintask(int argc, char** argv)
 				if (opTest == TEST_MEMORY)
 				{
 					AppLib::write("Run memory benchmark scenario.\r\n\r\n");
-					pMemoryScenario = new Benchmark(opTest, &s, pp);
+					pMemoryScenario = new BenchmarkMemory(opTest, &s, pp);
 					pMemoryScenario->execute();
 				}
 				else if (opTest == TEST_STORAGE)
 				{
-					AppLib::writeColor("Storage test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+					AppLib::writeColor("Storage benchmark yet not supported.\r\n", APPCONST::ERROR_COLOR);
 				}
 				else if (opTest == TEST_CPU)
 				{
-					AppLib::writeColor("CPU test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+					 AppLib::writeColor("CPU benchmark yet not supported.\r\n", APPCONST::ERROR_COLOR);
 				}
 				else if (opTest == TEST_GPU)
 				{
-					AppLib::writeColor("GPU test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+					AppLib::writeColor("GPU benchmark yet not supported.\r\n", APPCONST::ERROR_COLOR);
 				}
 				else if (opTest == TEST_TIMERS)
 				{
 					AppLib::write("Run timers test scenario.\r\n\r\n");
 					pTimersScenario = new Timers(opTest, &s, pp);
 					pTimersScenario->execute();
+				}
+				else if (opTest == TEST_SORTING)
+				{
+					// AppLib::writeColor("Compiler quality test yet not supported.\r\n", APPCONST::ERROR_COLOR);
+					// UNDER CONSTRUCTION.
+					AppLib::write("Run sorting performance test scenario.\r\n\r\n");
+					pSortingScenario = new BenchmarkSorting(opTest, &s, pp);
+					pSortingScenario->execute();
 				}
 				else
 				{
@@ -277,6 +257,4 @@ int maintask(int argc, char** argv)
 	// Release executable file path, it used for transmit report, exit application
 	if (pExecDir != NULL) free(pExecDir);
 	return 0;
-
-	// return status;
 }

@@ -217,6 +217,8 @@ BOOL ThreadsBuilder::buildThreadsList(INPUT_CONSTANTS* pInputC, INPUT_VARIABLES*
 				pT->largePagesMode = pInputC->pagingMode;
 				// Method selector by CPU instruction set
 				pT->methodId = pInputV->currentMethodId;
+				// Added for support C++ tests: vectors, intrinsics.
+				pT->asmOrCpp = pInputV->asmOrCpp;
 				// Flag for thread termination by return from callback routine.
 				pT->terminateThread = pInputV->terminateThread;
 				// Optimal affinity mask (or non-optimal if NUMA REMOTE mode)
@@ -268,6 +270,7 @@ BOOL ThreadsBuilder::updateThreadsList(INPUT_VARIABLES* pInputV)
 			p->sizeInstructions = pInputV->currentSizeInstructions;
 			p->measurementRepeats = pInputV->currentMeasurementRepeats;
 			p->methodId = pInputV->currentMethodId;
+			p->asmOrCpp = pInputV->asmOrCpp;
 			p->terminateThread = pInputV->terminateThread;
 			p++;
 		}
@@ -460,7 +463,7 @@ BOOL ThreadsBuilder::restartThreads(OUTPUT_VARIABLES* pOutputV, BOOL waitWork)
 
 // Thread callback handler.
 // This procedure used as callback for threads run by OS,
-// note this routine is not declared at class header.
+// note this routine is not declared at class header, it cannot direct use class members.
 DWORD WINAPI threadEntry(LPVOID threadControl)
 {
 	// Thread initialization part
@@ -493,10 +496,18 @@ DWORD WINAPI threadEntry(LPVOID threadControl)
 		SIZE_T repeatsCountExt = p->measurementRepeats >> 32;
 		DWORD64 deltaTSC = 0;
  
-		// Thread main work
-		(r->dll_PerformanceGate)
-			(rwMethodSelect, (BYTE*)bufferAlignedSrc, (BYTE*)bufferAlignedDst,
-				instructionsCount, repeatsCount, repeatsCountExt, &deltaTSC);
+		if (!(p->asmOrCpp))
+		{   // Thread main work, for patterns from FASM DLL.
+			(r->dll_PerformanceGate)
+				(rwMethodSelect, (BYTE*)bufferAlignedSrc, (BYTE*)bufferAlignedDst,
+					instructionsCount, repeatsCount, repeatsCountExt, &deltaTSC);
+		}
+		else
+		{   // Thread main work, for CPP patterns: vectors, intrinsics and same patterns.
+			(r->selected_pattern)
+				(rwMethodSelect, (BYTE*)bufferAlignedSrc, (BYTE*)bufferAlignedDst,
+					instructionsCount, repeatsCount, repeatsCountExt, &deltaTSC);
+		}
 
 		// Thread coordination
 		SetEvent(rxHandle);
@@ -521,6 +532,7 @@ void ThreadsBuilder::helperBlankThread(THREAD_CONTROL_ENTRY* pT)
 	pT->measurementRepeats = 0;              // Number of measurement repeats.
 	pT->largePagesMode = 0;                  // Bit D0=Large Pages, other bits [1-31/63] = reserved.
 	pT->methodId = 0;                        // Entry point to Target operation method subroutine ID.
+	pT->asmOrCpp = 0;                        // Added for support C++ tests: vectors, intrinsics.
 	pT->terminateThread = 0;                 // Flag for thread termination by return from callback routine.
 	helperBlankAffinity(&pT->optimalGaff);   // Affinity mask and group id, OPTIMAL for this thread.
 	helperBlankAffinity(&pT->originalGaff);  // Affinity mask and group id, ORIGINAL for this thread.

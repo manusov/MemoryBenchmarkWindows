@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,7 +11,7 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run user help scenario.
 
 options list:
@@ -22,6 +22,7 @@ help     = brief | full
 info     = cpu | topology | topologyex | memory | paging
            api | domains | threads | all
 test     = memory | storage | cpu | gpu | timers
+           sorting
 out      = screen | file
 asm      = readmov64 | writemov64 | copymov64 | modifynot64 | writestring64
            copystring64 | readmmx64 | writemmx64 | copymmx64 | readsse128

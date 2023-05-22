@@ -14,15 +14,15 @@ Get library data...done.
 NCRB performance library. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run sorting performance test scenario.
 
-TSC = 2497.263 MHz, fixed scenario sort 200000 integers, single thread.
+TSC = 2496.809 MHz, fixed scenario sort 200000 integers, single thread.
 
-Create random array: 0.154 ms.
-Sorting random array: 13278.744 ms.
+Create random array: 0.166 ms.
+Sorting random array: 13292.270 ms.
 Verify sorted random array PASSED: 0.104 ms.
 
-Create random vector: 0.219 ms.
-Sorting random vector: 9.915 ms.
-Verify sorted random array PASSED: 0.099 ms.
+Create random vector: 0.218 ms.
+Sorting random vector: 9.928 ms.
+Verify sorted random array PASSED: 0.106 ms.
 
 Delete headblock global objects...done.
 

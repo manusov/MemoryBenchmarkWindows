@@ -30,14 +30,8 @@ TODO.
 10)  Why console initialization error when output redirection?
 11)  See "TODO" list below main() routine at this file.
 
-
 NOW:
-Selections at single threadsRoutine, make variables BYTE instead WORD:
- BYTE largePagesMode
- BYTE methodId
- BYTE asmOrCpp = added.
- BYTE terminateThread
-and new list of pointers to cpp routines at buildThreadsList input, default = null.
+INPUT_VARIABLES iv; iv.currentRoutine, use for CPU tests. PerfLib.h, PerfLib.cpp.
 
 */
 

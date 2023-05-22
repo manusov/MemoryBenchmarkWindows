@@ -12,22 +12,21 @@ https://github.com/manusov/Prototyping
 Special thanks for C++ lessons :
 https://ravesli.com/uroki-cpp/
 
-Class realization for memory and cache benchmark scenario.
+Class realization for memory and/or cache benchmark scenario.
 TODO.
 
 */
 
-#include "Benchmark.h"
+#include "BenchmarkMemory.h"
 
-Benchmark::Benchmark(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
+BenchmarkMemory::BenchmarkMemory(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp) :
 	USM (op, cs, pp)
 {
 }
-Benchmark::~Benchmark()
+BenchmarkMemory::~BenchmarkMemory()
 {
-	// ... destructor functionality yet reserved ...
 }
-void Benchmark::execute()
+void BenchmarkMemory::execute()
 {
 	char msg[APPCONST::MAX_TEXT_STRING];
 
@@ -225,9 +224,11 @@ void Benchmark::execute()
 	ic.threadCount = 0;
 
 	INPUT_VARIABLES iv;
-	iv.currentMethodId = 0;
 	iv.currentSizeInstructions = 0;
 	iv.currentMeasurementRepeats = 0;
+	iv.currentRoutine = nullptr;
+	iv.currentMethodId = 0;
+	iv.asmOrCpp = 0;
 	iv.terminateThread = 0;
 
 	OUTPUT_VARIABLES ov;

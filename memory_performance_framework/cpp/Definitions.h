@@ -30,9 +30,17 @@ typedef struct
 	const LPCSTR libPathName;
 	const LPCSTR* fncName;
 } LIBRARY_ENTRY;
-// Declaration of OS API dynamical import and native DLL functions.
+// Declaration of Unified functions, OS API dynamical import and native DLL functions.
 // Unified placeholder for pointer in the all functions load cycle.
 typedef void(__stdcall* API_UNI_PTR)();
+// Unified placeholder for C++ functions.
+// CPU performance gate = same style as ASM DLL interface.
+// Compiler performance gate = optimized for C++ functions.
+#ifdef _WIN64
+typedef BOOL(__stdcall* CPU_PerformanceGate) (DWORD, byte*, byte*, size_t, size_t, size_t, DWORDLONG*);
+#elif _WIN32
+typedef BOOL(__cdecl* CPU_PerformanceGate) (DWORD, byte*, byte*, size_t, size_t, size_t, DWORDLONG*);
+#endif
 // OS API, KERNEL32.DLL.
 typedef BOOL(__stdcall* API_QueryPerformanceFrequency)(LARGE_INTEGER*);
 typedef BOOL(__stdcall* API_QueryPerformanceCounter)(LARGE_INTEGER*);
@@ -95,10 +103,15 @@ typedef struct {
 	DLL_MeasureTscByFileTime              dll_MeasureTscByFileTime;
 	DLL_MeasureTscByPcounter              dll_MeasureTscByPcounter;
 	DLL_PerformanceGate                   dll_PerformanceGate;
+	// Selected function pointer for given thread, optionally used if assembler DLL
+	// performance gate not used (for C++ code: tests with vectors, intrinsics and same).
+	// Use this position instead per-thread data for minimize per-thread data size,
+	// replicated for all threads.
+	CPU_PerformanceGate                   selected_pattern;
 	// Load status.
 	DWORD loadStatus;
 } FUNCTIONS_LIST;
-// Processor information, required for benchmarks scenarios
+// Processor information, required for benchmarks scenarios.
 typedef struct {
 	DWORD64 deltaTsc;
 	DWORD64 cpuBitmap;
@@ -116,12 +129,12 @@ typedef struct {
 	DWORD32 packagesCount;
 	DWORD32 hyperThreadingFlag;
 } SYSTEM_TOPOLOGY_DATA;
-// System memory information data
+// System memory information data.
 typedef struct {
 	DWORD64 physicalMemory;
 	DWORD64 freeMemory;
 } SYSTEM_MEMORY_DATA;
-// Paging information data
+// Paging information data.
 typedef struct {
 	SIZE_T defaultPage;
 	SIZE_T largePage;
@@ -151,9 +164,10 @@ typedef struct {
 	LPVOID base2;                 // Destination for copy.
 	DWORD64 sizeInstructions;     // Block size, units = instructions, for benchmarking.
 	DWORD64 measurementRepeats;   // Number of measurement repeats.
-	WORD largePagesMode;          // Bit D0=Large Pages, other bits [1-31/63] = reserved.
-	WORD methodId;                // Entry point to Target operation method subroutine ID.
-	WORD terminateThread;         // Flag for thread termination by return from callback routine.
+	BYTE largePagesMode;          // Bit D0=Large Pages, other bits [1-31/63] = reserved.
+	BYTE methodId;                // Entry point to Target operation method subroutine ID.
+	BYTE asmOrCpp;                // Added for support C++ tests: vectors, intrinsics.
+	BYTE terminateThread;         // Flag for thread termination by return from callback routine.
 	GROUP_AFFINITY optimalGaff;   // Affinity mask and group id, OPTIMAL for this thread.
 	GROUP_AFFINITY originalGaff;  // Affinity mask and group id, ORIGINAL for this thread.
 	FUNCTIONS_LIST* pRoutines;    // Pointers for dynamical import and this application DLL functions.
@@ -174,18 +188,20 @@ typedef struct {
 	DWORD64 deltaSize;
 	DWORD64 maxSizeBytes;  // This for memory allocation.
 	DWORD64 pageSize;
-	WORD pagingMode;
-	WORD htMode;
-	WORD numaMode;
 	WORD threadCount;
+	BYTE pagingMode;
+	BYTE htMode;
+	BYTE numaMode;
 } INPUT_CONSTANTS;
 // This structure for benchmark iteration parameters update
 // variables, must be updated for each iteration.
 typedef struct {
 	DWORD64 currentSizeInstructions;
 	DWORD64 currentMeasurementRepeats;
-	WORD currentMethodId;              // Can dynamically change method for latency measurement: prepare/walk.
-	WORD terminateThread;              // Added for thread termination without unsafe function TerminateThread.
+	CPU_PerformanceGate currentRoutine;  // This procedure pointer optionally used if asmOrCpp = 1.
+	BYTE currentMethodId;                // Can dynamically change method for latency measurement: prepare/walk.
+	BYTE asmOrCpp;                       // Added for support C++ tests: vectors, intrinsics.
+	BYTE terminateThread;                // Added for thread termination without unsafe function TerminateThread.
 } INPUT_VARIABLES;
 // This structure for output data of iteration.
 typedef struct {
@@ -202,7 +218,7 @@ typedef enum {
 	INFO_ALL
 } INFO_KEYS;
 typedef enum {
-	TEST_MEMORY, TEST_STORAGE, TEST_CPU, TEST_GPU, TEST_TIMERS
+	TEST_MEMORY, TEST_STORAGE, TEST_CPU, TEST_GPU, TEST_TIMERS, TEST_SORTING
 } TEST_KEYS;
 typedef enum {
 	IN_DEFAULT

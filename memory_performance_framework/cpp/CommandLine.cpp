@@ -338,7 +338,7 @@ const char* CommandLine::keysInfo[] = {
 };
 // Keys for scenario select: benchmark mode.
 const char* CommandLine::keysTest[] = {
-    "memory", "storage", "cpu", "gpu", "timers",
+    "memory", "storage", "cpu", "gpu", "timers", "sorting",
     nullptr
 };
 // Keys for output mode select

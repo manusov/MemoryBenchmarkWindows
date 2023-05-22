@@ -18,7 +18,6 @@ TODO.
 
 */
 
-#include "Constants.h"
 #include "Applib.h"
 
 bool AppLib::screenMode;

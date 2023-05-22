@@ -130,7 +130,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppLib.cpp" />
-    <ClCompile Include="Benchmark.cpp" />
+    <ClCompile Include="BenchmarkSorting.cpp" />
+    <ClCompile Include="BenchmarkCpu.cpp" />
+    <ClCompile Include="BenchmarkMemory.cpp" />
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="DomainsBuilder.cpp" />
     <ClCompile Include="FncLoader.cpp" />
@@ -138,6 +140,7 @@
     <ClCompile Include="MainTask.cpp" />
     <ClCompile Include="MemoryDetector.cpp" />
     <ClCompile Include="PagingDetector.cpp" />
+    <ClCompile Include="PerfLib.cpp" />
     <ClCompile Include="ProcessorDetector.cpp" />
     <ClCompile Include="SysInfo.cpp" />
     <ClCompile Include="ThreadsBuilder.cpp" />
@@ -149,7 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppLib.h" />
-    <ClInclude Include="Benchmark.h" />
+    <ClInclude Include="BenchmarkSorting.h" />
+    <ClInclude Include="BenchmarkCpu.h" />
+    <ClInclude Include="BenchmarkMemory.h" />
     <ClInclude Include="CommandLine.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="ControlSet.h" />
@@ -159,6 +164,7 @@
     <ClInclude Include="MainTask.h" />
     <ClInclude Include="MemoryDetector.h" />
     <ClInclude Include="PagingDetector.h" />
+    <ClInclude Include="PerfLib.h" />
     <ClInclude Include="ProcessorDetector.h" />
     <ClInclude Include="SysInfo.h" />
     <ClInclude Include="ThreadsBuilder.h" />

@@ -12,14 +12,14 @@ https://github.com/manusov/Prototyping
 Special thanks for C++ lessons :
 https://ravesli.com/uroki-cpp/
 
-Class header for memory and cache benchmark scenario.
+Class header for memory and/or cache benchmark scenario.
 TODO.
 	
 */
 
 #pragma once
-#ifndef BENCHMARK_H
-#define BENCHMARK_H
+#ifndef BENCHMARKMEMORY_H
+#define BENCHMARKMEMORY_H
 
 #include <windows.h>
 #include "Constants.h"
@@ -28,13 +28,13 @@ TODO.
 #include "AppLib.h"
 #include "USM.h"
 
-class Benchmark : public USM
+class BenchmarkMemory : public USM
 {
 public:
-	Benchmark(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp);
-	~Benchmark();
+	BenchmarkMemory(int op, SYSTEM_CONTROL_SET* cs, COMMAND_LINE_PARMS* pp);
+	~BenchmarkMemory();
 	void execute();  // Execute memory or cache benchmark scenario.
 };
 
-#endif  // BENCHMARK_H
+#endif  // BENCHMARKMEMORY_H
 

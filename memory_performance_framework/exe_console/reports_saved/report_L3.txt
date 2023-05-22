@@ -1,6 +1,6 @@
 Debug template v0.00.02. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -11,41 +11,41 @@ Initializing domains builder...done.
 Initializing threads builder...done.
 Measure TSC clock...done.
 Get library data...done.
-NCRB performance library. v0.02.01 for Windows x64. (C) 2023 Ilya Manusov.
+NCRB performance library. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run memory benchmark scenario.
 
 Asm method ID=15, bytes per instruction BPI=64.
-TSC frequency F=2496.524 MHz, period T=0.401 ns.
+TSC frequency F=2496.802 MHz, period T=0.401 ns.
 Cache points for data read/write:
 L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB.
 CPU core count=8, HyperThreading=1.
 
 Memory allocation...
-NUMA-unaware mode, list allocated at base = 00007FF747B14D40h.
+NUMA-unaware mode, list allocated at base = 00007FF650916D40h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
-  0  0000022E797A0000  0000000004000000  0000022E797A0000
+  0  0000020B30100000  0000000004000000  0000020B30100000
 --------------------------------------------------------------------------------
 
 Threads allocation...
-Threads entries created = 1 , list allocated at base = 0000022E790B72C0h
+Threads entries created = 1 , list allocated at base = 0000020B2F987400h
 --------------------------------------------------------------------------------
  ID  (values hex)
 --------------------------------------------------------------------------------
-  0  thread=00000000000000B0 rxevent=00000000000000B4 txevent=00000000000000B8
-     base1 =0000022E797A0000 base2  =0000022E7B7A0000 sizeins=0000000000008000
+  0  thread=00000000000000F0 rxevent=00000000000000F4 txevent=00000000000000F8
+     base1 =0000020B30100000 base2  =0000020B32100000 sizeins=0000000000008000
      repeat=0000000000002710 large page mode =0001    method id =000F
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000022E790A2E70
+     control set pointer          = 0000020B2F972E70
 --------------------------------------------------------------------------------
 
 Running threads...
-Runned with delta TSC = 00000000241525E8h.
+Runned with delta TSC = 0000000023F4AE90h.
 Allocate statistics arrays...done.
-Bandwidth statistics, base=0000022E790B6320h, size=0000000000000080h.
-Latency statistics,   base=0000022E790B63B0h, size=0000000000000080h.
+Bandwidth statistics, base=0000020B2F9850C0h, size=0000000000000080h.
+Latency statistics,   base=0000020B2F986460h, size=0000000000000080h.
 Run: method=15, threads=1, repeats=10000
      page mode=1, page size=4.000 KB
      start=2.000 MB, end=32.000 MB, delta=2.000 MB, bpi=64 bytes.
@@ -54,25 +54,25 @@ Calibration...done ( delay=7.896 seconds, update repeats=1266 ).
 --------------------------------------------------------------------------------
  #     size        CPI        nsPI      MBPS
 --------------------------------------------------------------------------------
- 1     2M          1.903      0.762     83970.939  
- 2     4M          1.865      0.747     85651.071  
- 3     6M          1.863      0.746     85743.515  
- 4     8M          1.872      0.750     85353.536  
- 5     10M         1.957      0.784     81626.051  
- 6     12M         2.060      0.825     77556.977  
- 7     14M         2.220      0.889     71972.258  
- 8     16M         2.414      0.967     66174.895  
- 9     18M         2.627      1.052     60827.055  
- 10    20M         2.833      1.135     56405.409  
- 11    22M         3.057      1.224     52271.991  
- 12    24M         3.247      1.301     49206.180  
- 13    26M         3.398      1.361     47022.862  
- 14    28M         3.523      1.411     45348.028  
- 15    30M         3.654      1.463     43732.444  
- 16    32M         3.765      1.508     42437.220  
+ 1     2M          1.893      0.758     84424.857  
+ 2     4M          1.873      0.750     85302.316  
+ 3     6M          1.848      0.740     86482.000  
+ 4     8M          1.869      0.748     85510.072  
+ 5     10M         1.884      0.755     84808.865  
+ 6     12M         1.965      0.787     81301.002  
+ 7     14M         2.161      0.865     73961.796  
+ 8     16M         2.364      0.947     67601.375  
+ 9     18M         2.633      1.054     60693.936  
+ 10    20M         2.874      1.151     55598.434  
+ 11    22M         3.087      1.236     51770.601  
+ 12    24M         3.346      1.340     47763.438  
+ 13    26M         3.456      1.384     46234.366  
+ 14    28M         3.552      1.422     44991.693  
+ 15    30M         3.639      1.458     43907.517  
+ 16    32M         3.756      1.504     42540.158  
 --------------------------------------------------------------------------------
 Bandwidth statistics ( megabytes per second ):
-max=85743.515,  min=42437.220,  average=64705.812,  median=63500.975.
+max=86482.000,  min=42540.158,  average=65180.250,  median=64147.655.
 --------------------------------------------------------------------------------
 Delete local objects...done.
 

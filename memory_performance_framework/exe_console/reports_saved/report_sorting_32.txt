@@ -1,0 +1,29 @@
+Debug template v0.00.02. (Windows ia32).
+
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows ia32. (C) 2023 Ilya Manusov.
+Get command line parameters...done.
+Load API...done.
+Detect processor features...done.
+Detect SMP and cache levels...done.
+Detect memory...done.
+Detect paging...done.
+Initializing domains builder...done.
+Initializing threads builder...done.
+Measure TSC clock...done.
+Get library data...done.
+NCRB performance library. v0.02.02 for Windows ia32. (C) 2023 Ilya Manusov.
+Run sorting performance test scenario.
+
+TSC = 2496.812 MHz, fixed scenario sort 200000 integers, single thread.
+
+Create random array: 0.133 ms.
+Sorting random array: 11630.091 ms.
+Verify sorted random array PASSED: 0.115 ms.
+
+Create random vector: 0.227 ms.
+Sorting random vector: 10.285 ms.
+Verify sorted random array PASSED: 0.098 ms.
+
+Delete headblock global objects...done.
+
+OK.
