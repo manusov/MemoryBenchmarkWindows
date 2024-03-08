@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows ia32).
+Debug template v0.00.03. (Windows ia32).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.03 for Windows ia32. (C) 2024 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -16,22 +16,22 @@ Run timers test scenario.
 
 Performance frequency = 10.000 MHz, period = 100.0 nanoseconds.
 Performance frequency clock resolution: min = 1 (100.0 ns), max = 1 (100.0 ns).
-File time clock resolution: min = 511 (51100 ns), max = 10267 (1026700 ns).
-TSC (by file time) frequency = 2497.311 MHz, period = 0.400 nanoseconds.
-TSC (by performance counter) frequency = 2495.997 MHz, period = 0.401 nanoseconds.
-TSC clock resolution: min = 12 (4.808 ns), max = 48 (19.231 ns).
+File time clock resolution: min = 9679 (967900 ns), max = 10268 (1026800 ns).
+TSC (by file time) frequency = 2496.954 MHz, period = 0.400 nanoseconds.
+TSC (by performance counter) frequency = 2496.001 MHz, period = 0.401 nanoseconds.
+TSC clock resolution: min = 14 (5.609 ns), max = 46 (18.429 ns).
 
 TSC measurement stability test by FTIME/PCNT (MHz).
-2497.17874 | 2495.99727.
-2496.79295 | 2495.99736.
-2497.34830 | 2495.99733.
-2497.11478 | 2495.99731.
-2497.24028 | 2495.99734.
-2496.51077 | 2495.99732.
-2496.79449 | 2495.99730.
-2497.57976 | 2495.99728.
-2496.79881 | 2495.99734.
-2496.82846 | 2495.99734.
+2497.06440 | 2496.00068.
+2497.46328 | 2496.00064.
+2496.84103 | 2496.00071.
+2496.80782 | 2496.00066.
+2497.24166 | 2496.00073.
+2496.78840 | 2496.00075.
+2496.88277 | 2496.00069.
+2496.81316 | 2496.00066.
+2496.81131 | 2496.00068.
+2496.89209 | 2496.00063.
 
 Delete headblock global objects...done.
 

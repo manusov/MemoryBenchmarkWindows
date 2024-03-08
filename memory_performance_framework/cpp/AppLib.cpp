@@ -458,13 +458,13 @@ void AppLib::storeSystemErrorName(char* buffer, size_t limit, DWORD errorCode)
         LocalFree(lpvMessageBuffer);
     }
 }
-void AppLib::calculateStatistics(std::vector<double> data, double& min, double& max, double& average, double& median)
+void AppLib::calculateStatistics(std::vector<double>& data, double& min, double& max, double& average, double& median)
 {
     size_t n = data.size();
     if (n)
     {
         std::sort(data.begin(), data.end());
-        double sum = std::accumulate(data.begin(), data.end(), 0);
+        double sum = std::accumulate(data.begin(), data.end(), double(0));
         min = data[0];
         max = data[n - 1];
         average = sum / n;

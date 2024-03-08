@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows x64).
+Debug template v0.00.03. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.03 for Windows x64. (C) 2024 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -14,15 +14,15 @@ Get library data...done.
 NCRB performance library. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run sorting performance test scenario.
 
-TSC = 2496.809 MHz, fixed scenario sort 200000 integers, single thread.
+TSC = 2496.976 MHz, fixed scenario sort 200000 integers, single thread.
 
-Create random array: 0.166 ms.
-Sorting random array: 13292.270 ms.
+Create random array: 0.198 ms.
+Sorting random array: 13210.163 ms.
+Verify sorted random array PASSED: 0.096 ms.
+
+Create random vector: 0.268 ms.
+Sorting random vector: 10.120 ms.
 Verify sorted random array PASSED: 0.104 ms.
-
-Create random vector: 0.218 ms.
-Sorting random vector: 9.928 ms.
-Verify sorted random array PASSED: 0.106 ms.
 
 Delete headblock global objects...done.
 

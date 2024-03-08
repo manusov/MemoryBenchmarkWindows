@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows x64).
+Debug template v0.00.03. (Windows x64).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.03 for Windows x64. (C) 2024 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -15,58 +15,58 @@ NCRB performance library. v0.02.02 for Windows x64. (C) 2023 Ilya Manusov.
 Run memory benchmark scenario.
 
 Asm method ID=34, bytes per instruction BPI=16.
-TSC frequency F=2496.877 MHz, period T=0.401 ns.
+TSC frequency F=2496.809 MHz, period T=0.401 ns.
 Cache points for data read/write:
 L1=48 KB, L2=512 KB, L3=16384 KB, L4=0 KB.
 CPU core count=8, HyperThreading=1.
 
 Memory allocation...
-NUMA-unaware mode, list allocated at base = 00007FF650916D40h.
+NUMA-unaware mode, list allocated at base = 00007FF7E7382D90h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
-  0  0000022694B40000  0000000014000000  0000022694B40000
+  0  0000027213080000  0000000014000000  0000027213080000
 --------------------------------------------------------------------------------
 
 Threads allocation...
-Threads entries created = 4 , list allocated at base = 0000022694458230h
+Threads entries created = 4 , list allocated at base = 00000272129783A0h
 --------------------------------------------------------------------------------
  ID  (values hex)
 --------------------------------------------------------------------------------
-  0  thread=000000000000004C rxevent=00000000000000F0 txevent=00000000000000F4
-     base1 =0000022694B40000 base2  =0000022697340000 sizeins=0000000000200000
+  0  thread=0000000000000048 rxevent=000000000000010C txevent=0000000000000110
+     base1 =0000027213080000 base2  =0000027215880000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000022694442F30
+     control set pointer          = 0000027212965E90
 
-  1  thread=00000000000000F8 rxevent=00000000000000FC txevent=0000000000000100
-     base1 =0000022699B40000 base2  =000002269C340000 sizeins=0000000000200000
+  1  thread=0000000000000114 rxevent=0000000000000118 txevent=000000000000011C
+     base1 =0000027218080000 base2  =000002721A880000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000022694442F30
+     control set pointer          = 0000027212965E90
 
-  2  thread=0000000000000104 rxevent=0000000000000108 txevent=000000000000010C
-     base1 =000002269EB40000 base2  =00000226A1340000 sizeins=0000000000200000
+  2  thread=0000000000000120 rxevent=0000000000000124 txevent=0000000000000128
+     base1 =000002721D080000 base2  =000002721F880000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000022694442F30
+     control set pointer          = 0000027212965E90
 
-  3  thread=0000000000000110 rxevent=0000000000000114 txevent=0000000000000118
-     base1 =00000226A3B40000 base2  =00000226A6340000 sizeins=0000000000200000
+  3  thread=000000000000012C rxevent=0000000000000130 txevent=0000000000000134
+     base1 =0000027222080000 base2  =0000027224880000 sizeins=0000000000200000
      repeat=00000000000000C8 large page mode =0001    method id =0022
      optimal affinity group\mask  = 0000\0000000000000000
      original affinity group\mask = 0000\0000000000000000
-     control set pointer          = 0000022694442F30
+     control set pointer          = 0000027212965E90
 --------------------------------------------------------------------------------
 
 Running threads...
-Runned with delta TSC = 000000005AFE4678h.
+Runned with delta TSC = 000000005AA5C434h.
 Allocate statistics arrays...done.
-Bandwidth statistics, base=000002269444AF60h, size=0000000000000048h.
-Latency statistics,   base=000002269444A830h, size=0000000000000048h.
+Bandwidth statistics, base=000002721296AC80h, size=0000000000000048h.
+Latency statistics,   base=000002721296ADC0h, size=0000000000000048h.
 Run: method=34, threads=4, repeats=200
      page mode=1, page size=4.000 KB
      start=32.000 MB, end=40.000 MB, delta=1.000 MB, bpi=16 bytes.
@@ -74,18 +74,18 @@ Run: method=34, threads=4, repeats=200
 --------------------------------------------------------------------------------
  #     size        CPI        nsPI      MBPS
 --------------------------------------------------------------------------------
- 1     32M         3.801      1.522     42039.139  
- 2     33M         3.710      1.486     43073.435  
- 3     34M         3.615      1.448     44203.522  
- 4     35M         3.573      1.431     44727.550  
- 5     36M         3.583      1.435     44602.874  
- 6     37M         3.578      1.433     44667.259  
- 7     38M         3.546      1.420     45066.451  
- 8     39M         3.610      1.446     44262.444  
- 9     40M         3.555      1.424     44952.038  
+ 1     32M         3.574      1.432     44707.077  
+ 2     33M         3.592      1.439     44485.424  
+ 3     34M         3.611      1.446     44254.155  
+ 4     35M         3.605      1.444     44324.793  
+ 5     36M         3.599      1.441     44405.518  
+ 6     37M         3.605      1.444     44331.675  
+ 7     38M         3.612      1.447     44243.751  
+ 8     39M         3.598      1.441     44407.567  
+ 9     40M         3.570      1.430     44755.995  
 --------------------------------------------------------------------------------
 Bandwidth statistics ( megabytes per second ):
-max=45066.451,  min=42039.139,  average=44176.778,  median=44602.874.
+max=44755.995,  min=44243.751,  average=44435.106,  median=44405.518.
 --------------------------------------------------------------------------------
 Delete local objects...done.
 

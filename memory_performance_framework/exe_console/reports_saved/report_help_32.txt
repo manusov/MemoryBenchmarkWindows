@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows ia32).
+Debug template v0.00.03. (Windows ia32).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.03 for Windows ia32. (C) 2024 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.

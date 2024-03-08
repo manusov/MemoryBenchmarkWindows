@@ -29,13 +29,13 @@ by header duplication in the *.cpp files.
 namespace APPCONST
 {
 	// Application strings and report file name.
-	const char* const MSG_APPLICATION = "Debug template v0.00.02.";
+	const char* const MSG_APPLICATION = "Debug template v0.00.03.";
 	const char* const MSG_STARTING = "Starting...";
 	const char* const DEFAULT_OUT_NAME = "output.txt";
 
 	// Application strings for console NCRB.
 	const char* const APPLICATION_STRING  = "NUMA CPU&RAM Benchmarks. Console Edition.";
-	const char* const COPYRIGHT_STRING    = "(C) 2023 Ilya Manusov.";
+	const char* const COPYRIGHT_STRING    = "(C) 2024 Ilya Manusov.";
 	const char* const ANY_KEY_STRING      = "Press any key...";
 	const char* const INPUT_FILE_NAME     = "input.txt";
 	const char* const OUTPUT_FILE_NAME    = "output.txt";
@@ -43,9 +43,9 @@ namespace APPCONST
 	constexpr size_t TEXT_SIZE = 100 * 1024;
 	constexpr size_t TX_SIZE   = 4095;
 	#if _WIN64
-	const char* const BUILD_STRING        = "v0.02.02 for Windows x64.";
+	const char* const BUILD_STRING        = "v0.02.03 for Windows x64.";
 	#elif _WIN32
-	const char* const BUILD_STRING        = "v0.02.02 for Windows ia32.";
+	const char* const BUILD_STRING        = "v0.02.03 for Windows ia32.";
 	#endif
 
 	// Parameters depend on x64 or ia32 build.

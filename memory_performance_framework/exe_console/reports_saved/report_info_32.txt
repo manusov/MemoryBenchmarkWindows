@@ -1,6 +1,6 @@
-Debug template v0.00.02. (Windows ia32).
+Debug template v0.00.03. (Windows ia32).
 
-NUMA CPU&RAM Benchmarks. Console Edition. v0.02.02 for Windows ia32. (C) 2023 Ilya Manusov.
+NUMA CPU&RAM Benchmarks. Console Edition. v0.02.03 for Windows ia32. (C) 2024 Ilya Manusov.
 Get command line parameters...done.
 Load API...done.
 Detect processor features...done.
@@ -16,7 +16,7 @@ Run system information scenario.
 
 [Processor information]
 
-Time stamp counter (TSC) frequency = 2496.1 MHz, period = 0.401 ns.
+Time stamp counter (TSC) frequency = 2496.6 MHz, period = 0.401 ns.
 CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 --------------------------------------------------------------------------------
   #   CPU  OS  CPU functionality and instructions
@@ -178,7 +178,7 @@ CPUID bitmap = 0007FFFFFF7FFFFFh, XGETBV bitmap = 0007FFFFFFFFFFFFh.
 
 [Memory information]
 
-Installed memory = 63.837 GB, free = 58.070 GB.
+Installed memory = 63.837 GB, free = 55.983 GB.
 
 [Paging information]
 
@@ -189,45 +189,45 @@ Default page = 4 KB, large page = 2048 KB, privileges = 0.
 --------------------------------------------------------------------------------
  Module           Function                            Pointer (hex)
 --------------------------------------------------------------------------------
- KERNEL32.DLL     QueryPerformanceFrequency           77001D80
- KERNEL32.DLL     QueryPerformanceCounter             76FFE570
- KERNEL32.DLL     GetLogicalProcessorInformation      76FF91C0
- KERNEL32.DLL     GetLogicalProcessorInformationEx    7655ECF0
- KERNEL32.DLL     GlobalMemoryStatusEx                77002480
- KERNEL32.DLL     GetActiveProcessorCount             77002130
- KERNEL32.DLL     GetActiveProcessorGroupCount        7703DD70
- KERNEL32.DLL     GetNumaHighestNodeNumber            76FF98F0
- KERNEL32.DLL     GetNumaNodeProcessorMask            7703EDF0
- KERNEL32.DLL     GetNumaNodeProcessorMaskEx          770149F0
- KERNEL32.DLL     VirtualAllocExNuma                  77016350
- KERNEL32.DLL     SetThreadAffinityMask               77040890
- KERNEL32.DLL     SetThreadGroupAffinity              770160C0
- KERNEL32.DLL     GetLargePageMinimum                 77014940
- KERNEL32.DLL     GetSystemFirmwareTable              77012690
- ADVAPI32.DLL     OpenProcessToken                    7722EAF0
- ADVAPI32.DLL     LookupPrivilegeValueA               77234540
- ADVAPI32.DLL     AdjustTokenPrivileges               7722FE00
- MPE32.DLL        GetDllStrings                       72AF1008
- MPE32.DLL        CheckCpuid                          72AF1037
- MPE32.DLL        ExecuteCpuid                        72AF105C
- MPE32.DLL        ExecuteRdtsc                        72AF1087
- MPE32.DLL        ExecuteXgetbv                       72AF1097
- MPE32.DLL        MeasureTsc                          72AF10AC
+ KERNEL32.DLL     QueryPerformanceFrequency           766E1980
+ KERNEL32.DLL     QueryPerformanceCounter             766DE1E0
+ KERNEL32.DLL     GetLogicalProcessorInformation      766D91C0
+ KERNEL32.DLL     GetLogicalProcessorInformationEx    754510A0
+ KERNEL32.DLL     GlobalMemoryStatusEx                766E2080
+ KERNEL32.DLL     GetActiveProcessorCount             766E1D30
+ KERNEL32.DLL     GetActiveProcessorGroupCount        7671CAE0
+ KERNEL32.DLL     GetNumaHighestNodeNumber            766D98F0
+ KERNEL32.DLL     GetNumaNodeProcessorMask            7671DB50
+ KERNEL32.DLL     GetNumaNodeProcessorMaskEx          766F3650
+ KERNEL32.DLL     VirtualAllocExNuma                  766F4FB0
+ KERNEL32.DLL     SetThreadAffinityMask               7671F5F0
+ KERNEL32.DLL     SetThreadGroupAffinity              766F4D20
+ KERNEL32.DLL     GetLargePageMinimum                 766F35A0
+ KERNEL32.DLL     GetSystemFirmwareTable              766F12F0
+ ADVAPI32.DLL     OpenProcessToken                    752AF000
+ ADVAPI32.DLL     LookupPrivilegeValueA               752B4A40
+ ADVAPI32.DLL     AdjustTokenPrivileges               752B0310
+ MPE32.DLL        GetDllStrings                       737F1008
+ MPE32.DLL        CheckCpuid                          737F1037
+ MPE32.DLL        ExecuteCpuid                        737F105C
+ MPE32.DLL        ExecuteRdtsc                        737F1087
+ MPE32.DLL        ExecuteXgetbv                       737F1097
+ MPE32.DLL        MeasureTsc                          737F10AC
  MPE32.DLL        MeasureTscByFileTime                00000000
- MPE32.DLL        MeasureTscByPcounter                72AF111A
- MPE32.DLL        PerformanceGate                     72AF1181
+ MPE32.DLL        MeasureTscByPcounter                737F111A
+ MPE32.DLL        PerformanceGate                     737F1181
 --------------------------------------------------------------------------------
 
 [NUMA domains information]
 
-NUMA nodes detected = 1, list allocated at base = 011A3878h.
+NUMA nodes detected = 1, list allocated at base = 00924BF8h.
 --------------------------------------------------------------------------------
  ID  affinity group\mask    allocated base    allocated size    original (hex)
 --------------------------------------------------------------------------------
   0  0000\000000000000FFFF  0000000000000000  0000000000000000  0000000000000000
 --------------------------------------------------------------------------------
 
-NUMA-unaware mode, list allocated at base = 00098E88h.
+NUMA-unaware mode, list allocated at base = 00F03EF8h.
 --------------------------------------------------------------------------------
  ID  allocated base    allocated size    original (all hex)
 --------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ NUMA-unaware mode, list allocated at base = 00098E88h.
 
 [Platform topology information]
 
-Threads entries created = 0 , list allocated at base = 011A3F80h
+Threads entries created = 0 , list allocated at base = 00925300h
 --------------------------------------------------------------------------------
 
 Delete headblock global objects...done.
